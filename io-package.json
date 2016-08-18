@@ -4,9 +4,9 @@
         "version":                  "0.0.2",
         "title":                    "HomeControl",
         "desc":                     {
- 			             "en": "ioBroker HomeControl Adapter. ",
- 			             "de": "ioBroker HomeControl Adapter.",
- 			             "ru": "ioBroker HomeControl драйвер как образец"
+ 			             "en": "HomeControl Adapter for cul. ",
+ 			             "de": "HomeControl Adapter f�r cul.",
+ 			             "ru": "HomeControl драйвер как образец"
 	},
         "platform":                 "Javascript/Node.js",
         "mode":                     "daemon",
@@ -15,7 +15,7 @@
 		"extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.template/master/admin/template.png",
 		"keywords":                 ["homecontrol"],
         "readme":                   "https://github.com/ioBroker/ioBroker.template/blob/master/README.md",
-		"loglevel":                 "info",
+		"loglevel":                 "debug",
         "type":                     "common adapters"
     },
     "native": {
@@ -23,7 +23,46 @@
         "baudrate": 115200
     },
     "objects": [
-	]
+{
+            "_id": "_design/homecontrol",
+            "language": "javascript",
+            "views": {
+                "devices": {
+                    "map": "function(doc) {\n  if (doc.type == 'device' && doc._id.slice(0, 4) == 'cul') {\n   emit(doc._id, doc);\n  }\n}"
+                }
+            }
+        },
+        {
+            "_id": "homecontrol.meta.roles",
+            "parent": "homecontrol",
+            "type": "meta",
+            "meta": {
+                "type": "roles",
+                "adapter": "homecontrol"
+            },
+            "common": {
+
+            },
+            "native": {
+                "temperature": {
+                    "type": "number",
+                    "unit": "°C",
+                    "read": true,
+                    "write": false,
+                    "role": "value.temperature"
+                },
+                "humidity": {
+                    "type": "number",
+                    "unit": "%",
+                    "min": 0,
+                    "max": 100,
+                    "read": true,
+                    "write": false,
+                    "role": "value.humidity"
+                }
+            }
+        }
+	],
 	"instanceObjects": [
         	
     ]
