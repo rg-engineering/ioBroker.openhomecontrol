@@ -14,8 +14,8 @@
         "enabled":                  true,
 		"extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.template/master/admin/template.png",
 		"keywords":                 ["homecontrol"],
-        "readme":                   "https://github.com/ioBroker/ioBroker.template/blob/master/README.md",
-		"loglevel":                 "debug",
+        "readme":                   "https://github.com/rg-engineering/ioBroker.homecontrol/blob/master/README.md",
+		"loglevel":                 "info",
         "type":                     "common adapters"
     },
     "native": {

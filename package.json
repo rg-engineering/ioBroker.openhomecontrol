@@ -1,6 +1,6 @@
 {
   "name": "iobroker.homecontrol",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "ioBroker HomeControl Adapter",
   "author": {
     "name": "René G.",
@@ -12,8 +12,8 @@
       "email": "@@email@@"
     }
   ],
-  "homepage": "https://github.com/ioBroker/ioBroker.template",
-  "license": "MIT",
+  "homepage": "https://github.com/rg-engineering/ioBroker.homecontrol",
+  "license": "GPL v3",
   "keywords": [
     "ioBroker",
     "HomeControl",
@@ -22,7 +22,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/ioBroker/ioBroker.template"
+    "url": "https://github.com/rg-engineering/ioBroker.homecontrol"
   },
   "dependencies": {
   },
@@ -38,7 +38,7 @@
       "grunt-exec": "^0.4.6"
   },
   "bugs": {
-    "url": "https://github.com/ioBroker/ioBroker.template/issues"
+    "url": "https://github.com/rg-engineering/ioBroker.homecontrol"
   },
   "readmeFilename": "README.md"
 }
