@@ -10,6 +10,7 @@ The HomeControl sensor sends temperature, hunidity, air pressure and brightness 
 CC1101.
 
 typical received data are:
+
   got data from Sensor :CE1283180000 with 1 DP as broadcast Bright 250 lux
   
   got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.80 C Hum 57.50 %
@@ -29,7 +30,7 @@ typical received data are:
 * (René) initial release
 
 ## License
-Copyright (C) <2015>  <rg>
+Copyright (C) <2016>  <info@rg-engineering.eu>
 
 //
 
