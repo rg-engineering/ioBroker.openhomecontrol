@@ -83,18 +83,26 @@ adapter.on('ready', function () {
 
 function main() {
     var options = {
-        // serialport: adapter.config.serialport || '/dev/ttyACM0',
-        serialport: adapter.config.serialport || 'COM7',
+         serialport: adapter.config.serialport || '/dev/ttyACM0',
+        //serialport: adapter.config.serialport || 'COM7',
         baudrate: adapter.config.baudrate || 115200
     };
 
+    SerialPort.list(function (err, ports) {
+  	  ports.forEach(function(port) {
+  		  adapter.log.info(port.comName + ' ' + port.pnpId + ' ' + port.manufacturer);
+  	  });
+  	});
+    
+    
+    //Rechte im Linux gesetzt??? 
     try {
         myPort = new SerialPort(options.serialport, {
             baudRate: 115200
         });
 
     } catch (e) {
-        console.warn('Serial port is not created');
+    	adapter.log.error('Serial port is not created');
     }
 
     /*
@@ -106,14 +114,18 @@ function main() {
             }
         });
     */
+    
+    adapter.log.info('port created; portname: ' + options.serialport + ' ' + myPort.comName+ ' '+ myPort.pnpId+' '+myPort.manufacturer + ' Data rate: ' + myPort.options.baudRate + ' ' + options.baudrate);
+    
     myPort.on('open', showPortOpen);
     myPort.on('data', sendSerialData);
     myPort.on('close', showPortClose);
     myPort.on('error', showError);
 
-    adapter.log.debug('port created; portname: ' + options.serialport);
-    adapter.log.debug('Data rate: ' + myPort.options.baudRate + ' ' + options.baudrate);
 
+
+
+    
 //test only =====================================================
  /*   adapter.delObject("CE1283180000",function (err, obj) {
 	    if (err) {
@@ -134,10 +146,17 @@ function main() {
 
 
 function showPortOpen() {
-    if (myPort != null) {
-        adapter.log.debug('port open. ');
-        myPort.write("V\n\r");
-        myPort.write("hr\n\r");
+	
+	try{
+		if (myPort != null) {
+			adapter.log.info('port open: ' + myPort.options.baudRate + ' ' + myPort.comName);
+		    myPort.write("V\n\r");
+		    myPort.write("hr\n\r");
+		}
+	}
+
+    catch (e) {
+        adapter.log.error('exception in  showPortOpen [' + e + ']');
     }
 }
 
@@ -161,19 +180,42 @@ function sendSerialData(data) {
     if (data.length < 2) {
         return;
     }
-    adapter.log.debug(data);
-
-    if (data.includes("receive off")) {
-        adapter.log.debug('port reopen. ');
-        myPort.write("V\n\r");
-        myPort.write("hr\n\r");
-        return;
+    adapter.log.info(data);
+	try{
+		//.contains geht unter linux nicht; unter win schon ???
+		if (data.indexOf("receive off")>0) {
+			adapter.log.info('port reopen. ');
+        
+		    myPort.write("V\n\r");
+		    myPort.write("hr\n\r");
+		    
+        	return;
+		}
+	}
+    catch (e) {
+        adapter.log.error('exception in  sendSerialData 1 [' + e + ']');
     }
-    if (data.includes("receive on")) {
+    
+    try{
+    	if (data.indexOf("receive on")>0 ) {
 
-        return;
+    		return;
+    	}
     }
+    catch (e) {
+        adapter.log.error('exception in  sendSerialData 3 [' + e + ']');
+    }
+    
+    try{
+    	if (data.indexOf("HC-culfw Build")>0){
 
+    		return;
+    	}
+    }
+    catch (e) {
+        adapter.log.error('exception in  sendSerialData 4 [' + e + ']');
+    }
+    
     //got data from Sensor :3FAF82180000 with 2 DP as broadcast Temp 30.64 C Press 958.32 mBar
     try {
         var res = data.split(" ");
@@ -278,7 +320,7 @@ function sendSerialData(data) {
     }
 
     catch (e) {
-        adapter.log.error('exception in  sendSerialData [' + e + ']');
+        adapter.log.error('exception in  sendSerialData 2 [' + e + ']');
     }
 }
 

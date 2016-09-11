@@ -19,12 +19,20 @@ typical received data are:
    
   got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.66 C Press 962.33 mBar 
   
+The adapter is based on serialport 
+https://github.com/EmergingTechnologyAdvisors/node-serialport/blob/4.0.1/README.md
 
+For linux ARM system you need to compile serialport.
+Just use 
 
+ npm install serialport --build-from-source
+
+as root
 
 ## Changelog
 
-
+#### 0.3.0
+* (René) update to run under linux (debian) ARM system (Allwinner A10)
 
 #### 0.2.0
 * (René) initial release
