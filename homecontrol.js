@@ -14,6 +14,7 @@ var objects = {};
 var metaRoles = {};
 
 var myPort = null;
+var receivedData = "";
 
 try {
     var SerialPort = require('serialport');
@@ -180,15 +181,18 @@ function sendSerialData(data) {
     if (data.length < 2) {
         return;
     }
-    adapter.log.info(data);
+    
+    receivedData = receivedData+data;
+    
+    adapter.log.info(receivedData);
 	try{
 		//.contains geht unter linux nicht; unter win schon ???
-		if (data.indexOf("receive off")>0) {
+		if (receivedData.indexOf("receive off")>0) {
 			adapter.log.info('port reopen. ');
         
 		    myPort.write("V\n\r");
 		    myPort.write("hr\n\r");
-		    
+		    receivedData="";
         	return;
 		}
 	}
@@ -199,6 +203,7 @@ function sendSerialData(data) {
     try{
     	if (data.indexOf("receive on")>0 ) {
 
+    		receivedData="";
     		return;
     	}
     }
@@ -207,8 +212,9 @@ function sendSerialData(data) {
     }
     
     try{
-    	if (data.indexOf("HC-culfw Build")>0){
+    	if (receivedData.indexOf("HC-culfw Build")>0){
 
+    		receivedData="";
     		return;
     	}
     }
@@ -218,15 +224,13 @@ function sendSerialData(data) {
     
     //got data from Sensor :3FAF82180000 with 2 DP as broadcast Temp 30.64 C Press 958.32 mBar
     try {
-        var res = data.split(" ");
-        var id = res[4].substr(1); //remove first character
+        var res = receivedData.split(" ");
+        var id = res[4].substr(0); //remove first character
         var type = res[3].substr(0);
         var datapoints = parseInt(res[7].substr(0));
         //adapter.log.info("from " + id + " with " + datapoints);
         
         //adapter.log.info("split size " + res.length);
-        
-
         
         //got data from Sensor :CE1283180000 with 1 DP as broadcast Bright 0 lux
         //got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.80 C Hum 57.50 %
@@ -320,8 +324,19 @@ function sendSerialData(data) {
     }
 
     catch (e) {
-        adapter.log.error('exception in  sendSerialData 2 [' + e + ']');
+    	var sText = e.toString();
+    	if (sText.indexOf("Cannot read property 'substr' of undefined")>0)
+    	{
+    		
+    	}
+    	else
+    	{
+    		adapter.log.error('exception in  sendSerialData 2 [' + e + ']');
+    	}
+        return;
     }
+    
+    receivedData="";
 }
 
 function showPortClose() {

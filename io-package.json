@@ -1,7 +1,7 @@
 {
     "common": {
         "name":                     "homecontrol",
-        "version":                  "0.0.3",
+        "version":                  "0.0.4",
         "title":                    "HomeControl",
         "desc":                     {
  			             "en": "HomeControl Adapter for cul. ",
