@@ -1,6 +1,6 @@
 {
   "name": "iobroker.homecontrol",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "ioBroker HomeControl Adapter",
   "author": {
     "name": "René G.",

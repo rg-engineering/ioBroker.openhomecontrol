@@ -40,6 +40,9 @@ as root
 
 ## Changelog
 
+#### 0.0.6
+* (René)just cleanups
+
 #### 0.0.5
 * (René) supports HomeControl and CUL (with modified culfw)
 		 available serial ports in admin page shown

@@ -14,6 +14,9 @@ https://www.npmjs.com/package/serialport#raspberry-pi-linux
 
 
 
+        
+
+
 iobroker restart homecontrol
 iobroker upload homecontrol
 
