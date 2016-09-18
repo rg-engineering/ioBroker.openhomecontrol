@@ -1,7 +1,17 @@
 {
     "common": {
         "name":                     "homecontrol",
-        "version":                  "0.0.4",
+        "version":                  "0.0.5",
+        "news": {
+        	"0.0.5": {
+                "en": "support for HomeControl sensors",
+                "de": "unterstützt HomeControl Sensoren",
+              },
+        	"0.0.4": {
+              "en": "receive function optimized",
+              "de": "Empfangsfunktion optimiert",
+            },
+        },
         "title":                    "HomeControl",
         "desc":                     {
  			             "en": "HomeControl Adapter for cul. ",
@@ -10,17 +20,20 @@
 	},
         "platform":                 "Javascript/Node.js",
         "mode":                     "daemon",
-        "icon":                     "template.png",
+        "icon":                     "homecontrol.png",
         "enabled":                  true,
+        "messagebox": 				true,
 		"extIcon":                  "https://raw.githubusercontent.com/ioBroker/ioBroker.template/master/admin/template.png",
 		"keywords":                 ["homecontrol"],
         "readme":                   "https://github.com/rg-engineering/ioBroker.homecontrol/blob/master/README.md",
 		"loglevel":                 "info",
-        "type":                     "common adapters"
+		"stopBeforeUpdate": 		true,
+        "type":                     "hardware"
     },
     "native": {
         "serialport": "COM7",
-        "baudrate": 115200
+        "baudrate": 115200,
+        "device": "HomeControl"
     },
     "objects": [
 {

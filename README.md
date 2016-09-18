@@ -9,16 +9,25 @@ It needs a modified culfw (see https://github.com/rg-engineering/culfw4CUL_HomeC
 The HomeControl sensor sends temperature, hunidity, air pressure and brightness via
 CC1101.
 
-typical received data are:
+typical received data are on CUL:
 
-  got data from Sensor :CE1283180000 with 1 DP as broadcast Bright 250 lux
+  	got data from Sensor :CE1283180000 with 1 DP as broadcast Bright 250 lux
   
-  got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.80 C Hum 57.50 %
+  	got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.80 C Hum 57.50 %
   
-  got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.67 C Press 962.35 mBar
+  	got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.67 C Press 962.35 mBar
    
-  got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.66 C Press 962.33 mBar 
+  	got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.66 C Press 962.33 mBar 
   
+ typical received data are on HomeControl:
+ 	
+	got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 31.03 C Press 959.00 mBar
+		
+	got data from Sensor: 3FAF82820000 as broadcast with 1 DP Bright 29.00 lux
+	
+	got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 30.80 C Hum 38.30 %
+	
+ 
 The adapter is based on serialport 
 https://github.com/EmergingTechnologyAdvisors/node-serialport/blob/4.0.1/README.md
 
@@ -31,10 +40,17 @@ as root
 
 ## Changelog
 
-#### 0.3.0
+#### 0.0.5
+* (René) supports HomeControl and CUL (with modified culfw)
+		 available serial ports in admin page shown
+
+#### 0.0.4
+* (René) receive function optimized
+
+#### 0.0.3
 * (René) update to run under linux (debian) ARM system (Allwinner A10)
 
-#### 0.2.0
+#### 0.0.2
 * (René) initial release
 
 ## License

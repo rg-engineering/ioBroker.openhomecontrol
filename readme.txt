@@ -12,6 +12,14 @@ https://www.npmjs.com/package/serialport2
 https://itp.nyu.edu/physcomp/labs/labs-serial-communication/lab-serial-communication-with-node-js/
 https://www.npmjs.com/package/serialport#raspberry-pi-linux
 
+
+
+iobroker restart homecontrol
+iobroker upload homecontrol
+
+
+
+
 Vorbereitung:
 
 cd /opt/iobroker 
