@@ -40,6 +40,11 @@ as root
 
 ## Changelog
 
+#### 0.0.8
+#### 0.0.7
+* (René)error telegarm added
+		ignore sensor ID FFFFFFFFFFFF
+
 #### 0.0.6
 * (René)just cleanups
 

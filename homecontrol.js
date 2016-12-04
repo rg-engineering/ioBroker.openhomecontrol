@@ -110,12 +110,12 @@ function main() {
     };
 
     SerialPort.list(function (err, ports) {
-  	  ports.forEach(function(port) {
-  		  adapter.log.info(port.comName + ' ' + port.pnpId + ' ' + port.manufacturer);
-  	  });
-  	});
-    
-    
+        ports.forEach(function (port) {
+            adapter.log.info(port.comName + ' ' + port.pnpId + ' ' + port.manufacturer);
+        });
+    });
+
+
     //Rechte im Linux gesetzt??? 
     try {
         myPort = new SerialPort(options.serialport, {
@@ -123,7 +123,7 @@ function main() {
         });
 
     } catch (e) {
-    	adapter.log.error('Serial port is not created [' + e + ']' );
+        adapter.log.error('Serial port is not created [' + e + ']');
     }
 
     /*
@@ -135,42 +135,42 @@ function main() {
             }
         });
     */
-    
-    adapter.log.info('port created; portname: ' + options.serialport + ' ' + myPort.comName+ ' '+ myPort.pnpId+' '+myPort.manufacturer + ' Data rate: ' + myPort.options.baudRate + ' ' + options.baudrate);
-    
+
+    adapter.log.info('port created; portname: ' + options.serialport + ' ' + myPort.comName + ' ' + myPort.pnpId + ' ' + myPort.manufacturer + ' Data rate: ' + myPort.options.baudRate + ' ' + options.baudrate);
+
     myPort.on('open', showPortOpen);
     myPort.on('data', sendSerialData);
     myPort.on('close', showPortClose);
     myPort.on('error', showError);
 
-    if (adapter.config.device=="CUL"){
-    	adapter.log.info("CUL used");
+    if (adapter.config.device == "CUL") {
+        adapter.log.info("CUL used");
     }
-    else if (adapter.config.device=="HomeControl"){
-    	adapter.log.info("HomeControl used");
+    else if (adapter.config.device == "HomeControl") {
+        adapter.log.info("HomeControl used");
     }
     else {
-    	adapter.log.info("unknown device");
+        adapter.log.info("unknown device");
     }
 
 
-    
-//test only =====================================================
- /*   adapter.delObject("CE1283180000",function (err, obj) {
-	    if (err) {
-	        adapter.log.error(err);
-	        return -1;
-	    }
-	    else
-	    {
-	    	adapter.log.info("object deleted");
-	    }
-    }
-    
-    		);
-    		*/
-//until here =====================================================
-    
+
+    //test only =====================================================
+    /*   adapter.delObject("CE1283180000",function (err, obj) {
+           if (err) {
+               adapter.log.error(err);
+               return -1;
+           }
+           else
+           {
+               adapter.log.info("object deleted");
+           }
+       }
+       
+               );
+               */
+    //until here =====================================================
+
 }
 
 
@@ -212,75 +212,78 @@ function sendSerialData(data) {
     if (data.length < 2) {
         return;
     }
-    
-    receivedData = receivedData+data;
-    
+
+    receivedData = receivedData + data;
+
     adapter.log.info(receivedData);
-    
-    if (adapter.config.device=="CUL"){
-    		
-    	try{
-    		//.contains geht unter linux nicht; unter win schon ???
-    		if (receivedData.indexOf("receive off")>0) {
-    			adapter.log.info('port reopen. ');
-        
-    			myPort.write("V\n\r");
-    			myPort.write("hr\n\r");
-    			receivedData="";
-    			return;
-    		}
-	
-    		if (data.indexOf("receive on")>0 ) {
 
-    			receivedData="";
-    			return;
-    		}
-    
-    		if (receivedData.indexOf("HC-culfw Build")>0){
+    if (adapter.config.device == "CUL") {
 
-    			receivedData="";
-    			return;
-    		}
-    	}
-    	catch (e) {
-    		adapter.log.error('exception in  sendSerialData 4 [' + e + ']');
-    	}
+        try {
+            //.contains geht unter linux nicht; unter win schon ???
+            if (receivedData.indexOf("receive off") > 0) {
+                adapter.log.info('port reopen. ');
+
+                myPort.write("V\n\r");
+                myPort.write("hr\n\r");
+                receivedData = "";
+                return;
+            }
+
+            if (data.indexOf("receive on") > 0) {
+
+                receivedData = "";
+                return;
+            }
+
+            if (receivedData.indexOf("HC-culfw Build") > 0) {
+
+                receivedData = "";
+                return;
+            }
+        }
+        catch (e) {
+            adapter.log.error('exception in  sendSerialData 4 [' + e + ']');
+        }
     }
-    else if (adapter.config.device=="HomeControl"){
-    	// filter out everyting not needed...
-    	// if got data not in then drop message
-    	if (receivedData.indexOf("data from")<=0){
+    else if (adapter.config.device == "HomeControl") {
+        // filter out everyting not needed...
+        // if got data not in then drop message
+        if (receivedData.indexOf("data from") <= 0) {
 
-			receivedData="";
-			return;
-		}
-    	
+            receivedData = "";
+            return;
+        }
+
     }
-    
-    
+
+
     //got data from Sensor :3FAF82180000 with 2 DP as broadcast Temp 30.64 C Press 958.32 mBar
     try {
         var res = receivedData.split(" ");
-        var id = res[4].substr(0); 
-        	
+        var id = res[4].substr(0);
+
+        if (id == "FFFFFFFFFFFF") {
+            return;
+        }
         var type = res[3].substr(0);
-        var datapoints=0; 
-        if (adapter.config.device=="CUL"){
-        	datapoints = parseInt(res[7].substr(0));
+        var datapoints = 0;
+        if (adapter.config.device == "CUL") {
+            datapoints = parseInt(res[7].substr(0));
         }
-        else if (adapter.config.device=="HomeControl"){
-        	datapoints = parseInt(res[8].substr(0));
+        else if (adapter.config.device == "HomeControl") {
+            datapoints = parseInt(res[8].substr(0));
         }
-        
+
         adapter.log.info("from " + id + " with " + datapoints);
-        
+
         //adapter.log.info("split size " + res.length);
-        
+
         //CUL
         //got data from Sensor :CE1283180000 with 1 DP as broadcast Bright 0 lux
         //got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.80 C Hum 57.50 %
         //got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.67 C Press 962.35 mBar 
-    	//got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.66 C Press 962.33 mBar 
+        //got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.66 C Press 962.33 mBar 
         //   
         //HomeControl
         //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 31 
@@ -298,78 +301,75 @@ function sendSerialData(data) {
         //got data from Sensor: 3FAF82820000 as broadcast with 1 DP Bright 29.00 lux
         //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 30.30 C Hum 39.00 %
         //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 31.03 C Press 959.00 mBar
-        var state2add=false;
+        var state2add = false;
         for (var _i = 0; _i < datapoints; _i++) {
-        	var _idx=0;
-        	if (adapter.config.device=="CUL"){
-        		_idx=11 + (_i*5);
-        	}
-        	else if (adapter.config.device=="HomeControl"){
-        		_idx=10 + (_i*3);
-        	}
-        	//adapter.log.info("index " + _idx);
-        	var _state = res[_idx];
-        	
-        	var _value;
-        	var found=false;
-        	var k=1;
-        	while (!found)
-        	{
-        		_value = parseFloat(res[_idx+k].substr(0));
-        		
-        		k++;
-        		if (!isNaN(_value)) //check NaN
-        		{
-        			found = true;
-        		}
-        		
-        		else if (k>5)
-        		{
-        			adapter.log.warn("value not found")
-        			found = true;
-        		}
-        	}
-        	adapter.log.info("on index " + _idx + " : " + _state + " = " + _value);
-        	
-        	
-        	
-        	if (!objects[id + '.' + _state])
-        	{
-        		//add new states if not exists
-        		state2add=true;
-        		adapter.log.info(id + '.' + _state + " not found; try to add");
-        	}
-        	
-        	//just update value for all states
-            adapter.setState(id + '.' + _state, {val: _value, ack: true});
+            var _idx = 0;
+            if (adapter.config.device == "CUL") {
+                _idx = 11 + (_i * 5);
+            }
+            else if (adapter.config.device == "HomeControl") {
+                _idx = 10 + (_i * 3);
+            }
+            //adapter.log.info("index " + _idx);
+            var _state = res[_idx];
+
+            var _value;
+            var found = false;
+            var k = 1;
+            while (!found) {
+                _value = parseFloat(res[_idx + k].substr(0));
+
+                k++;
+                if (!isNaN(_value)) //check NaN
+                {
+                    found = true;
+                }
+
+                else if (k > 5) {
+                    adapter.log.warn("value not found")
+                    found = true;
+                }
+            }
+            adapter.log.info("on index " + _idx + " : " + _state + " = " + _value);
+
+
+
+            if (!objects[id + '.' + _state]) {
+                //add new states if not exists
+                state2add = true;
+                adapter.log.info(id + '.' + _state + " not found; try to add");
+            }
+
+            //just update value for all states
+            adapter.setState(id + '.' + _state, { val: _value, ack: true });
         }
-        
+
         //add new states
-        if (!objects[id] || state2add){
-        	adapter.log.info("add new device " + id);
-        	var newObjects = [];
-        	var newDevice = {
-                    _id:    id,
-                    type:   'device',
-                    common: {
-                        name: type
-                    },
-                    native: ""
-                };
-        	
+        if (!objects[id] || state2add) {
+            adapter.log.info("add new device " + id);
+            var newObjects = [];
+            var newDevice = {
+                _id: id,
+                type: 'device',
+                common: {
+                    name: type
+                },
+                native: ""
+            };
+
             for (var i = 0; i < datapoints; i++) {
-            	var common = {};
-            	var idx=0;
-            	if (adapter.config.device=="CUL"){
-            		idx=11 + (i*5);
-            	}
-            	else if (adapter.config.device=="HomeControl"){
-            		idx=10 + (i*3);
-            	}
-            	var _state = res[idx];
-            	//var value = parseFloat(res[12+ i*3].substr(0));
-            	//var unit = res[13+i*3];
-            	
+                var common = {};
+                var idx = 0;
+                if (adapter.config.device == "CUL") {
+                    idx = 11 + (i * 5);
+                }
+                else if (adapter.config.device == "HomeControl") {
+                    idx = 10 + (i * 3);
+                }
+                var _state = res[idx];
+                //var value = parseFloat(res[12+ i*3].substr(0));
+                //var unit = res[13+i*3];
+
                 if (metaRoles[id + '_' + _state]) {
                     common = metaRoles[id + '_' + _state];
                 } else if (metaRoles[_state]) {
@@ -380,8 +380,8 @@ function sendSerialData(data) {
 
                 adapter.log.info("add new state " + id + '.' + _state);
                 var newState = {
-                    _id:    id + '.' + _state,
-                    type:   'state',
+                    _id: id + '.' + _state,
+                    type: 'state',
                     common: common,
                     native: {}
                 };
@@ -397,19 +397,17 @@ function sendSerialData(data) {
     }
 
     catch (e) {
-    	var sText = e.toString();
-    	if (sText.indexOf("Cannot read property 'substr' of undefined")>0)
-    	{
-    		
-    	}
-    	else
-    	{
-    		adapter.log.error('exception in  sendSerialData 2 [' + e + ']');
-    	}
+        var sText = e.toString();
+        if (sText.indexOf("Cannot read property 'substr' of undefined") > 0) {
+
+        }
+        else {
+            adapter.log.error('exception in  sendSerialData 2 [' + e + ']');
+        }
         return;
     }
-    
-    receivedData="";
+
+    receivedData = "";
 }
 
 function showPortClose() {
