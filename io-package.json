@@ -1,11 +1,15 @@
 {
   "common": {
     "name": "homecontrol",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "news": {
+      "0.0.9": {
+        "en": "new datapoint last update",
+        "de": "neuer Datenpunkt last update"
+      },
       "0.0.8": {
         "en": "ignore Sensor ID FFFFFFFFFFFF",
-        "de": "Sesnor ID FFFFFFFFFFFF wird ignoriert"
+        "de": "Sensor ID FFFFFFFFFFFF wird ignoriert"
       },
       "0.0.7": {
         "en": "error telegram added",
@@ -26,9 +30,8 @@
     },
     "title": "HomeControl",
     "desc": {
-      "en": "HomeControl Adapter for cul. ",
-      "de": "HomeControl Adapter f�r cul.",
-      "ru": "HomeControl драйвер как образец"
+      "en": "HomeControl Adapter. ",
+      "de": "HomeControl Adapter."
     },
     "platform": "Javascript/Node.js",
     "mode": "daemon",
@@ -38,7 +41,7 @@
     "extIcon": "https://github.com/rg-engineering/ioBroker.homecontrol/blob/master/admin/homecontrol.PNG",
     "keywords": [ "homecontrol" ],
     "readme": "https://github.com/rg-engineering/ioBroker.homecontrol/blob/master/README.md",
-    "loglevel": "info",
+    "loglevel": "debug",
     "stopBeforeUpdate": true,
     "type": "hardware"
   },
@@ -54,36 +57,6 @@
       "views": {
         "devices": {
           "map": "function(doc) {\n  if (doc.type == 'device' && doc._id.slice(0, 4) == 'cul') {\n   emit(doc._id, doc);\n  }\n}"
-        }
-      }
-    },
-    {
-      "_id": "homecontrol.meta.roles",
-      "parent": "homecontrol",
-      "type": "meta",
-      "meta": {
-        "type": "roles",
-        "adapter": "homecontrol"
-      },
-      "common": {
-
-      },
-      "native": {
-        "temperature": {
-          "type": "number",
-          "unit": "°C",
-          "read": true,
-          "write": false,
-          "role": "value.temperature"
-        },
-        "humidity": {
-          "type": "number",
-          "unit": "%",
-          "min": 0,
-          "max": 100,
-          "read": true,
-          "write": false,
-          "role": "value.humidity"
         }
       }
     }

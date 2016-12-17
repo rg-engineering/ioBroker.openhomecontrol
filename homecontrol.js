@@ -10,9 +10,6 @@ var utils =    require(__dirname + '/lib/utils'); // Get common adapter utils
 // adapter will be restarted automatically every time as the configuration changed, e.g system.adapter.template.0
 var adapter = utils.adapter('homecontrol');
 
-var objects = {};
-var metaRoles = {};
-
 var myPort = null;
 var receivedData = "";
 
@@ -56,7 +53,7 @@ adapter.on('message', function (obj) {
 // is called when adapter shuts down - callback has to be called under any circumstances!
 adapter.on('unload', function (callback) {
     try {
-        adapter.log.info('cleaned everything up...');
+        adapter.log.debug('cleaned everything up...');
         callback();
     }
     catch (e) {
@@ -126,16 +123,6 @@ function main() {
         adapter.log.error('Serial port is not created [' + e + ']');
     }
 
-    /*
-    adapter.objects.getObject('homecontrol.meta.roles', function (err, res) {
-        metaRoles = res.native;
-        adapter.objects.getObjectView('homecontrol', 'devices', function (err, res) {
-            for (var i = 0, l = res.total_rows; i < l; i++) {
-                objects[res.rows[i].id] = res.rows[i].value;
-            }
-        });
-    */
-
     adapter.log.info('port created; portname: ' + options.serialport + ' ' + myPort.comName + ' ' + myPort.pnpId + ' ' + myPort.manufacturer + ' Data rate: ' + myPort.options.baudRate + ' ' + options.baudrate);
 
     myPort.on('open', showPortOpen);
@@ -150,7 +137,7 @@ function main() {
         adapter.log.info("HomeControl used");
     }
     else {
-        adapter.log.info("unknown device");
+        adapter.log.warn("unknown device");
     }
 
 
@@ -178,7 +165,7 @@ function showPortOpen() {
 	
 	try{
 		if (myPort != null) {
-			adapter.log.info('port open: ' + myPort.options.baudRate + ' ' + myPort.comName);
+			adapter.log.debug('port open: ' + myPort.options.baudRate + ' ' + myPort.comName);
 			if (adapter.config.device=="CUL"){
 				//to enable homecontrol mode on CUL
 				myPort.write("V\n\r");
@@ -192,20 +179,6 @@ function showPortOpen() {
     }
 }
 
-
-function insertObjects(objs) {
-    if (objs.length < 1) {
-        return;
-    } else {
-        var newObject = objs.pop();
-        adapter.setObject(newObject._id, newObject, function (err, res) {
-            adapter.log.debug('object ' + adapter.namespace + '.' + newObject._id + ' created');
-            setTimeout(insertObjects, 0, objs);
-        });
-    }
-}
-
-
 function sendSerialData(data) {
     data = data.toString();
 
@@ -215,14 +188,14 @@ function sendSerialData(data) {
 
     receivedData = receivedData + data;
 
-    adapter.log.info(receivedData);
+    adapter.log.debug(receivedData);
 
     if (adapter.config.device == "CUL") {
 
         try {
             //.contains geht unter linux nicht; unter win schon ???
             if (receivedData.indexOf("receive off") > 0) {
-                adapter.log.info('port reopen. ');
+                adapter.log.debug('port reopen. ');
 
                 myPort.write("V\n\r");
                 myPort.write("hr\n\r");
@@ -275,7 +248,7 @@ function sendSerialData(data) {
             datapoints = parseInt(res[8].substr(0));
         }
 
-        adapter.log.info("from " + id + " with " + datapoints);
+        adapter.log.debug("from " + id + " with " + datapoints);
 
         //adapter.log.info("split size " + res.length);
 
@@ -301,7 +274,7 @@ function sendSerialData(data) {
         //got data from Sensor: 3FAF82820000 as broadcast with 1 DP Bright 29.00 lux
         //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 30.30 C Hum 39.00 %
         //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 31.03 C Press 959.00 mBar
-        var state2add = false;
+
         for (var _i = 0; _i < datapoints; _i++) {
             var _idx = 0;
             if (adapter.config.device == "CUL") {
@@ -330,70 +303,37 @@ function sendSerialData(data) {
                     found = true;
                 }
             }
-            adapter.log.info("on index " + _idx + " : " + _state + " = " + _value);
+            adapter.log.debug("on index " + _idx + " : " + _state + " = " + _value);
 
-
-
-            if (!objects[id + '.' + _state]) {
-                //add new states if not exists
-                state2add = true;
-                adapter.log.info(id + '.' + _state + " not found; try to add");
-            }
-
-            //just update value for all states
-            adapter.setState(id + '.' + _state, { val: _value, ack: true });
-        }
-
-        //add new states
-        if (!objects[id] || state2add) {
-            adapter.log.info("add new device " + id);
-            var newObjects = [];
-            var newDevice = {
-                _id: id,
-                type: 'device',
+            adapter.setObjectNotExists(id + "." + _state, {
+                type: "state",
                 common: {
-                    name: type
-                },
-                native: ""
-            };
-
-            for (var i = 0; i < datapoints; i++) {
-                var common = {};
-                var idx = 0;
-                if (adapter.config.device == "CUL") {
-                    idx = 11 + (i * 5);
+                    name: _state,
+                    type: "state",
+                    role: "indicator.state",
+                    read: true,
+                    write: false
                 }
-                else if (adapter.config.device == "HomeControl") {
-                    idx = 10 + (i * 3);
-                }
-                var _state = res[idx];
-                //var value = parseFloat(res[12+ i*3].substr(0));
-                //var unit = res[13+i*3];
+            });
 
-                if (metaRoles[id + '_' + _state]) {
-                    common = metaRoles[id + '_' + _state];
-                } else if (metaRoles[_state]) {
-                    common = metaRoles[_state];
-                }
+            adapter.setState(id + '.' + _state, { val: _value, ack: true });
 
-                common.name = _state;
-
-                adapter.log.info("add new state " + id + '.' + _state);
-                var newState = {
-                    _id: id + '.' + _state,
-                    type: 'state',
-                    common: common,
-                    native: {}
-                };
-
-                objects[id + '.' + _state] = newState;
-                newObjects.push(newState);
-            }
-            objects[id] = newDevice;
-            newObjects.push(newDevice);
-
-            insertObjects(newObjects);
         }
+
+
+        adapter.setObjectNotExists(id + ".LastUpdate", {
+            type: "state",
+            common: {
+                name: "Last update",
+                type: "datetime",
+                role: "indicator.date",
+                read: true,
+                write: false
+            }
+        });
+        var theDate = new Date();
+        adapter.setState(id + ".LastUpdate", { val: theDate.toString(), ack: true });
+         
     }
 
     catch (e) {

@@ -1,5 +1,0 @@
-* in config-Menü
-	* Anzeige verfügbarer interfaces
-	* Umschaltung CUL HomeControl
-	
-* support cul oder homecontrol
