@@ -26,7 +26,13 @@ typical received data are on CUL:
 	got data from Sensor: 3FAF82820000 as broadcast with 1 DP Bright 29.00 lux
 	
 	got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 30.80 C Hum 38.30 %
-	
+
+protocol description for raw data can be found under
+http://wiki.rg-engineering.eu/index.php?title=Funk-Protokoll
+
+The system can be used for our sensors:
+http://wiki.rg-engineering.eu/index.php?title=Umwelt-Funk-Sensor
+
  
 The adapter is based on serialport 
 https://github.com/EmergingTechnologyAdvisors/node-serialport/blob/4.0.1/README.md
@@ -39,7 +45,10 @@ Just use
 as root
 
 ## Changelog
-
+#### 0.0.10
+* (René) interpretes raw data instead of telegram, so we are more flexible in new data points; this needs a new version of firmware on Nano. It's not supported with CUL yet.
+#### 0.0.9
+* (René) new datapoint 'last update'
 #### 0.0.8
 #### 0.0.7
 * (René)error telegarm added

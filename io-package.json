@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "homecontrol",
-    "version": "0.0.9",
+    "version": "0.0.10",
     "news": {
+      "0.0.10": {
+        "en": "interpretes raw data instead of telegram",
+        "de": "Rohdaten-Interpretation anstatt Telegram"
+      },
       "0.0.9": {
         "en": "new datapoint last update",
         "de": "neuer Datenpunkt last update"
@@ -48,7 +52,8 @@
   "native": {
     "serialport": "COM7",
     "baudrate": 115200,
-    "device": "HomeControl"
+    "device": "HomeControl",
+    "mode":  "telegram"
   },
   "objects": [
     {

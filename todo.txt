@@ -1,0 +1,3 @@
+* send intervall einstellbar...
+* daten zusammenbauen und senden
+* Konfiguration, welche daten wohin gesendet werden

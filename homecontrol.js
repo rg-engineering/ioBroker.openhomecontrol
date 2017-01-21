@@ -12,6 +12,7 @@ var adapter = utils.adapter('homecontrol');
 
 var myPort = null;
 var receivedData = "";
+var SendTimer = null;
 
 try {
     var SerialPort = require('serialport');
@@ -126,7 +127,7 @@ function main() {
     adapter.log.info('port created; portname: ' + options.serialport + ' ' + myPort.comName + ' ' + myPort.pnpId + ' ' + myPort.manufacturer + ' Data rate: ' + myPort.options.baudRate + ' ' + options.baudrate);
 
     myPort.on('open', showPortOpen);
-    myPort.on('data', sendSerialData);
+    myPort.on('data', receiveSerialData);
     myPort.on('close', showPortClose);
     myPort.on('error', showError);
 
@@ -140,6 +141,13 @@ function main() {
         adapter.log.warn("unknown device");
     }
 
+    if (!SendTimer) {
+        adapter.log.debug("init timer");
+        var _SendTimer = setInterval(function () {
+            SendData();
+        },  60 * 1000);  //intervall evtl. einstellbar??
+        SendTimer = _SendTimer;
+    }
 
 
     //test only =====================================================
@@ -166,11 +174,26 @@ function showPortOpen() {
 	try{
 		if (myPort != null) {
 			adapter.log.debug('port open: ' + myPort.options.baudRate + ' ' + myPort.comName);
-			if (adapter.config.device=="CUL"){
-				//to enable homecontrol mode on CUL
-				myPort.write("V\n\r");
-				myPort.write("hr\n\r");
-			}
+            if (adapter.config.device == "CUL") {
+                //to enable homecontrol mode on CUL
+                myPort.write("V\n\r");
+                myPort.write("hr\n\r");
+            }
+            else if (adapter.config.device == "HomeControl") {
+                //send configuration to nano
+                if (adapter.config.mode == "telegram") {
+                    myPort.write("mi");
+                    myPort.write(0x0D);
+                }
+                else
+                    if (adapter.config.mode == "raw data") {
+                        myPort.write("mr");
+                        myPort.write(0x0D);
+                    }
+                    else {
+                        adapter.log.error('unknown receive mode');
+                    }
+            }
 		}
 	}
 
@@ -179,7 +202,7 @@ function showPortOpen() {
     }
 }
 
-function sendSerialData(data) {
+function receiveSerialData(data) {
     data = data.toString();
 
     if (data.length < 2) {
@@ -219,7 +242,7 @@ function sendSerialData(data) {
             adapter.log.error('exception in  sendSerialData 4 [' + e + ']');
         }
     }
-    else if (adapter.config.device == "HomeControl") {
+    else if (adapter.config.device == "HomeControl" && adapter.config.mode == "telegram") {
         // filter out everyting not needed...
         // if got data not in then drop message
         if (receivedData.indexOf("data from") <= 0) {
@@ -230,10 +253,31 @@ function sendSerialData(data) {
 
     }
 
+    if (adapter.config.mode == "telegram") {
+        receiveSerialDataTelegram(receivedData);
+    }
+    else
+        if (adapter.config.mode == "raw data") {
+            receiveSerialDataRaw(receivedData);
+        }
+        else {
+            adapter.log.error('unknown receive mode');
+        }
+}
 
+function receiveSerialDataRaw(data) {
+    receivedData = "";
+}
+
+//interprete
+
+//interpretedatapoint
+
+
+function receiveSerialDataTelegram(data) {
     //got data from Sensor :3FAF82180000 with 2 DP as broadcast Temp 30.64 C Press 958.32 mBar
     try {
-        var res = receivedData.split(" ");
+        var res = data.split(" ");
         var id = res[4].substr(0);
 
         if (id == "FFFFFFFFFFFF") {
@@ -333,7 +377,7 @@ function sendSerialData(data) {
         });
         var theDate = new Date();
         adapter.setState(id + ".LastUpdate", { val: theDate.toString(), ack: true });
-         
+
     }
 
     catch (e) {
@@ -357,3 +401,28 @@ function showPortClose() {
 function showError(error) {
     adapter.log.error('Serial port error: ' + error);
 }
+
+
+//=================================== send functions =========================================
+function SendData() {
+    adapter.log.debug('Send data');
+}
+
+function sendSerialDataRaw(data) {
+    myPort.write(data);
+    myPort.write(0x0D);
+}
+
+function sendAddHeader() {
+}
+
+function sendAddTime() {
+}
+
+function sendAddDate() {
+}
+
+
+function sendAddTemperature() {
+}
+
