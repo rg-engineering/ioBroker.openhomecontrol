@@ -1,18 +1,48 @@
+/*
+ * homecontrol adapter für iobroker
+ *
+ * Created: 15.09.2016 21:31:28
+ *  Author: Rene
+
+Copyright(C)[2016, 2017][René Glaß]
+
+Dieses Programm ist freie Software.Sie können es unter den Bedingungen der GNU General Public License, wie von der Free Software 
+Foundation veröffentlicht, weitergeben und/ oder modifizieren, entweder gemäß Version 3 der Lizenz oder (nach Ihrer Option) jeder 
+späteren Version.
+
+Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE,
+    sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK.Details finden Sie in der
+GNU General Public License.
+
+Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben.Falls nicht,
+    siehe < http://www.gnu.org/licenses/>.
+
+*/
+
 /* jshint -W097 */// jshint strict:false
 /*jslint node: true */
 "use strict";
 
 // you have to require the utils module and call adapter function
 var utils =    require(__dirname + '/lib/utils'); // Get common adapter utils
-
+ 
 // you have to call the adapter function and pass a options object
 // name has to be set and has to be equal to adapters folder name and main file name excluding extension
 // adapter will be restarted automatically every time as the configuration changed, e.g system.adapter.template.0
 var adapter = utils.adapter('homecontrol');
 
+
 var myPort = null;
 var receivedData = "";
 var SendTimer = null;
+
+var DataToSend = {};
+var DataToSendLength = 0;
+var IDX_DATENPUNKTE = 14;
+var IDX_TYPE = 13;
+var IDX_TARGET = 7;
+var IDX_SOURCE = 1;
+var IDX_START = 0;
 
 try {
     var SerialPort = require('serialport');
@@ -145,7 +175,7 @@ function main() {
         adapter.log.debug("init timer");
         var _SendTimer = setInterval(function () {
             SendData();
-        },  60 * 1000);  //intervall evtl. einstellbar??
+        },  10 * 1000);  //intervall evtl. einstellbar??
         SendTimer = _SendTimer;
     }
 
@@ -258,24 +288,24 @@ function receiveSerialData(data) {
     }
     else
         if (adapter.config.mode == "raw data") {
-            receiveSerialDataRaw(receivedData);
+            //receiveSerialDataRaw(receivedData);
         }
         else {
             adapter.log.error('unknown receive mode');
         }
 }
 
+//this will be the new function to interprete raw data sent by nano
+//for that we create a new class rfsensorpacket which can also be used to send data
 function receiveSerialDataRaw(data) {
     receivedData = "";
 }
 
-//interprete
-
-//interpretedatapoint
-
-
+//this is the obsolete old function which will be removed in one of the next releases
+//here we need to interprete telegram data on nano. Nano sends then a interpreted telegram like:
+//got data from Sensor :3FAF82180000 with 2 DP as broadcast Temp 30.64 C Press 958.32 mBar
 function receiveSerialDataTelegram(data) {
-    //got data from Sensor :3FAF82180000 with 2 DP as broadcast Temp 30.64 C Press 958.32 mBar
+
     try {
         var res = data.split(" ");
         var id = res[4].substr(0);
@@ -404,25 +434,157 @@ function showError(error) {
 
 
 //=================================== send functions =========================================
+
+function lowByte(w) {
+    return ((w) & 0xff);
+}
+function highByte(w) {
+    return(((w) >> 8) & 0xff);
+}
+
+function AddHeader() {
+    DataToSend[IDX_START] = 0x00;
+    DataToSend[IDX_SOURCE] = 0x10;  //source: meine ID 6Byte; zentrale
+    DataToSend[IDX_SOURCE + 1] = 0x10;  //
+    DataToSend[IDX_SOURCE + 2] = 0x10;  //
+    DataToSend[IDX_SOURCE + 3] = 0x10;  //
+    DataToSend[IDX_SOURCE + 4] = 0x10;  //
+    DataToSend[IDX_SOURCE + 5] = 0x10;  //
+
+    DataToSend[IDX_TARGET] = 0xFE;  //Target: Broadcast 6Byte
+    DataToSend[IDX_TARGET + 1] = 0xFE;
+    DataToSend[IDX_TARGET + 2] = 0xFE;
+    DataToSend[IDX_TARGET + 3] = 0xFE;
+    DataToSend[IDX_TARGET + 4] = 0xFE;
+    DataToSend[IDX_TARGET + 5] = 0xFE;
+    DataToSend[IDX_TYPE] = 0x10;  //Type: Zentrale
+    DataToSend[IDX_DATENPUNKTE] = 0x00;  //Datenpunkte
+    DataToSendLength = IDX_DATENPUNKTE + 1;
+}
+
+function AddTime(){
+    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+    DataToSend[DataToSendLength] = 0x05;  //Time
+    DataToSend[DataToSendLength + 1] = 0x06; //time: 3*int hh::mm::ss
+
+    var theDate = new Date();
+
+    var hour = theDate.getHours();
+    var minute = theDate.getMinutes();
+    var second = theDate.getSeconds();
+
+    DataToSend[DataToSendLength + 2] = highByte(hour);
+    DataToSend[DataToSendLength + 3] = lowByte(hour);
+
+    DataToSend[DataToSendLength + 4] = highByte(minute);
+    DataToSend[DataToSendLength + 5] = lowByte(minute);
+
+    DataToSend[DataToSendLength + 6] = highByte(second);
+    DataToSend[DataToSendLength + 7] = lowByte(second);
+
+
+    DataToSend[DataToSendLength + 8] = 0x00; //ohne einheit
+
+    DataToSendLength += 9;
+
+    adapter.log.debug('Time ' + hour + ':' + minute + ':' + second);
+
+    CheckDataLength();
+}
+
+function AddDate(){
+    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+    DataToSend[DataToSendLength] = 0x04;  //Date
+    DataToSend[DataToSendLength + 1] = 0x05; //date: 3*int dd.mm.yyyy
+
+    var theDate = new Date();
+
+    var day = theDate.getDate();
+    var month = theDate.getMonth()+1;
+    var year = theDate.getFullYear();
+
+    //erwartet
+    //0 16 == 0000 0000 0001 0110 = 22  
+    //0 1  == 0000 0000 0000 0001 = 1
+    //7 e1 == 0000 0111 1110 0001 = 2017
+
+    //ist
+    //0 16 == 22 ==   0000 0000 0001 0110
+    //0 0 == 0 ==     0000 0000 0000 0000   // erwartet 1 == 0 1 = 0000 0001
+    //f e1 == 4065 == 0000 1111 1110 0001 //erwartet 2017 = 7 e1
+
+    DataToSend[DataToSendLength + 2] = highByte(day);
+    DataToSend[DataToSendLength + 3] = lowByte(day);
+
+    DataToSend[DataToSendLength + 4] = highByte(month);
+    DataToSend[DataToSendLength + 5] = lowByte(month);
+
+    DataToSend[DataToSendLength + 6] = highByte(year);
+    DataToSend[DataToSendLength + 7] = lowByte(year);
+
+    DataToSend[DataToSendLength + 8] = 0x00; //ohne einheit
+
+    DataToSendLength += 9;
+
+    adapter.log.debug('Date ' + day + '.' + month + '.' + year);
+
+    CheckDataLength();
+}
+
+function AddTemperature() {
+
+}
+
+function CheckDataLength() {
+}
+
+
+/*
+Zeit/Datum-Telegramm
+s 0  0  0  0  0  0  0  fe  fe  fe  fe  fe  fe  1 2 4 5 0 15 0  1 7 e1  0 5 6 0  e 0 37 0 22 0  -> HEX 0 als Absender
+  0 16 16 16 16 16 16 254 254 254 254 254 254 16 2 5 6 0 14 0 55 0 34  0 4 5 0 22 0  1 7 225 0 -> DEC Date/Time vertauscht
+  0 16 16 16 16 16 16 254 254 254 254 254 254 16 2 4 5 0 22 0  1 7 225 0 5 6 0 14 0 55 0 34 0 -> DEC wie oben Zentrale als Absender
+*/
+
 function SendData() {
-    adapter.log.debug('Send data');
-}
+    //adapter.log.debug('Send data');
 
-function sendSerialDataRaw(data) {
-    myPort.write(data);
-    myPort.write(0x0D);
-}
-
-function sendAddHeader() {
-}
-
-function sendAddTime() {
-}
-
-function sendAddDate() {
+    try {
+        AddHeader();
+        AddDate();
+        AddTime();
+    }
+    catch (e) {
+        adapter.log.error('exception in  SendData [' + e + '] ');
+    }
+    sendSerialDataRaw();
 }
 
 
-function sendAddTemperature() {
+
+function sendSerialDataRaw() {
+
+    try {
+        //var sTemp = "";
+        myPort.write("s");
+
+        var buffer = new Buffer(DataToSendLength+1);
+        //copy into buffer for data conversion...
+        for (var i = 0; i < DataToSendLength; i++) {
+            buffer[i] = DataToSend[i];
+            //sTemp += buffer[i];
+            //sTemp += " ";
+        }
+        buffer[DataToSendLength] = 0x0D; //final return
+        myPort.write(buffer);
+        //adapter.log.debug(sTemp);
+    }
+    catch (e) {
+        adapter.log.error('exception in  sendSerialDataRaw [' + e + ']');
+    }
 }
+
+
+
+
 
