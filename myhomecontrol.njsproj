@@ -7,7 +7,7 @@
     <ProjectHome>
     </ProjectHome>
     <ProjectView>ShowAllFiles</ProjectView>
-    <StartupFile>homecontrol.js</StartupFile>
+    <StartupFile>myhomecontrol.js</StartupFile>
     <WorkingDirectory>.</WorkingDirectory>
     <OutputPath>.</OutputPath>
     <ProjectTypeGuids>{3AF33F2E-1136-4D97-BBB7-1795711AC8B8};{349c5851-65df-11da-9384-00065b846f21};{9092AA53-FB77-4645-B42D-1CCCA6BD08BD}</ProjectTypeGuids>
@@ -23,10 +23,10 @@
     <Content Include="package.json" />
     <Content Include="README.md" />
     <Compile Include="Gruntfile.js" />
-    <Compile Include="homecontrol.js" />
+    <Compile Include="myhomecontrol.js" />
     <Compile Include="test.js" />
     <Content Include="admin\index.html" />
-    <Content Include="admin\homecontrol.png" />
+    <Content Include="admin\myhomecontrol.png" />
     <Content Include="admin\template.png" />
     <Compile Include="lib\utils.js" />
     <Compile Include="tasks\jscs.js" />

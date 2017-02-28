@@ -1,25 +1,10 @@
 
-# ioBroker.homecontrol
+# ioBroker.myHomeControl
 ===========================
 
-This adapter implements interpretation of data received from Homecontrol sensor via RF
-and cul.
+This adapter implements interpretation of data received from Homecontrol sensor via RF.
 
-It needs a modified culfw (see https://github.com/rg-engineering/culfw4CUL_HomeControl).
-The HomeControl sensor sends temperature, hunidity, air pressure and brightness via
-CC1101.
-
-typical received data are on CUL:
-
-  	got data from Sensor :CE1283180000 with 1 DP as broadcast Bright 250 lux
-  
-  	got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.80 C Hum 57.50 %
-  
-  	got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.67 C Press 962.35 mBar
-   
-  	got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.66 C Press 962.33 mBar 
-  
- typical received data are on HomeControl:
+ typical received data on HomeControl:
  	
 	got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 31.03 C Press 959.00 mBar
 		
@@ -45,11 +30,17 @@ Just use
 as root
 
 ## Changelog
+#### 0.0.11
+* (René) renamed to myHomeControl
+
 #### 0.0.10
 * (René) interpretes raw data instead of telegram, so we are more flexible in new data points; this needs a new version of firmware on Nano. It's not supported with CUL yet.
+
 #### 0.0.9
 * (René) new datapoint 'last update'
+
 #### 0.0.8
+
 #### 0.0.7
 * (René)error telegarm added
 		ignore sensor ID FFFFFFFFFFFF

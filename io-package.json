@@ -1,8 +1,12 @@
 {
   "common": {
-    "name": "homecontrol",
-    "version": "0.0.10",
+    "name": "myhomecontrol",
+    "version": "0.0.11",
     "news": {
+      "0.0.11": {
+        "en": "renamed to myHomeControl",
+        "de": "Umbenennung nach myHomeControl"
+      },
       "0.0.10": {
         "en": "interpretes raw data instead of telegram",
         "de": "Rohdaten-Interpretation anstatt Telegram"
@@ -32,19 +36,19 @@
         "de": "Empfangsfunktion optimiert"
       }
     },
-    "title": "HomeControl",
+    "title": "myHomeControl",
     "desc": {
-      "en": "HomeControl Adapter. ",
-      "de": "HomeControl Adapter."
+      "en": "myHomeControl Adapter. ",
+      "de": "myHomeControl Adapter."
     },
     "platform": "Javascript/Node.js",
     "mode": "daemon",
-    "icon": "homecontrol.png",
+    "icon": "myhomecontrol.png",
     "enabled": true,
     "messagebox": true,
-    "extIcon": "https://github.com/rg-engineering/ioBroker.homecontrol/blob/master/admin/homecontrol.PNG",
+    "extIcon": "https://github.com/rg-engineering/ioBroker.myhomecontrol/blob/master/admin/myhomecontrol.PNG",
     "keywords": [ "homecontrol" ],
-    "readme": "https://github.com/rg-engineering/ioBroker.homecontrol/blob/master/README.md",
+    "readme": "https://github.com/rg-engineering/ioBroker.myhomecontrol/blob/master/README.md",
     "loglevel": "debug",
     "stopBeforeUpdate": true,
     "type": "hardware"
