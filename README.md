@@ -30,6 +30,7 @@ Just use
 as root
 
 ## Changelog
+
 #### 0.0.11
 * (René) renamed to myHomeControl
 

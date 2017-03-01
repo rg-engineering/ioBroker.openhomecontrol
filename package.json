@@ -12,7 +12,7 @@
       "email": "@@email@@"
     }
   ],
-  "homepage": "https://github.com/rg-engineering/ioBroker.homecontrol",
+  "homepage": "https://github.com/rg-engineering/ioBroker.myhomecontrol",
   "license": "GPL v3",
   "keywords": [
     "ioBroker",

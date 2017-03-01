@@ -38,8 +38,8 @@
     },
     "title": "myHomeControl",
     "desc": {
-      "en": "myHomeControl Adapter. ",
-      "de": "myHomeControl Adapter."
+      "en": "myHomeControl Adapter",
+      "de": "myHomeControl Adapter"
     },
     "platform": "Javascript/Node.js",
     "mode": "daemon",
@@ -57,7 +57,8 @@
     "serialport": "COM7",
     "baudrate": 115200,
     "device": "HomeControl",
-    "mode":  "telegram"
+    "mode": "telegram",
+    "sendInterval": 180
   },
   "objects": [
     {

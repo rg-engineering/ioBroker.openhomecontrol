@@ -45,7 +45,7 @@
         }, 2000);
             
         //function sendTo(_adapter_instance, command, message, callback)
-        sendTo('homecontrol.0', 'listUart', null, function (list) {
+        sendTo('myhomecontrol.0', 'listUart', null, function (list) {
            	if (timeout) {
                 clearTimeout(timeout);
                 timeout = null;
