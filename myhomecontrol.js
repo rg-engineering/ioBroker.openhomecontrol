@@ -147,8 +147,10 @@ function main() {
     var options = {
         //serialport: adapter.config.serialport || '/dev/ttyACM0',
         serialport: adapter.config.serialport || 'COM13',
-        baudrate: parseInt(adapter.config.baudrate) || 115200,
-        device: adapter.config.device || "HomeControl"
+        baudrate: parseInt(adapter.config.baudrate) || 57600,
+        device: adapter.config.device || "HomeControl",
+        sendInterval2Display: adapter.config.sendInterval2Display || 30,
+        sendIntervalBroadcast: adapter.config.sendIntervalBroadcast || 30
     };
 
     SerialPort.list(function (err, ports) {
@@ -195,7 +197,7 @@ function main() {
     if (!SendTimer2Display) {
         var _SendTimer2Display = setInterval(function () {
             SendData2Display();
-        }, 30 * 1000);  //intervall evtl. einstellbar??
+        }, options.sendInterval * 1000);  
         SendTimer2Display = _SendTimer2Display;
     }
 /*
@@ -715,7 +717,7 @@ function AddAirPressure() {
 
 function AddWeatherIconId() {
     try {
-        adapter.getForeignState('weatherunderground.0.forecast_day.1d.icon', function (err, obj) {
+        adapter.getForeignState('weatherunderground.0.forecast_day.0d.icon', function (err, obj) {
             if (err) {
                 adapter.log.error(err);
                 AlreadySending = false;

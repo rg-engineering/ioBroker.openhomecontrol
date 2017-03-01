@@ -34,7 +34,8 @@
         "select Device": { "de": "Geräteauswahl" },
         "Serial port": { "de": "serieller Port" },
         "Baud rate": { "de": "Übertragungsrate" },
-        "send Interval to display [s]": { "de": "Sendeintervall zum Display [s]" }
+        "send Interval to display [s]": { "de": "Sendeintervall zum Display [s]" },
+        "send Interval broadcast [s]": {"de": "Sendeintervall broadcast [s]"}
     };
 
     var timeout;
@@ -162,7 +163,12 @@
         <tr>
             <td class="translate">send Interval to display [s]</td>
             <td>
-                <input type="text" id="sendInterval" class="value" />
+                <input type="text" id="sendInterval2Display" class="value" />
+            </td>
+        <tr>
+            <td class="translate">send Interval broadcast [s]</td>
+            <td>
+                <input type="text" id="sendIntervalBroadcast" class="value" />
             </td>
         </tr>
     </table>

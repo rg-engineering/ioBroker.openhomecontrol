@@ -55,10 +55,11 @@
   },
   "native": {
     "serialport": "COM7",
-    "baudrate": 115200,
+    "baudrate": 57600,
     "device": "HomeControl",
     "mode": "telegram",
-    "sendInterval": 180
+    "sendInterval2Display": 180,
+    "sendIntervalBroadcast": 60
   },
   "objects": [
     {
