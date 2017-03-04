@@ -149,8 +149,8 @@ function main() {
         serialport: adapter.config.serialport || 'COM13',
         baudrate: parseInt(adapter.config.baudrate) || 57600,
         device: adapter.config.device || "HomeControl",
-        sendInterval2Display: adapter.config.sendInterval2Display || 30,
-        sendIntervalBroadcast: adapter.config.sendIntervalBroadcast || 30
+        sendInterval2Display: parseInt(adapter.config.sendInterval2Display) || 180,
+            sendIntervalBroadcast: parseInt(adapter.config.sendIntervalBroadcast) || 30
     };
 
     SerialPort.list(function (err, ports) {
@@ -187,18 +187,23 @@ function main() {
         adapter.log.warn("unknown device");
     }
 
-    if (!SendTimerBroadcast) {
-        adapter.log.debug("init timer");
-        var _SendTimerBroadcast = setInterval(function () {
-            SendDataBroadcast();
-        }, 10 * 1000);  //intervall evtl. einstellbar??
-        SendTimerBroadcast = _SendTimerBroadcast;
+    try {
+        if (!SendTimerBroadcast) {
+            adapter.log.debug("init timer");
+            var _SendTimerBroadcast = setInterval(function () {
+                SendDataBroadcast();
+            }, options.sendIntervalBroadcast * 1000);  
+            SendTimerBroadcast = _SendTimerBroadcast;
+        }
+        if (!SendTimer2Display) {
+            var _SendTimer2Display = setInterval(function () {
+                SendData2Display();
+            }, options.sendInterval2Display * 1000);
+            SendTimer2Display = _SendTimer2Display;
+        }
     }
-    if (!SendTimer2Display) {
-        var _SendTimer2Display = setInterval(function () {
-            SendData2Display();
-        }, options.sendInterval * 1000);  
-        SendTimer2Display = _SendTimer2Display;
+    catch (e) {
+        adapter.log.error('exception in  init timer [' + e + ']');
     }
 /*
     if (!WeatherTimer) {
