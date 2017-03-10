@@ -32,6 +32,10 @@ as root
 ## Changelog
 
 #### 0.0.11
+* (René) Configuration for display
+	date to be sent are now objects and needs to be written from javascript or similar
+
+#### 0.0.11
 * (René) renamed to myHomeControl
 
 #### 0.0.10

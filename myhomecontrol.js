@@ -40,7 +40,7 @@ var adapter = utils.adapter('myhomecontrol');
 var myPort = null;
 var receivedData = "";
 var SendTimerBroadcast = null;
-var SendTimer2Display = null;
+//var SendTimer2Display = null;
 
 //var WeatherTimer = null;
 
@@ -128,6 +128,14 @@ adapter.on('stateChange', function (id, state) {
     if (state && !state.ack) {
         adapter.log.info('ack is not set!');
     }
+
+    /*
+    stateChange myhomecontrol.0.98EF82180000.WeatherIcon2Display
+    {"val":"partlycloudy","ack":false,"ts":1488721037466,"q":0,"from":"system.adapter.javascript.0","lc":1488719660182}
+    */
+
+
+
 });
 
 
@@ -150,7 +158,7 @@ function main() {
         baudrate: parseInt(adapter.config.baudrate) || 57600,
         device: adapter.config.device || "HomeControl",
         sendInterval2Display: parseInt(adapter.config.sendInterval2Display) || 180,
-            sendIntervalBroadcast: parseInt(adapter.config.sendIntervalBroadcast) || 30
+        sendIntervalBroadcast: parseInt(adapter.config.sendIntervalBroadcast) || 30
     };
 
     SerialPort.list(function (err, ports) {
@@ -188,19 +196,23 @@ function main() {
     }
 
     try {
-        if (!SendTimerBroadcast) {
-            adapter.log.debug("init timer");
+        if (!SendTimerBroadcast && options.sendIntervalBroadcast > 0) {
+            adapter.log.debug("init timer broadcast with " + options.sendIntervalBroadcast + "s");
             var _SendTimerBroadcast = setInterval(function () {
                 SendDataBroadcast();
-            }, options.sendIntervalBroadcast * 1000);  
+            }, options.sendIntervalBroadcast * 1000);
             SendTimerBroadcast = _SendTimerBroadcast;
         }
-        if (!SendTimer2Display) {
+
+/*
+        if (!SendTimer2Display && options.sendInterval2Display > 0) {
+            adapter.log.debug("init timer to display with " + options.sendInterval2Display + "s");
             var _SendTimer2Display = setInterval(function () {
                 SendData2Display();
             }, options.sendInterval2Display * 1000);
             SendTimer2Display = _SendTimer2Display;
         }
+   */
     }
     catch (e) {
         adapter.log.error('exception in  init timer [' + e + ']');
@@ -229,6 +241,7 @@ function main() {
                */
     //until here =====================================================
 
+    //adapter.subscribeStates('*'); //nicht notwendig; wir lesen einfach zeitgesteuert...
 }
 
 
@@ -349,6 +362,7 @@ function receiveSerialDataTelegram(data) {
     try {
         var res = data.split(" ");
         var id = res[4].substr(0);
+        var toSendId = "";
 
         if (id == "FFFFFFFFFFFF") {
             return;
@@ -397,6 +411,61 @@ function receiveSerialDataTelegram(data) {
                 name: type,
             }
         });
+
+        //add writable datapoints for display
+        if (type.indexOf("Display") >= 0) {
+            adapter.log.debug("found a display; add datapoints");
+            adapter.setObjectNotExists(id + "." + "Temp2Display", {
+                type: "state",
+                common: {
+                    name: "Temperature",
+                    type: "state",
+                    role: "sensor",
+                    function: "Wetter",
+                    read: true,
+                    write: true
+                }
+            });
+
+            adapter.setObjectNotExists(id + "." + "Humidity2Display", {
+                type: "state",
+                common: {
+                    name: "Humidity",
+                    type: "state",
+                    role: "sensor",
+                    function: "Wetter",
+                    read: true,
+                    write: true
+                }
+            });
+
+            adapter.setObjectNotExists(id + "." + "Pressure2Display", {
+                type: "state",
+                common: {
+                    name: "Pressure",
+                    type: "state",
+                    role: "sensor",
+                    function: "Wetter",
+                    read: true,
+                    write: true
+                }
+            });
+
+            adapter.setObjectNotExists(id + "." + "WeatherIcon2Display", {
+                type: "state",
+                common: {
+                    name: "WeatherIcon",
+                    type: "state",
+                    role: "sensor",
+                    function: "Wetter",
+                    read: true,
+                    write: true
+                }
+            });
+
+            toSendId = id;
+        }
+
 
         for (var _i = 0; _i < datapoints; _i++) {
             var _idx = 0;
@@ -475,6 +544,11 @@ function receiveSerialDataTelegram(data) {
     }
 
     receivedData = "";
+
+    //if Display then answer with data
+    if (toSendId.length > 0) {
+        SendData2Display(toSendId);
+    }
 }
 
 function showPortClose() {
@@ -495,7 +569,7 @@ function highByte(w) {
     return(((w) >> 8) & 0xff);
 }
 
-function AddHeader(target) {
+function AddHeader(target, DisplayID) {
     DataToSend[IDX_START] = 0x00;
     DataToSend[IDX_SOURCE] = 0x10;  //source: meine ID 6Byte; zentrale
     DataToSend[IDX_SOURCE + 1] = 0x10;  //
@@ -513,13 +587,27 @@ function AddHeader(target) {
         DataToSend[IDX_TARGET + 5] = 0xFE;
     }
     else {
+        //to do: über alle displays
         //98EF82180000
-        DataToSend[IDX_TARGET] = 0x98;  //Target: Display 6Byte
-        DataToSend[IDX_TARGET + 1] = 0xEF;
-        DataToSend[IDX_TARGET + 2] = 0x82;
-        DataToSend[IDX_TARGET + 3] = 0x18;
-        DataToSend[IDX_TARGET + 4] = 0x00;
-        DataToSend[IDX_TARGET + 5] = 0x00;
+
+        //DisplayId ist string
+        //wir brauchen die Werte
+
+        adapter.log.debug('add header: ' + DisplayID + ' = ' +
+            parseInt(DisplayID.substr(0, 2),16) + ' ' +
+            parseInt(DisplayID.substr(2, 2),16) + ' ' +
+            parseInt(DisplayID.substr(4, 2),16) + ' ' +
+            parseInt(DisplayID.substr(6, 2),16) + ' ' +
+            parseInt(DisplayID.substr(8, 2),16) + ' ' +
+            parseInt(DisplayID.substr(10, 2),16)
+        );
+
+        DataToSend[IDX_TARGET] = parseInt(DisplayID.substr(0, 2),16);
+        DataToSend[IDX_TARGET + 1] = parseInt(DisplayID.substr(2, 2),16);
+        DataToSend[IDX_TARGET + 2] = parseInt(DisplayID.substr(4, 2),16);
+        DataToSend[IDX_TARGET + 3] = parseInt(DisplayID.substr(6, 2),16);
+        DataToSend[IDX_TARGET + 4] = parseInt(DisplayID.substr(8, 2),16);
+        DataToSend[IDX_TARGET + 5] = parseInt(DisplayID.substr(10, 2),16);
     }
 
     DataToSend[IDX_TYPE] = 0x10;  //Type: Zentrale
@@ -568,16 +656,6 @@ function AddDate(){
     var month = theDate.getMonth()+1;
     var year = theDate.getFullYear();
 
-    //erwartet
-    //0 16 == 0000 0000 0001 0110 = 22  
-    //0 1  == 0000 0000 0000 0001 = 1
-    //7 e1 == 0000 0111 1110 0001 = 2017
-
-    //ist
-    //0 16 == 22 ==   0000 0000 0001 0110
-    //0 0 == 0 ==     0000 0000 0000 0000   // erwartet 1 == 0 1 = 0000 0001
-    //f e1 == 4065 == 0000 1111 1110 0001 //erwartet 2017 = 7 e1
-
     DataToSend[DataToSendLength + 2] = highByte(day);
     DataToSend[DataToSendLength + 3] = lowByte(day);
 
@@ -596,40 +674,42 @@ function AddDate(){
     CheckDataLength();
 }
 
-function AddTemperature() {
+function AddTemperature(DisplayID) {
     try {
-        adapter.getForeignState('hm-rpc.0.KEQ0766678.1.TEMPERATURE', function (err, obj) {
+
+        adapter.getState(DisplayID + '.Temp2Display', function (err, obj) {
             if (err) {
                 adapter.log.error(err);
                 AlreadySending = false;
             } else {
-                var temperature = obj.val;
-
-                DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
-                DataToSend[DataToSendLength] = 0x01;  //Temperature
-                DataToSend[DataToSendLength + 1] = 0x03; //float
-
-
-                var farr = new Float32Array(1);
-                farr[0] = temperature;
-                var barr = new Int8Array(farr.buffer);
+                
+                if (obj != null) {
+                    var temperature = obj.val;
+                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+                    DataToSend[DataToSendLength] = 0x01;  //Temperature
+                    DataToSend[DataToSendLength + 1] = 0x03; //float
 
 
-                DataToSend[DataToSendLength + 2] = barr[0];
-                DataToSend[DataToSendLength + 3] = barr[1];
-                DataToSend[DataToSendLength + 4] = barr[2];
-                DataToSend[DataToSendLength + 5] = barr[3];
+                    var farr = new Float32Array(1);
+                    farr[0] = temperature;
+                    var barr = new Int8Array(farr.buffer);
 
 
-                DataToSend[DataToSendLength + 6] = 0x01; //°C
+                    DataToSend[DataToSendLength + 2] = barr[0];
+                    DataToSend[DataToSendLength + 3] = barr[1];
+                    DataToSend[DataToSendLength + 4] = barr[2];
+                    DataToSend[DataToSendLength + 5] = barr[3];
 
-                DataToSendLength += 7;
 
-                adapter.log.debug('Temperature ' + temperature);
+                    DataToSend[DataToSendLength + 6] = 0x01; //°C
 
-                CheckDataLength();
+                    DataToSendLength += 7;
 
-                AddHumidity();
+                    adapter.log.debug('Temperature ' + temperature);
+
+                    CheckDataLength();
+                }
+                AddHumidity(DisplayID);
 
             }
         });
@@ -639,40 +719,42 @@ function AddTemperature() {
     }
 }
 
-function AddHumidity() {
+function AddHumidity(DisplayID) {
     try {
-        adapter.getForeignState('hm-rpc.0.KEQ0766678.1.HUMIDITY', function (err, obj) {
+        adapter.getState(DisplayID + '.Humidity2Display', function (err, obj) {
             if (err) {
                 adapter.log.error(err);
                 AlreadySending = false;
             } else {
-                var humidity = obj.val;
 
-                DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
-                DataToSend[DataToSendLength] = 0x02;  //Humidity
-                DataToSend[DataToSendLength + 1] = 0x03; //float
+                if (obj != null) {
+                    var humidity = obj.val;
 
-
-                var farr = new Float32Array(1);
-                farr[0] = humidity;
-                var barr = new Int8Array(farr.buffer);
+                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+                    DataToSend[DataToSendLength] = 0x02;  //Humidity
+                    DataToSend[DataToSendLength + 1] = 0x03; //float
 
 
-                DataToSend[DataToSendLength + 2] = barr[0];
-                DataToSend[DataToSendLength + 3] = barr[1];
-                DataToSend[DataToSendLength + 4] = barr[2];
-                DataToSend[DataToSendLength + 5] = barr[3];
+                    var farr = new Float32Array(1);
+                    farr[0] = humidity;
+                    var barr = new Int8Array(farr.buffer);
 
 
-                DataToSend[DataToSendLength + 6] = 0x02; //%
+                    DataToSend[DataToSendLength + 2] = barr[0];
+                    DataToSend[DataToSendLength + 3] = barr[1];
+                    DataToSend[DataToSendLength + 4] = barr[2];
+                    DataToSend[DataToSendLength + 5] = barr[3];
 
-                DataToSendLength += 7;
 
-                adapter.log.debug('Humidity ' + humidity);
+                    DataToSend[DataToSendLength + 6] = 0x02; //%
 
-                CheckDataLength();
+                    DataToSendLength += 7;
 
-                AddAirPressure();
+                    adapter.log.debug('Humidity ' + humidity);
+
+                    CheckDataLength();
+                }
+                AddAirPressure(DisplayID);
             }
         });
     }
@@ -681,37 +763,40 @@ function AddHumidity() {
     }
 }
 
-function AddAirPressure() {
+function AddAirPressure(DisplayID) {
     try {
-        adapter.getForeignState('myhomecontrol.0.CE1283180000.Press', function (err, obj) {
+
+        adapter.getState(DisplayID + '.Pressure2Display', function (err, obj) {
             if (err) {
                 adapter.log.error(err);
                 AlreadySending = false;
             } else {
-                var pressure = obj.val;
+                if (obj != null) {
+                    var pressure = obj.val;
 
-                DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
-                DataToSend[DataToSendLength] = 0x09;  //Pressure
-                DataToSend[DataToSendLength + 1] = 0x03; //float
+                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+                    DataToSend[DataToSendLength] = 0x09;  //Pressure
+                    DataToSend[DataToSendLength + 1] = 0x03; //float
 
-                var farr = new Float32Array(1);
-                farr[0] = pressure;
-                var barr = new Int8Array(farr.buffer);
+                    var farr = new Float32Array(1);
+                    farr[0] = pressure;
+                    var barr = new Int8Array(farr.buffer);
 
-                DataToSend[DataToSendLength + 2] = barr[0];
-                DataToSend[DataToSendLength + 3] = barr[1];
-                DataToSend[DataToSendLength + 4] = barr[2];
-                DataToSend[DataToSendLength + 5] = barr[3];
+                    DataToSend[DataToSendLength + 2] = barr[0];
+                    DataToSend[DataToSendLength + 3] = barr[1];
+                    DataToSend[DataToSendLength + 4] = barr[2];
+                    DataToSend[DataToSendLength + 5] = barr[3];
 
 
-                DataToSend[DataToSendLength + 6] = 0x03; //mBar
+                    DataToSend[DataToSendLength + 6] = 0x03; //mBar
 
-                DataToSendLength += 7;
+                    DataToSendLength += 7;
 
-                adapter.log.debug('Pressure ' + pressure);
+                    adapter.log.debug('Pressure ' + pressure);
 
-                CheckDataLength();
-                AddWeatherIconId();
+                    CheckDataLength();
+                }
+                AddWeatherIconId(DisplayID);
             }
         });
     }
@@ -720,131 +805,134 @@ function AddAirPressure() {
     }
 }
 
-function AddWeatherIconId() {
+function AddWeatherIconId(DisplayID) {
     try {
-        adapter.getForeignState('weatherunderground.0.forecast_day.0d.icon', function (err, obj) {
+
+        adapter.getState(DisplayID + '.WeatherIcon2Display', function (err, obj) {
             if (err) {
                 adapter.log.error(err);
                 AlreadySending = false;
             } else {
-                var icon = obj.val;
+                if (obj != null) {
+                    var icon = obj.val;
 
-                var icon_id = -1;
+                    var icon_id = -1;
 
 
-                switch (icon) {
-                    case "clear":
-                    case "nt_clear":
-                        icon_id = 1;
-                        break;
-                    case "partlycloudy":
-                    case "nt_partlycloudy":
-                        icon_id = 2;
-                        break;
-                    case "mostlycloudy":
-                    case "nt_mostlycloudy":
-                        icon_id = 3;
-                        break;
-                    case "cloudy":
-                    case "nt_cloudy":
-                        icon_id = 4;
-                        break;
-                    case "hazy":
-                    case "nt_hazy":
-                        icon_id = 5;
-                        break;
-                    case "foggy":
-                    case "nt_foggy":
-                        icon_id = 6;
-                        break;
-                    case "veryhot":
-                    case "nt_veryhot":
-                        icon_id = 7;
-                        break;
-                    case "verycold":
-                    case "nt_verycold":
-                        icon_id = 8;
-                        break;
-                    case "blowingsnow":
-                    case "nt_blowingsnow":
-                        icon_id = 9;
-                        break;
-                    case "chanceshowers":
-                    case "nt_chanceshowers":
-                        icon_id = 10;
-                        break;
-                    case "showers":
-                    case "nt_showers":
-                        icon_id = 11;
-                        break;
-                    case "chancerain":
-                    case "nt_chancerain":
-                        icon_id = 12;
-                        break;
-                    case "rain":
-                    case "nt_rain":
-                        icon_id = 13;
-                        break;
-                    case "chancethunderstorm":
-                    case "nt_chancethunderstorm":
-                        icon_id = 14;
-                        break;
-                    case "thunderstorm":
-                    case "nt_thunderstorm":
-                        icon_id = 15;
-                        break;
-                    case "flurries":
-                    case "nt_flurries":
-                        icon_id = 16;
-                        break;
-                    case "chancesnowshowers":
-                    case "nt_chancesnowshowers":
-                        icon_id = 18;
-                        break;
-                    case "snowshowers":
-                    case "nt_snowshowers":
-                        icon_id = 19;
-                        break;
-                    case "chancesnow":
-                    case "nt_chancesnow":
-                        icon_id = 20;
-                        break;
-                    case "snow":
-                    case "nt_snow":
-                        icon_id = 21;
-                        break;
-                    case "chanceicepellets":
-                    case "nt_chanceicepellets":
-                        icon_id = 22;
-                        break;
-                    case "icepellets":
-                    case "nt_icepellets":
-                        icon_id = 23;
-                        break;
-                    case "blizzard":
-                    case "nt_blizzard":
-                        icon_id = 24;
-                        break;
-                    default:
-                        adapter.log.error('unknown WeatherIcon ' + icon );
-                        break;
+                    switch (icon) {
+                        case "clear":
+                        case "nt_clear":
+                            icon_id = 1;
+                            break;
+                        case "partlycloudy":
+                        case "nt_partlycloudy":
+                            icon_id = 2;
+                            break;
+                        case "mostlycloudy":
+                        case "nt_mostlycloudy":
+                            icon_id = 3;
+                            break;
+                        case "cloudy":
+                        case "nt_cloudy":
+                            icon_id = 4;
+                            break;
+                        case "hazy":
+                        case "nt_hazy":
+                            icon_id = 5;
+                            break;
+                        case "foggy":
+                        case "nt_foggy":
+                            icon_id = 6;
+                            break;
+                        case "veryhot":
+                        case "nt_veryhot":
+                            icon_id = 7;
+                            break;
+                        case "verycold":
+                        case "nt_verycold":
+                            icon_id = 8;
+                            break;
+                        case "blowingsnow":
+                        case "nt_blowingsnow":
+                            icon_id = 9;
+                            break;
+                        case "chanceshowers":
+                        case "nt_chanceshowers":
+                            icon_id = 10;
+                            break;
+                        case "showers":
+                        case "nt_showers":
+                            icon_id = 11;
+                            break;
+                        case "chancerain":
+                        case "nt_chancerain":
+                            icon_id = 12;
+                            break;
+                        case "rain":
+                        case "nt_rain":
+                            icon_id = 13;
+                            break;
+                        case "chancethunderstorm":
+                        case "nt_chancethunderstorm":
+                            icon_id = 14;
+                            break;
+                        case "thunderstorm":
+                        case "nt_thunderstorm":
+                            icon_id = 15;
+                            break;
+                        case "flurries":
+                        case "nt_flurries":
+                            icon_id = 16;
+                            break;
+                        case "chancesnowshowers":
+                        case "nt_chancesnowshowers":
+                            icon_id = 18;
+                            break;
+                        case "snowshowers":
+                        case "nt_snowshowers":
+                            icon_id = 19;
+                            break;
+                        case "chancesnow":
+                        case "nt_chancesnow":
+                            icon_id = 20;
+                            break;
+                        case "snow":
+                        case "nt_snow":
+                            icon_id = 21;
+                            break;
+                        case "chanceicepellets":
+                        case "nt_chanceicepellets":
+                            icon_id = 22;
+                            break;
+                        case "icepellets":
+                        case "nt_icepellets":
+                            icon_id = 23;
+                            break;
+                        case "blizzard":
+                        case "nt_blizzard":
+                            icon_id = 24;
+                            break;
+                        default:
+                            adapter.log.error('unknown WeatherIcon ' + icon);
+                            break;
+                    }
+
+
+
+                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+                    DataToSend[DataToSendLength] = 0x0B; //WeatherIcon
+                    DataToSend[DataToSendLength + 1] = 0x01; //byte
+
+                    DataToSend[DataToSendLength + 2] = icon_id;
+
+                    DataToSend[DataToSendLength + 3] = 0x00; //ohne
+
+                    DataToSendLength += 4;
+
+                    adapter.log.debug('WeatherIcon ' + icon + " = " + icon_id);
+
+                    CheckDataLength();
                 }
-
-
-
-                DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
-                DataToSend[DataToSendLength] = 0x0B; //WeatherIcon
-                DataToSend[DataToSendLength + 1] = 0x01; //byte
-
-                DataToSend[DataToSendLength + 2] = icon_id;
-
-                DataToSend[DataToSendLength + 3] = 0x00; //ohne
-
-                DataToSendLength += 4;
-
-                adapter.log.debug('WeatherIcon ' + icon + " = " + icon_id);
-
-                CheckDataLength();
                 sendSerialDataRaw();
             }
         });
@@ -873,7 +961,7 @@ function SendDataBroadcast() {
 
     AlreadySending = true;
     try {
-        AddHeader(0xFE);
+        AddHeader(0xFE,"");
         AddDate();
         AddTime();
     }
@@ -883,20 +971,23 @@ function SendDataBroadcast() {
     sendSerialDataRaw(); 
 }
 
-function SendData2Display() {
-    //adapter.log.debug('Send data');
+function SendData2Display(DisplayID) {
+
     if (AlreadySending)
         return;
 
+    adapter.log.debug('Send data to Display ' + DisplayID);
+
     AlreadySending = true;
     try {
-        AddHeader(0x00);
-        AddTemperature(); //from there we add humidity and then air pressure; don't do it here because it's asynchron call
+        AddHeader(0x00, DisplayID);
+        AddTemperature(DisplayID); //from there we add humidity and then air pressure; don't do it here because it's a asynchron call
     }
     catch (e) {
-        adapter.log.error('exception in  SendData [' + e + '] ');
+        adapter.log.error('exception in  SendData [' + e + '] ' + DisplayID);
     }
     //sendSerialDataRaw(); it's called in AddPressure finally
+
 }
 
 function sendSerialDataRaw() {
@@ -921,66 +1012,4 @@ function sendSerialDataRaw() {
     }
     AlreadySending = false;
 }
-
-
-
-
-/*
-var hex2double = function (input) {
-
-    var hi = parseInt(input.substring(0, 8), 16);
-    var lo = parseInt(input.substring(8), 16);
-
-    var p32 = 0x100000000;
-    var p52 = 0x10000000000000;
-
-    var exp = (hi >> 20) & 0x7ff;
-    var sign = (hi >> 31);
-    var m = 1 + ((hi & 0xfffff) * p32 + lo) / p52;
-    m = exp ? (m + 1) : (m * 2.0);
-
-    return (sign ? -1 : 1) * m * Math.pow(2, exp - 1023);
-};
-*/
-
-/*
-
-Wetterstation
-url.setUrl("http://api.wunderground.com/api/fe3fbb0aa338493c/forecast/lang:DL/q/Germany/Neumark.xml");
-url.setUrl("http://api.wunderground.com/api/fe3fbb0aa338493c/hourly/lang:DL/q/Germany/Neumark.xml");
-url.setUrl("http://api.wunderground.com/api/fe3fbb0aa338493c/forecast/hourly/lang:DL/q/Germany/Neumark.xml");
-url.setUrl("http://api.wunderground.com/api/fe3fbb0aa338493c/forecast/hourly/lang:DL/q/Germany/"+sStation+".xml");
-stemp= "http://api.wunderground.com/api/" + sLicense + "/forecast/hourly/lang:DL/q/Germany/" + sStation + ".xml";
-http://api.wunderground.com/api/fe3fbb0aa338493c/hourly/lang:DL/q/Neumark.json
-http://api.wunderground.com/api/fe3fbb0aa338493c/forecast/hourly/lang:DL/q/Germany/Neumark.xml
-http://api.wunderground.com/api/fe3fbb0aa338493c/forecast/hourly/lang:DL/q/Germany/Neumark.json
-
-var parseString = require('xml2js').parseString;
-var xml = '<?xml version="1.0" encoding="UTF-8" ?><business><company>Code Blog</company><owner>Nic Raboy</owner><employee><firstname>Nic</firstname><lastname>Raboy</lastname></employee><employee><firstname>Maria</firstname><lastname>Campos</lastname></employee></business>';
-parseString(xml, function (err, result) {
-    console.dir(JSON.stringify(result));
-});
-*/
-
-/*
-function GetWeatherData() {
-    try {
-        adapter.log.debug('GetWeatherData');
-        //Lizenz und Station einstellbar...
-        request('http://api.wunderground.com/api/fe3fbb0aa338493c/forecast/hourly/lang:DL/q/Germany/Neumark.xml', function (error, response, body) {
-            if (!error && response.statusCode == 200) {
-                //log("Body: " + body + response.statusCode);
-
-                var weather = xmlparser.toJson(body);
-                adapter.log.debug(weather);
-
-            } else {
-                adapter.log.error(error);
-            }
-        });
-
-    }
-    catch (e) { console.error(e); }
-}
-*/
 
