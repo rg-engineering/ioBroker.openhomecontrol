@@ -31,7 +31,10 @@ as root
 
 ## Changelog
 
-#### 0.0.11
+#### 0.0.13
+* (René) 
+
+#### 0.0.12
 * (René) Configuration for display
 	date to be sent are now objects and needs to be written from javascript or similar
 

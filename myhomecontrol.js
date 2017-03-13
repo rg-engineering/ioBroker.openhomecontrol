@@ -189,7 +189,15 @@ function main() {
         adapter.log.info("CUL used");
     }
     else if (adapter.config.device == "HomeControl") {
-        adapter.log.info("HomeControl used");
+        if (adapter.config.mode == "telegram") {
+            adapter.log.info("HomeControl used in telegram mode");
+        }
+        else if (adapter.config.mode == "raw data") {
+            adapter.log.info("HomeControl used in raw mode");
+        }
+        else {
+            adapter.log.warn("HomeControl used in unknown mode");
+        }
     }
     else {
         adapter.log.warn("unknown device");
@@ -255,26 +263,33 @@ function showPortOpen() {
                 myPort.write("V\n\r");
                 myPort.write("hr\n\r");
             }
-            else if (adapter.config.device == "HomeControl") {
-                //send configuration to nano
-                if (adapter.config.mode == "telegram") {
-                    myPort.write("mi");
-                    myPort.write(0x0D);
-                }
-                else
-                    if (adapter.config.mode == "raw data") {
-                        myPort.write("mr");
-                        myPort.write(0x0D);
-                    }
-                    else {
-                        adapter.log.error('unknown receive mode');
-                    }
-            }
 		}
 	}
 
     catch (e) {
         adapter.log.error('exception in  showPortOpen [' + e + ']');
+    }
+}
+
+function SetMode() {
+    if (myPort != null) {
+        if (adapter.config.device == "HomeControl") {
+            //send configuration to nano
+            if (adapter.config.mode == "telegram") {
+                adapter.log.debug('telegram mode set on ' + myPort.comName);
+                myPort.write("mi\n\r");
+                //myPort.write(0x0D);
+            }
+            else
+                if (adapter.config.mode == "raw data") {
+                    adapter.log.debug('raw data mode set on ' + myPort.comName);
+                    myPort.write("mr\n\r");
+                    //myPort.write(0x0D);
+                }
+                else {
+                    adapter.log.error('unknown receive mode');
+                }
+        }
     }
 }
 
@@ -318,7 +333,7 @@ function receiveSerialData(data) {
             adapter.log.error('exception in  sendSerialData 4 [' + e + ']');
         }
     }
-    else if (adapter.config.device == "HomeControl" && adapter.config.mode == "telegram") {
+    else if (adapter.config.device == "HomeControl") {
         // filter out everyting not needed...
         // if got data not in then drop message
 
@@ -328,31 +343,200 @@ function receiveSerialData(data) {
             return;
         }
 
-        if (receivedData.indexOf("data from") <= 0) {
-
-            receivedData = "";
-            return;
+        //only once after boot of Nano
+        if (receivedData.indexOf("RAM") >= 0) {
+            setTimeout(function () {
+                SetMode();
+            }, 2000);
         }
 
+        if (adapter.config.mode == "telegram") {
+
+            if (receivedData.indexOf("data from") <= 0) {
+
+                receivedData = "";
+                return;
+            }
+            else {
+                receiveSerialDataTelegram(receivedData);
+            }
+        }
+        else
+            if (adapter.config.mode == "raw data") {
+
+                //telegram starts with I and ends with J
+                if (receivedData.indexOf("I") >= 0 && receivedData.indexOf("J") > 0) {
+                    adapter.log.debug('now going to interprete ' + receivedData);
+                    receiveSerialDataRaw(receivedData);
+                }
+                else if (receivedData.indexOf("I") < 0) {
+                    //ignore the rest...
+                    receivedData = "";
+                    return;
+                }
+            }
+            else {
+                adapter.log.error('unknown receive mode');
+            }
     }
+}
 
-    if (adapter.config.mode == "telegram") {
-        receiveSerialDataTelegram(receivedData);
-    }
-    else
-        if (adapter.config.mode == "raw data") {
-            //receiveSerialDataRaw(receivedData);
+function AddDatapoints4Display(id) {
+    adapter.log.debug("found a display; add datapoints");
+    adapter.setObjectNotExists(id + "." + "Temp2Display", {
+        type: "state",
+        common: {
+            name: "Temperature",
+            type: "state",
+            role: "sensor",
+            function: "Wetter",
+            read: true,
+            write: true
         }
-        else {
-            adapter.log.error('unknown receive mode');
+    });
+
+    adapter.setObjectNotExists(id + "." + "Humidity2Display", {
+        type: "state",
+        common: {
+            name: "Humidity",
+            type: "state",
+            role: "sensor",
+            function: "Wetter",
+            read: true,
+            write: true
         }
+    });
+
+    adapter.setObjectNotExists(id + "." + "Pressure2Display", {
+        type: "state",
+        common: {
+            name: "Pressure",
+            type: "state",
+            role: "sensor",
+            function: "Wetter",
+            read: true,
+            write: true
+        }
+    });
+
+    adapter.setObjectNotExists(id + "." + "WeatherIcon2Display", {
+        type: "state",
+        common: {
+            name: "WeatherIcon",
+            type: "state",
+            role: "sensor",
+            function: "Wetter",
+            read: true,
+            write: true
+        }
+    });
 }
 
 //this will be the new function to interprete raw data sent by nano
-//for that we create a new class rfsensorpacket which can also be used to send data
-function receiveSerialDataRaw(data) {
+/*
+ Protokollbeschreibung:
+ 0.-5. Byte Quelle-ID (6Byte)
+ 6.-11. Byte Ziel-ID (0xFE Broadcast, 0x10 Zentrale) (6Byte)
+ 12. Byte ModulType (0x01 Sensor, 0x02 Aktor, 0x03 Display 0x10 Zentrale)
+ 13. Byte Anzahl Datenpunkt (nicht Länge!)
+
+ CRC über gesamtes Telegram vom chip selbst
+
+*/
+function receiveSerialDataRaw(dataorg) {
+
+
+
+    /*
+    myhomecontrol.0	2017- 03 - 13 19:56:54.041	debug	s
+    myhomecontrol.0	2017- 03 - 13 19:56:54.031	debug	0 16 16 16 16 16 16 152 14 15 130 1 8 16 0
+    myhomecontrol.0	2017- 03 - 13 19:56:53.863	debug	add header: 98 ef 82 18 = 152 14 15 130 1 8
+    myhomecontrol.0	2017- 03 - 13 19:56:53.861	debug	Send data to Display 98 ef 82 18
+    myhomecontrol.0	2017- 03 - 13 19:56:53.853	debug	(2) from 98 ef 82 18 (Display) with 0
+    myhomecontrol.0	2017- 03 - 13 19:56:53.847	debug	found a display; add datapoints
+    now going to interprete I 00 98 ef 82 18 00 00 fe fe fe fe fe fe 03 00 J
+    */
+
+    var data = dataorg.substr(5, dataorg.length - 6);
+    var dataArray = data.split(" ");
+
+    try {
+        //interprete header
+        var bytenumber = 0;
+        var source = data.substr(bytenumber, 17);
+        source = source.replace(/ /g, ''); //alle Leerzeichen entfernen
+        source = source.toUpperCase(); //und alles in Großbuchstaben
+        bytenumber += 6;
+        var target = data.substr(bytenumber * 2, 17);
+        target = target.replace(/ /g, ''); //alle Leerzeichen entfernen
+        target = target.toUpperCase(); //und alles in Großbuchstaben
+        bytenumber += 6;
+        var type = parseInt(dataArray[bytenumber], 16);
+        bytenumber += 1;
+        var datapoints = parseInt(dataArray[bytenumber], 16);
+        bytenumber += 1;
+
+        var stype = "unknown";
+        switch (type) {
+            case 0x01:
+                stype = "Sensor ";
+                break;
+            case 0x02:
+                stype = "Actor ";
+                break;
+            case 0x03:
+                stype = "Display ";
+                AddDatapoints4Display(source);
+                break;
+            case 0x10:
+                stype = "Zentrale ";
+                break;
+        }
+        adapter.log.debug("(2) from " + source + " (" + stype + ") with " + datapoints);
+        adapter.setObjectNotExists(source, {
+            type: "device",
+            common: {
+                name: stype,
+            }
+        });
+        // than all datapoints
+        for (var i = 0; i < datapoints; i++) {
+            InterpreteDatapoint(source);
+        }
+
+        adapter.setObjectNotExists(source + ".LastUpdate", {
+            type: "state",
+            common: {
+                name: "Last update",
+                type: "datetime",
+                role: "indicator.date",
+                read: true,
+                write: false
+            }
+        });
+        var theDate = new Date();
+        adapter.setState(source + ".LastUpdate", { val: theDate.toString(), ack: true });
+
+        if (type == 0x03) {
+            SendData2Display(source);
+        }
+    }
+    catch (e) {
+        adapter.log.error('exception in receiveSerialDataRaw [' + e + ']');
+    }
     receivedData = "";
 }
+
+/*
+pro Datenpunkt:
+0. Byte Type (0x01 Temp, 0x02 Feuchte, 0x03 Luftqualität, 0x04 Datum, 0x05 Uhrzeit, 0x06 Helligkeit, 0x07 Batteriezustand, 0x08 Sabotage, 0x09 AirPressur. 0x0A error message, 0x0B WeatherIcon)
+1. Byte Type / Länge der Daten (0x01 Byte 0x02 int 0x03 float 0x04 string 0x05 date 0x06 time)
+2. Byte Daten
+3. Byte Einheit (0x00 ohne, 0x01 °C, 0x02 %, 0x03 mBar, 0x04 lux)
+*/
+function InterpreteDatapoint(data) {
+}
+
 
 //this is the obsolete old function which will be removed in one of the next releases
 //here we need to interprete telegram data on nano. Nano sends then a interpreted telegram like:
@@ -414,54 +598,8 @@ function receiveSerialDataTelegram(data) {
 
         //add writable datapoints for display
         if (type.indexOf("Display") >= 0) {
-            adapter.log.debug("found a display; add datapoints");
-            adapter.setObjectNotExists(id + "." + "Temp2Display", {
-                type: "state",
-                common: {
-                    name: "Temperature",
-                    type: "state",
-                    role: "sensor",
-                    function: "Wetter",
-                    read: true,
-                    write: true
-                }
-            });
-
-            adapter.setObjectNotExists(id + "." + "Humidity2Display", {
-                type: "state",
-                common: {
-                    name: "Humidity",
-                    type: "state",
-                    role: "sensor",
-                    function: "Wetter",
-                    read: true,
-                    write: true
-                }
-            });
-
-            adapter.setObjectNotExists(id + "." + "Pressure2Display", {
-                type: "state",
-                common: {
-                    name: "Pressure",
-                    type: "state",
-                    role: "sensor",
-                    function: "Wetter",
-                    read: true,
-                    write: true
-                }
-            });
-
-            adapter.setObjectNotExists(id + "." + "WeatherIcon2Display", {
-                type: "state",
-                common: {
-                    name: "WeatherIcon",
-                    type: "state",
-                    role: "sensor",
-                    function: "Wetter",
-                    read: true,
-                    write: true
-                }
-            });
+            AddDatapoints4Display(id);
+            
 
             toSendId = id;
         }
@@ -1003,8 +1141,10 @@ function sendSerialDataRaw() {
             sTemp += buffer[i];
             sTemp += " ";
         }
-        buffer[DataToSendLength] = 0x0D; //final return
+        //buffer[DataToSendLength] = 0x0D; //final return
         myPort.write(buffer);
+
+        myPort.write("\n\r");
         adapter.log.debug(sTemp);
     }
     catch (e) {
@@ -1013,3 +1153,12 @@ function sendSerialDataRaw() {
     AlreadySending = false;
 }
 
+
+function DeleteDevices() {
+    adapter.getDevices(function (err, devices) {
+        for (var d = 0; d < devices.length; d++) {
+            //adapter.deleteDevice(devices[d]._id);
+            log(devices[d]._id);
+        }
+    });
+}

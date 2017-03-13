@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "myhomecontrol",
-    "version": "0.0.12",
+    "version": "0.0.13",
     "news": {
+      "0.0.13": {
+        "en": "",
+        "de": ""
+      },
       "0.0.12": {
         "en": "configuration for display changed",
         "de": "Konfiguration für Display geändert"
