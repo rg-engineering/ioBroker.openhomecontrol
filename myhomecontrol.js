@@ -545,6 +545,7 @@ updateCE1283180000.unknown with undefined unknown bytenumber: 17
 ce, 12, 83, 18, 00, 00, fe, fe, fe, fe, fe, fe, 01, 04, 01, 03, e8, 2b, b1, 41, 01, 09, 03, 48, 83, 73, 44, 03, 02, 03, 00, 00, 2a, 42, 02, 06, 02, 00, 01, 04, J
 (2) from CE1283180000 (Sensor) with 4 DPs
 */
+
 function InterpreteDatapoint(dataArray, bytenumber, source) {
 
     adapter.log.debug(dataArray);
