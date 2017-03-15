@@ -615,7 +615,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
             barr[2] = parseInt(dataArray[bytenumber + 2], 16);
             barr[3] = parseInt(dataArray[bytenumber + 3], 16);
 
-            value = farr[0];
+            value = (farr[0]).toFixed(2);
             bytenumber = bytenumber + 4;
             break;
         case 0x04: // string 
