@@ -492,7 +492,7 @@ function receiveSerialDataRaw(dataorg) {
                 stype = "Zentrale ";
                 break;
         }
-        adapter.log.debug("(2) from " + source + " (" + stype + ") with " + datapoints);
+        adapter.log.debug("(2) from " + source + " (" + stype + ") with " + datapoints+ " DPs");
         adapter.setObjectNotExists(source, {
             type: "device",
             common: {
@@ -501,7 +501,7 @@ function receiveSerialDataRaw(dataorg) {
         });
         // than all datapoints
         for (var i = 0; i < datapoints; i++) {
-            InterpreteDatapoint(source);
+            bytenumber = InterpreteDatapoint(dataArray,bytenumber,source);
         }
 
         adapter.setObjectNotExists(source + ".LastUpdate", {
@@ -534,7 +534,148 @@ pro Datenpunkt:
 2. Byte Daten
 3. Byte Einheit (0x00 ohne, 0x01 °C, 0x02 %, 0x03 mBar, 0x04 lux)
 */
-function InterpreteDatapoint(data) {
+/*
+updateCE1283180000.unknown with undefined unknown bytenumber: 26
+ce, 12, 83, 18, 00, 00, fe, fe, fe, fe, fe, fe, 01, 04, 01, 03, e8, 2b, b1, 41, 01, 09, 03, 48, 83, 73, 44, 03, 02, 03, 00, 00, 2a, 42, 02, 06, 02, 00, 01, 04, J
+updateCE1283180000.unknown with undefined unknown bytenumber: 23
+ce, 12, 83, 18, 00, 00, fe, fe, fe, fe, fe, fe, 01, 04, 01, 03, e8, 2b, b1, 41, 01, 09, 03, 48, 83, 73, 44, 03, 02, 03, 00, 00, 2a, 42, 02, 06, 02, 00, 01, 04, J
+updateCE1283180000.unknown with undefined unknown bytenumber: 20
+ce, 12, 83, 18, 00, 00, fe, fe, fe, fe, fe, fe, 01, 04, 01, 03, e8, 2b, b1, 41, 01, 09, 03, 48, 83, 73, 44, 03, 02, 03, 00, 00, 2a, 42, 02, 06, 02, 00, 01, 04, J
+updateCE1283180000.unknown with undefined unknown bytenumber: 17
+ce, 12, 83, 18, 00, 00, fe, fe, fe, fe, fe, fe, 01, 04, 01, 03, e8, 2b, b1, 41, 01, 09, 03, 48, 83, 73, 44, 03, 02, 03, 00, 00, 2a, 42, 02, 06, 02, 00, 01, 04, J
+(2) from CE1283180000 (Sensor) with 4 DPs
+*/
+function InterpreteDatapoint(dataArray, bytenumber, source) {
+
+    adapter.log.debug(dataArray);
+    var stype = "unknown";
+    var type = parseInt( dataArray[bytenumber],16);
+    bytenumber++;
+
+    adapter.log.debug("type " + type);
+    switch (type) {
+        case 0x01:
+            stype = "Temperature";
+            break;
+        case 0x02:
+            stype = "Humidity";
+            break;
+        case 0x03:
+            stype = "AirQuality";
+            break;
+        case 0x04:
+            stype = "Date";
+            break;
+        case 0x05:
+            stype = "Time";
+            break;
+        case 0x06:
+            stype = "Brightness";
+            break;
+        case 0x07:
+            stype = "Battery";
+            break;
+        case 0x08:
+            stype = "Sabotage";
+            break;
+        case 0x09:
+            stype = "AirPressur";
+            break;
+        case 0x0A:
+            stype = "Error";
+            break;
+        case 0x0B:
+            stype = "WeatherIcon"
+            break;
+    }
+
+    var datatype = parseInt( dataArray[bytenumber],16);
+    bytenumber++;
+    var value;
+    adapter.log.debug("datatype " + datatype);
+    switch (datatype) {
+        case 0x01: // Byte 
+            value = parseInt(dataArray[bytenumber], 16);
+            bytenumber++;
+            break;
+        case 0x02: // int 
+            value = parseInt(dataArray[bytenumber], 16) << 8;
+            bytenumber++;
+            value = value + parseInt(dataArray[bytenumber], 16);
+            bytenumber++;
+            break;
+        case 0x03: // float
+
+            var farr = new Float32Array(1);
+            
+            var barr = new Int8Array(farr.buffer);
+
+            barr[0] = parseInt(dataArray[bytenumber], 16);
+            barr[1] = parseInt(dataArray[bytenumber + 1], 16);
+            barr[2] = parseInt(dataArray[bytenumber + 2], 16);
+            barr[3] = parseInt(dataArray[bytenumber + 3], 16);
+
+            value = farr[0];
+            bytenumber = bytenumber + 4;
+            break;
+        case 0x04: // string 
+            //to do..
+            break;
+        case 0x05: // date
+            var day = parseInt(dataArray[bytenumber], 16) << 8 + parseInt(dataArray[bytenumber + 1], 16);
+            var month = parseInt(dataArray[bytenumber + 2], 16) << 8 + parseInt(dataArray[bytenumber + 3], 16);
+            var year = parseInt(dataArray[bytenumber + 4], 16) << 8 + parseInt(dataArray[bytenumber + 5], 16);
+            bytenumber = bytenumber + 3 * 2;
+            value = day + "." + month + "." + year;
+            break;
+        case 0x06: // time
+            var hour = parseInt(dataArray[bytenumber], 16) << 8 + parseInt(dataArray[bytenumber + 1], 16);
+            var minute = parseInt(dataArray[bytenumber + 2], 16) << 8 + parseInt(dataArray[bytenumber + 3], 16);
+            var second = parseInt(dataArray[bytenumber + 4], 16) << 8 + parseInt(dataArray[bytenumber + 5], 16);
+            bytenumber = bytenumber + 3 * 2;
+            value = hour + ":" + minute + ":" + second;
+            break;
+    }
+
+    var sdataunit = "unknown";
+    var dataunit = parseInt( dataArray[bytenumber],16);
+    bytenumber++;
+    adapter.log.debug("dataunit " + dataunit);
+    switch (dataunit) {
+        case 0x00:
+            sdataunit = ""; //ohne
+            break;
+        case 0x01:
+            sdataunit = "°C";
+            break;
+        case 0x02:
+            sdataunit = "%";
+            break;
+        case 0x03:
+            sdataunit = "mBar";
+            break;
+        case 0x04:
+            sdataunit = "lux";
+            break;
+    }
+
+    adapter.setObjectNotExists(source + "." + stype, {
+        type: "state",
+        common: {
+            name: stype,
+            type: "state",
+            role: "sensor",
+            function: "Wetter",
+            read: true,
+            write: false
+        }
+    });
+
+    adapter.log.debug("update" + source + "." + stype + " with " + value + " " + sdataunit + " bytenumber: " + bytenumber);
+
+    adapter.setState(source + '.' + stype, { val: value, ack: true });
+
+    return bytenumber;
 }
 
 
@@ -822,6 +963,8 @@ function AddTemperature(DisplayID) {
             } else {
                 
                 if (obj != null) {
+                    //set ack-flag
+                    adapter.setState(DisplayID + '.Temp2Display', { ack: true });
                     var temperature = obj.val;
                     DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
                     DataToSend[DataToSendLength] = 0x01;  //Temperature
@@ -866,6 +1009,8 @@ function AddHumidity(DisplayID) {
             } else {
 
                 if (obj != null) {
+                    //set ack-flag
+                    adapter.setState(DisplayID + '.Humidity2Display', { ack: true });
                     var humidity = obj.val;
 
                     DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
@@ -910,6 +1055,8 @@ function AddAirPressure(DisplayID) {
                 AlreadySending = false;
             } else {
                 if (obj != null) {
+                    //set ack-flag
+                    adapter.setState(DisplayID + '.Pressure2Display', { ack: true });
                     var pressure = obj.val;
 
                     DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
@@ -952,6 +1099,10 @@ function AddWeatherIconId(DisplayID) {
                 AlreadySending = false;
             } else {
                 if (obj != null) {
+
+                    //set ack-flag
+                    adapter.setState(DisplayID + '.WeatherIcon2Display', { ack: true });
+
                     var icon = obj.val;
 
                     var icon_id = -1;
