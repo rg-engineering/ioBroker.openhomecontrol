@@ -1,4 +1,4 @@
-
+ï»¿
 # ioBroker.myHomeControl
 ===========================
 
@@ -32,42 +32,42 @@ as root
 ## Changelog
 
 #### 0.0.13
-* (René) 
+* (RenÃ©) 
 
 #### 0.0.12
-* (René) Configuration for display
+* (RenÃ©) Configuration for display
 	date to be sent are now objects and needs to be written from javascript or similar
 
 #### 0.0.11
-* (René) renamed to myHomeControl
+* (RenÃ©) renamed to myHomeControl
 
 #### 0.0.10
-* (René) interpretes raw data instead of telegram, so we are more flexible in new data points; this needs a new version of firmware on Nano. It's not supported with CUL yet.
+* (RenÃ©) interpretes raw data instead of telegram, so we are more flexible in new data points; this needs a new version of firmware on Nano. It's not supported with CUL yet.
 
 #### 0.0.9
-* (René) new datapoint 'last update'
+* (RenÃ©) new datapoint 'last update'
 
 #### 0.0.8
 
 #### 0.0.7
-* (René)error telegarm added
+* (RenÃ©)error telegarm added
 		ignore sensor ID FFFFFFFFFFFF
 
 #### 0.0.6
-* (René)just cleanups
+* (RenÃ©)just cleanups
 
 #### 0.0.5
-* (René) supports HomeControl and CUL (with modified culfw)
+* (RenÃ©) supports HomeControl and CUL (with modified culfw)
 		 available serial ports in admin page shown
 
 #### 0.0.4
-* (René) receive function optimized
+* (RenÃ©) receive function optimized
 
 #### 0.0.3
-* (René) update to run under linux (debian) ARM system (Allwinner A10)
+* (RenÃ©) update to run under linux (debian) ARM system (Allwinner A10)
 
 #### 0.0.2
-* (René) initial release
+* (RenÃ©) initial release
 
 ## License
 Copyright (C) <2016>  <info@rg-engineering.eu>

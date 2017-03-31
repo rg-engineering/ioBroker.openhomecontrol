@@ -1,15 +1,15 @@
-{
+ï»¿{
   "common": {
     "name": "myhomecontrol",
     "version": "0.0.13",
     "news": {
       "0.0.13": {
-        "en": "",
-        "de": ""
+        "en": "raw data interpretation works now",
+        "de": "Rohdaten-Interpretierung funktioniert nun"
       },
       "0.0.12": {
         "en": "configuration for display changed",
-        "de": "Konfiguration für Display geändert"
+        "de": "Konfiguration fÃ¼r Display geÃ¤ndert"
       },
       "0.0.11": {
         "en": "renamed to myHomeControl",
@@ -29,15 +29,15 @@
       },
       "0.0.7": {
         "en": "error telegram added",
-        "de": "Fehlertelegramm hinzugefügt"
+        "de": "Fehlertelegramm hinzugefÃ¼gt"
       },
       "0.0.6": {
         "en": "just cleanup",
-        "de": "einige Aufräumarbeiten"
+        "de": "einige AufrÃ¤umarbeiten"
       },
       "0.0.5": {
         "en": "support for HomeControl sensors",
-        "de": "unterstützt HomeControl Sensoren"
+        "de": "unterstÃ¼tzt HomeControl Sensoren"
       },
       "0.0.4": {
         "en": "receive function optimized",
@@ -55,11 +55,12 @@
     "enabled": true,
     "messagebox": true,
     "extIcon": "https://github.com/rg-engineering/ioBroker.myhomecontrol/blob/master/admin/myhomecontrol.PNG",
-    "keywords": [ "homecontrol" ],
+    "keywords": [ "myhomecontrol" ],
     "readme": "https://github.com/rg-engineering/ioBroker.myhomecontrol/blob/master/README.md",
     "loglevel": "debug",
     "stopBeforeUpdate": true,
-    "type": "hardware"
+    "type": "hardware".
+    "license": "GPL-3.0"
   },
   "native": {
     "serialport": "COM7",
@@ -68,19 +69,5 @@
     "mode": "telegram",
     "sendInterval2Display": 180,
     "sendIntervalBroadcast": 60
-  },
-  "objects": [
-    {
-      "_id": "_design/homecontrol",
-      "language": "javascript",
-      "views": {
-        "devices": {
-          "map": "function(doc) {\n  if (doc.type == 'device' && doc._id.slice(0, 4) == 'cul') {\n   emit(doc._id, doc);\n  }\n}"
-        }
-      }
-    }
-  ],
-  "instanceObjects": [
-
-  ]
+  }
 }

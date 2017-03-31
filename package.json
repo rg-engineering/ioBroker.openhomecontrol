@@ -1,9 +1,9 @@
-{
+﻿{
   "name": "iobroker.myhomecontrol",
   "version": "0.0.13",
   "description": "ioBroker myHomeControl Adapter",
   "author": {
-    "name": "Ren� G.",
+    "name": "René G.",
     "email": "info@rg-engineering.eu"
   },
   "contributors": [

@@ -1,17 +1,17 @@
-/*
- * myhomecontrol adapter für iobroker
+ï»¿/*
+ * myhomecontrol adapter fÃ¼r iobroker
  *
  * Created: 15.09.2016 21:31:28
  *  Author: Rene
 
-Copyright(C)[2016, 2017][René Glaß]
+Copyright(C)[2016, 2017][RenÃ© GlaÃŸ]
 
-Dieses Programm ist freie Software.Sie können es unter den Bedingungen der GNU General Public License, wie von der Free Software 
-Foundation veröffentlicht, weitergeben und/ oder modifizieren, entweder gemäß Version 3 der Lizenz oder (nach Ihrer Option) jeder 
-späteren Version.
+Dieses Programm ist freie Software.Sie kÃ¶nnen es unter den Bedingungen der GNU General Public License, wie von der Free Software 
+Foundation verÃ¶ffentlicht, weitergeben und/ oder modifizieren, entweder gemÃ¤ÃŸ Version 3 der Lizenz oder (nach Ihrer Option) jeder 
+spÃ¤teren Version.
 
-Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE,
-    sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK.Details finden Sie in der
+Die VerÃ¶ffentlichung dieses Programms erfolgt in der Hoffnung, daÃŸ es Ihnen von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE,
+    sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÃœR EINEN BESTIMMTEN ZWECK.Details finden Sie in der
 GNU General Public License.
 
 Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben.Falls nicht,
@@ -438,9 +438,9 @@ function AddDatapoints4Display(id) {
  0.-5. Byte Quelle-ID (6Byte)
  6.-11. Byte Ziel-ID (0xFE Broadcast, 0x10 Zentrale) (6Byte)
  12. Byte ModulType (0x01 Sensor, 0x02 Aktor, 0x03 Display 0x10 Zentrale)
- 13. Byte Anzahl Datenpunkt (nicht Länge!)
+ 13. Byte Anzahl Datenpunkt (nicht LÃ¤nge!)
 
- CRC über gesamtes Telegram vom chip selbst
+ CRC Ã¼ber gesamtes Telegram vom chip selbst
 
 */
 function receiveSerialDataRaw(dataorg) {
@@ -465,11 +465,11 @@ function receiveSerialDataRaw(dataorg) {
         var bytenumber = 0;
         var source = data.substr(bytenumber, 17);
         source = source.replace(/ /g, ''); //alle Leerzeichen entfernen
-        source = source.toUpperCase(); //und alles in Großbuchstaben
+        source = source.toUpperCase(); //und alles in GroÃŸbuchstaben
         bytenumber += 6;
         var target = data.substr(bytenumber * 2, 17);
         target = target.replace(/ /g, ''); //alle Leerzeichen entfernen
-        target = target.toUpperCase(); //und alles in Großbuchstaben
+        target = target.toUpperCase(); //und alles in GroÃŸbuchstaben
         bytenumber += 6;
         var type = parseInt(dataArray[bytenumber], 16);
         bytenumber += 1;
@@ -529,10 +529,10 @@ function receiveSerialDataRaw(dataorg) {
 
 /*
 pro Datenpunkt:
-0. Byte Type (0x01 Temp, 0x02 Feuchte, 0x03 Luftqualität, 0x04 Datum, 0x05 Uhrzeit, 0x06 Helligkeit, 0x07 Batteriezustand, 0x08 Sabotage, 0x09 AirPressur. 0x0A error message, 0x0B WeatherIcon)
-1. Byte Type / Länge der Daten (0x01 Byte 0x02 int 0x03 float 0x04 string 0x05 date 0x06 time)
+0. Byte Type (0x01 Temp, 0x02 Feuchte, 0x03 LuftqualitÃ¤t, 0x04 Datum, 0x05 Uhrzeit, 0x06 Helligkeit, 0x07 Batteriezustand, 0x08 Sabotage, 0x09 AirPressur. 0x0A error message, 0x0B WeatherIcon)
+1. Byte Type / LÃ¤nge der Daten (0x01 Byte 0x02 int 0x03 float 0x04 string 0x05 date 0x06 time)
 2. Byte Daten
-3. Byte Einheit (0x00 ohne, 0x01 °C, 0x02 %, 0x03 mBar, 0x04 lux)
+3. Byte Einheit (0x00 ohne, 0x01 Â°C, 0x02 %, 0x03 mBar, 0x04 lux)
 */
 /*
 updateCE1283180000.unknown with undefined unknown bytenumber: 26
@@ -647,7 +647,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
             sdataunit = ""; //ohne
             break;
         case 0x01:
-            sdataunit = "°C";
+            sdataunit = "Â°C";
             break;
         case 0x02:
             sdataunit = "%";
@@ -867,7 +867,7 @@ function AddHeader(target, DisplayID) {
         DataToSend[IDX_TARGET + 5] = 0xFE;
     }
     else {
-        //to do: über alle displays
+        //to do: Ã¼ber alle displays
         //98EF82180000
 
         //DisplayId ist string
@@ -983,7 +983,7 @@ function AddTemperature(DisplayID) {
                     DataToSend[DataToSendLength + 5] = barr[3];
 
 
-                    DataToSend[DataToSendLength + 6] = 0x01; //°C
+                    DataToSend[DataToSendLength + 6] = 0x01; //Â°C
 
                     DataToSendLength += 7;
 
