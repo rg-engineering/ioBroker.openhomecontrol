@@ -1,7 +1,7 @@
 ﻿{
   "common": {
     "name": "myhomecontrol",
-    "version": "0.0.13",
+    "version": "0.0.14",
     "news": {
       "0.0.13": {
         "en": "raw data interpretation works now",
@@ -54,13 +54,13 @@
     "icon": "myhomecontrol.png",
     "enabled": true,
     "messagebox": true,
-    "extIcon": "https://github.com/rg-engineering/ioBroker.myhomecontrol/blob/master/admin/myhomecontrol.PNG",
+    "extIcon": "https://raw.githubusercontent.com/rg-engineering/ioBroker.myhomecontrol/master/admin/myhomecontrol.png",
     "keywords": [ "myhomecontrol" ],
     "readme": "https://github.com/rg-engineering/ioBroker.myhomecontrol/blob/master/README.md",
     "loglevel": "debug",
     "stopBeforeUpdate": true,
     "type": "hardware".
-    "license": "GPL-3.0"
+    "license": "MIT"
   },
   "native": {
     "serialport": "COM7",

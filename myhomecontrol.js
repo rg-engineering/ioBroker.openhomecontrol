@@ -1162,6 +1162,8 @@ function AddWeatherIconId(DisplayID) {
                         case "nt_rain":
                             icon_id = 13;
                             break;
+                        case "chancetstorms":
+                        case "nt_chancetstorms":
                         case "chancethunderstorm":
                         case "nt_chancethunderstorm":
                             icon_id = 14;
