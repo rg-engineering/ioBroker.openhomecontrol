@@ -1,8 +1,12 @@
-﻿{
+{
   "common": {
     "name": "myhomecontrol",
     "version": "0.0.14",
     "news": {
+      "0.0.14": {
+        "en": "bug fixing",
+        "de": "Fehlerbehebung"
+      },
       "0.0.13": {
         "en": "raw data interpretation works now",
         "de": "Rohdaten-Interpretierung funktioniert nun"
@@ -59,7 +63,7 @@
     "readme": "https://github.com/rg-engineering/ioBroker.myhomecontrol/blob/master/README.md",
     "loglevel": "debug",
     "stopBeforeUpdate": true,
-    "type": "hardware".
+    "type": "hardware",
     "license": "MIT"
   },
   "native": {

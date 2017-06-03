@@ -1,6 +1,7 @@
-﻿
+
 # ioBroker.myHomeControl
 ===========================
+
 
 This adapter implements interpretation of data received from Homecontrol sensor via RF.
 
@@ -32,7 +33,7 @@ as root
 ## Changelog
 
 #### 0.0.14
-* (René) 
+* (René) bug fixing
 
 #### 0.0.13
 * (René) 

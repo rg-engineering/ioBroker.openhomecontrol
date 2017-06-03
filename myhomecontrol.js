@@ -1,4 +1,4 @@
-﻿/*
+/*
  * myhomecontrol adapter für iobroker
  *
  * Created: 15.09.2016 21:31:28
@@ -18,6 +18,7 @@ Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Prog
     siehe < http://www.gnu.org/licenses/>.
 
 */
+
 
 /* jshint -W097 */// jshint strict:false
 /*jslint node: true */
@@ -1168,6 +1169,9 @@ function AddWeatherIconId(DisplayID) {
                         case "nt_chancethunderstorm":
                             icon_id = 14;
                             break;
+                    
+                        case "tstorms":
+                        case "nt_tstorms":
                         case "thunderstorm":
                         case "nt_thunderstorm":
                             icon_id = 15;

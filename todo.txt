@@ -1,3 +1,4 @@
 
 
-* Konfiguration, welche daten wohin gesendet werden
+* Konfiguration, welche Daten wohin gesendet werden
+* support des neuen groﬂen displays (mehr daten)
