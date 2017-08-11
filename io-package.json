@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "myhomecontrol",
-    "version": "0.0.14",
+    "version": "0.0.15",
     "news": {
+      "0.0.15": {
+        "en": "Percentage of precipitation (PoP) to send added",
+        "de": "Senden der Regenwahrscheinlichkeit hinzugefügt"
+      },
       "0.0.14": {
         "en": "bug fixing",
         "de": "Fehlerbehebung"

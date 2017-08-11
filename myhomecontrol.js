@@ -431,6 +431,18 @@ function AddDatapoints4Display(id) {
             write: true
         }
     });
+
+    adapter.setObjectNotExists(id + "." + "PoP2Display", {
+        type: "state",
+        common: {
+            name: "Percentage of precipitation",
+            type: "state",
+            role: "sensor",
+            function: "Wetter",
+            read: true,
+            write: true
+        }
+    });
 }
 
 //this will be the new function to interprete raw data sent by nano
@@ -1036,6 +1048,47 @@ function AddHumidity(DisplayID) {
                     DataToSendLength += 7;
 
                     adapter.log.debug('Humidity ' + humidity);
+
+                    CheckDataLength();
+                }
+                AddPoP(DisplayID);
+            }
+        });
+    }
+    catch (e) {
+        adapter.log.error('exception in  AddHumidity [' + e + ']');
+    }
+}
+
+function AddPoP(DisplayID) {
+    try {
+        adapter.getState(DisplayID + '.PoP2Display', function (err, obj) {
+            if (err) {
+                adapter.log.error(err);
+                AlreadySending = false;
+            } else {
+
+                if (obj != null) {
+                    //set ack-flag
+                    adapter.setState(DisplayID + '.PoP2Display', { ack: true });
+                    var pop = obj.val;
+
+                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+                    DataToSend[DataToSendLength] = 0x0C;  //pop
+                    DataToSend[DataToSendLength + 1] = 0x02; //int
+
+                    var farr = new Float32Array(1);
+                    farr[0] = humidity;
+                    var barr = new Int8Array(farr.buffer);
+
+                    DataToSend[DataToSendLength + 2] = barr[0];
+                    DataToSend[DataToSendLength + 3] = barr[1];
+
+                    DataToSend[DataToSendLength + 4] = 0x02; //%
+
+                    DataToSendLength += 5;
+
+                    adapter.log.debug('PoP ' + pop);
 
                     CheckDataLength();
                 }

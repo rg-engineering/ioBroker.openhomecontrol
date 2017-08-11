@@ -32,6 +32,9 @@ as root
 
 ## Changelog
 
+#### 0.0.15
+* (René) Percentage of precipitation (PoP) to send added
+
 #### 0.0.14
 * (René) bug fixing
 
