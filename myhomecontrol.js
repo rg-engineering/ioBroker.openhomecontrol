@@ -27,7 +27,7 @@ Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Prog
 // you have to require the utils module and call adapter function
 var utils =    require(__dirname + '/lib/utils'); // Get common adapter utils
 
-
+var version = "0.0.15";
 
 
 // you have to call the adapter function and pass a options object
@@ -144,6 +144,9 @@ adapter.on('stateChange', function (id, state) {
 // is called when databases are connected and adapter received configuration.
 // start here!
 adapter.on('ready', function () {
+
+    adapter.log.info("version " + version);
+
     try {
         main();
     }
@@ -153,6 +156,7 @@ adapter.on('ready', function () {
 });
 
 function main() {
+    //adapter.log.debug("111");
     var options = {
         //serialport: adapter.config.serialport || '/dev/ttyACM0',
         serialport: adapter.config.serialport || 'COM13',
@@ -161,13 +165,13 @@ function main() {
         sendInterval2Display: parseInt(adapter.config.sendInterval2Display) || 180,
         sendIntervalBroadcast: parseInt(adapter.config.sendIntervalBroadcast) || 30
     };
-
+    //adapter.log.debug("222");
     SerialPort.list(function (err, ports) {
         ports.forEach(function (port) {
             adapter.log.info(port.comName + ' ' + port.pnpId + ' ' + port.manufacturer);
         });
     });
-
+    //adapter.log.debug("333");
 
     //Rechte im Linux gesetzt??? 
     try {
@@ -178,8 +182,12 @@ function main() {
     } catch (e) {
         adapter.log.error('Serial port is not created [' + e + ']');
     }
-
-    adapter.log.info('port created; portname: ' + options.serialport + ' ' + myPort.comName + ' ' + myPort.pnpId + ' ' + myPort.manufacturer + ' Data rate: ' + myPort.options.baudRate + ' ' + options.baudrate);
+    //adapter.log.debug("444");
+    //adapter.log.info('port created; portname: ' + options.serialport + ' ' + myPort.comName + ' ' + myPort.pnpId + ' ' + myPort.manufacturer + ' Data rate: ' + myPort.options.baudRate + ' ' + options.baudrate);
+    //with serialport 5.0.0:
+    adapter.log.info('port created; portname: ' + options.serialport + ' Data rate: ' + myPort.baudRate + ' ' + options.baudrate);
+    //adapter.log.info('port created; portname: ' + options.serialport);
+    //adapter.log.debug("555");
 
     myPort.on('open', showPortOpen);
     myPort.on('data', receiveSerialData);
@@ -257,8 +265,10 @@ function main() {
 function showPortOpen() {
 	
 	try{
-		if (myPort != null) {
-			adapter.log.debug('port open: ' + myPort.options.baudRate + ' ' + myPort.comName);
+        if (myPort != null) {
+            //adapter.log.debug('port open: ' + myPort.options.baudRate + ' ' + myPort.comName);
+            //with serialport 5.0.0:
+			adapter.log.debug('port open: ' + myPort.baudRate);
             if (adapter.config.device == "CUL") {
                 //to enable homecontrol mode on CUL
                 myPort.write("V\n\r");
@@ -277,13 +287,17 @@ function SetMode() {
         if (adapter.config.device == "HomeControl") {
             //send configuration to nano
             if (adapter.config.mode == "telegram") {
-                adapter.log.debug('telegram mode set on ' + myPort.comName);
+                //adapter.log.debug('telegram mode set on ' + myPort.comName);
+                //with serialport 5.0.0:
+                adapter.log.debug('telegram mode set on ' + myPort.path);
                 myPort.write("mi\n\r");
                 //myPort.write(0x0D);
             }
             else
                 if (adapter.config.mode == "raw data") {
-                    adapter.log.debug('raw data mode set on ' + myPort.comName);
+                    //adapter.log.debug('raw data mode set on ' + myPort.comName);
+                    //with serialport 5.0.0:
+                    adapter.log.debug('raw data mode set on ' + myPort.path);
                     myPort.write("mr\n\r");
                     //myPort.write(0x0D);
                 }
@@ -1077,12 +1091,8 @@ function AddPoP(DisplayID) {
                     DataToSend[DataToSendLength] = 0x0C;  //pop
                     DataToSend[DataToSendLength + 1] = 0x02; //int
 
-                    var farr = new Float32Array(1);
-                    farr[0] = humidity;
-                    var barr = new Int8Array(farr.buffer);
-
-                    DataToSend[DataToSendLength + 2] = barr[0];
-                    DataToSend[DataToSendLength + 3] = barr[1];
+                    DataToSend[DataToSendLength + 2] = highByte(pop);
+                    DataToSend[DataToSendLength + 3] = lowByte(pop);
 
                     DataToSend[DataToSendLength + 4] = 0x02; //%
 
@@ -1097,7 +1107,7 @@ function AddPoP(DisplayID) {
         });
     }
     catch (e) {
-        adapter.log.error('exception in  AddHumidity [' + e + ']');
+        adapter.log.error('exception in  AddPoP [' + e + ']');
     }
 }
 

@@ -34,6 +34,7 @@ as root
 
 #### 0.0.15
 * (René) Percentage of precipitation (PoP) to send added
+* (René) update to serialport 5.0.0
 
 #### 0.0.14
 * (René) bug fixing
