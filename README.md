@@ -32,6 +32,9 @@ as root
 
 ## Changelog
 
+#### 0.0.16
+* (René) protocol extension: wind average speed, wind gust and wind direction added
+
 #### 0.0.15
 * (René) Percentage of precipitation (PoP) to send added
 * (René) update to serialport 5.0.0

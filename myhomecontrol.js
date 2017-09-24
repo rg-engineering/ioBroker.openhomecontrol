@@ -27,7 +27,7 @@ Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Prog
 // you have to require the utils module and call adapter function
 var utils =    require(__dirname + '/lib/utils'); // Get common adapter utils
 
-var version = "0.0.15";
+var version = "0.0.16";
 
 
 // you have to call the adapter function and pass a options object
@@ -615,6 +615,18 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
         case 0x0B:
             stype = "WeatherIcon"
             break;
+        case 0x0C:
+            stype = "PoP"
+            break;
+        case 0x0D:
+            stype = "AvgWindSpeed"
+            break;
+        case 0x0E:
+            stype = "WindGust"
+            break;
+        case 0x0F:
+            stype = "WindDir"
+            break;
     }
 
     var datatype = parseInt( dataArray[bytenumber],16);
@@ -684,6 +696,12 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
             break;
         case 0x04:
             sdataunit = "lux";
+            break;
+        case 0x05:
+            sdataunit = "m/s";
+            break;
+        case 0x06:
+            sdataunit = "deg";
             break;
     }
 
@@ -1367,6 +1385,8 @@ function sendSerialDataRaw() {
 
         myPort.write("\n\r");
         adapter.log.debug(sTemp);
+
+        buffer = null;
     }
     catch (e) {
         adapter.log.error('exception in  sendSerialDataRaw [' + e + ']');

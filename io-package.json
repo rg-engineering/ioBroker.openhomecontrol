@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "myhomecontrol",
-    "version": "0.0.15",
+    "version": "0.0.16",
     "news": {
+      "0.0.16": {
+        "en": "protocol extension: wind average speed, wind gust and wind direction added",
+        "de": "Erweiterung des Protokolls: Windgeschwindigkeit, Windböen und Windrichtung hinzugefügt"
+      },
       "0.0.15": {
         "en": "Percentage of precipitation (PoP) to send added",
         "de": "Senden der Regenwahrscheinlichkeit hinzugefügt"
