@@ -402,11 +402,12 @@ function AddDatapoints4Display(id) {
         type: "state",
         common: {
             name: "Temperature",
-            type: "state",
+            type: "number",
             role: "sensor",
             function: "Wetter",
             read: true,
-            write: true
+            write: true,
+            unit: "°C"
         }
     });
 
@@ -414,11 +415,12 @@ function AddDatapoints4Display(id) {
         type: "state",
         common: {
             name: "Humidity",
-            type: "state",
+            type: "number",
             role: "sensor",
             function: "Wetter",
             read: true,
-            write: true
+            write: true,
+            unit: "%"
         }
     });
 
@@ -426,11 +428,12 @@ function AddDatapoints4Display(id) {
         type: "state",
         common: {
             name: "Pressure",
-            type: "state",
+            type: "number",
             role: "sensor",
             function: "Wetter",
             read: true,
-            write: true
+            write: true,
+            unit: "kPa"
         }
     });
 
@@ -438,7 +441,7 @@ function AddDatapoints4Display(id) {
         type: "state",
         common: {
             name: "WeatherIcon",
-            type: "state",
+            type: "string",
             role: "sensor",
             function: "Wetter",
             read: true,
@@ -450,11 +453,12 @@ function AddDatapoints4Display(id) {
         type: "state",
         common: {
             name: "Percentage of precipitation",
-            type: "state",
+            type: "number",
             role: "sensor",
             function: "Wetter",
             read: true,
-            write: true
+            write: true,
+            unit: "%"
         }
     });
 }
