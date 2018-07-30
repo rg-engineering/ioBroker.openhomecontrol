@@ -29,12 +29,14 @@
     <Content Include="io-package.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
+    <Compile Include="admin\words.js">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Gruntfile.js" />
     <Compile Include="myhomecontrol.js" />
     <Compile Include="test.js" />
     <Content Include="admin\index.html" />
     <Content Include="admin\myhomecontrol.png" />
-    <Content Include="admin\template.png" />
     <Compile Include="lib\utils.js" />
     <Compile Include="tasks\jscs.js" />
     <Compile Include="tasks\jscsRules.js" />

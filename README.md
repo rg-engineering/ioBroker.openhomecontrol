@@ -32,6 +32,9 @@ as root
 
 ## Changelog
 
+#### 0.0.17
+* (René) update serial port lib
+
 #### 0.0.16
 * (René) protocol extension: wind average speed, wind gust and wind direction added
 

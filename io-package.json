@@ -1,8 +1,12 @@
 {
   "common": {
     "name": "myhomecontrol",
-    "version": "0.0.16",
+    "version": "0.0.17",
     "news": {
+      "0.0.17": {
+        "en": "update serial port lib",
+        
+      },
       "0.0.16": {
         "en": "protocol extension: wind average speed, wind gust and wind direction added",
         "de": "Erweiterung des Protokolls: Windgeschwindigkeit, Windböen und Windrichtung hinzugefügt"

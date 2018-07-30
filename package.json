@@ -1,6 +1,6 @@
 {
   "name": "iobroker.myhomecontrol",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "ioBroker myHomeControl Adapter",
   "author": {
     "name": "René G.",
@@ -25,7 +25,7 @@
     "url": "https://github.com/rg-engineering/ioBroker.myhomecontrol"
   },
   "dependencies": {
-    "serialport": "^6.0.4"
+    "serialport": "^6.2.0"
   },
   "devDependencies": {
     "grunt": "^1.0.1",
