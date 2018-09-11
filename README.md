@@ -1,6 +1,12 @@
-
+![Logo](admin/myhomecontrol.png)
 # ioBroker.myHomeControl
 ===========================
+
+[![NPM version](https://img.shields.io/npm/v/iobroker.myhomecontrol.svg)](https://www.npmjs.com/package/iobroker.myhomecontrol)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.myhomecontrol.svg)](https://www.npmjs.com/package/iobroker.myhomecontrol)
+[![Tests](https://travis-ci.org/rg-engineering/ioBroker.myhomecontrol.svg?branch=master)](https://travis-ci.org/rg-engineering/ioBroker.myhomecontrol)
+
+[![NPM](https://nodei.co/npm/iobroker.myhomecontrol.png?downloads=true)](https://nodei.co/npm/iobroker.myhomecontrol/)
 
 
 This adapter implements interpretation of data received from Homecontrol sensor via RF.
