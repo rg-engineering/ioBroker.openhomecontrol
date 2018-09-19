@@ -1,0 +1,245 @@
+﻿<html>
+
+<head>
+    <link rel="stylesheet" type="text/css" href="../../css/adapter.css" />
+    <link rel="stylesheet" type="text/css" href="../../lib/css/materialize.css">
+
+    <script type="text/javascript" src="../../lib/js/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="../../socket.io/socket.io.js"></script>
+
+    <script type="text/javascript" src="../../js/translate.js"></script>
+    <script type="text/javascript" src="../../lib/js/materialize.js"></script>
+    <script type="text/javascript" src="../../js/adapter-settings.js"></script>
+    <script type="text/javascript" src="words.js"></script>
+    
+    <style>
+        .polled {
+            height: 100px !important;
+        }
+
+        .adapter-body {
+            overflow: hidden !important;
+        }
+    </style>
+    <!-- you have to define 2 functions in the global scope: -->
+    <script type="text/javascript">
+
+        // Dictionary (systemDictionary is global variable from adapter-settings.js)
+
+
+        var timeout;
+
+        function getComPorts(actualValue) {
+            timeout = setTimeout(function () {
+                getComPorts(actualValue);
+            }, 2000);
+
+            //function sendTo(_adapter_instance, command, message, callback)
+            sendTo('myhomecontrol.0', 'listUart', null, function (list) {
+                if (timeout) {
+                    clearTimeout(timeout);
+                    timeout = null;
+                }
+
+                for (var i = 0; i < list.length; i++) {
+                    $('#serialport').append('<option value="' + list[i].comName + '" ' + ((actualValue == list[i].comName) ? 'selected' : '') + '>' + list[i].comName + '</option>');
+                }
+            });
+
+            M.updateTextFields();
+        }
+
+
+        // the function loadSettings has to exist ...
+        function load(settings, onChange) {
+
+            if (!settings) return;
+
+            // example: select elements with id=key and class=value and insert value
+            for (var key in settings) {
+                // example: select elements with id=key and class=value and insert value
+                if ($('#' + key + '.value').attr('type') == 'checkbox') {
+                    $('#' + key + '.value').prop('checked', settings[key]).change(function () {
+                        onChange();
+                    });
+                } else {
+                    $('#' + key + '.value').val(settings[key]).change(function () {
+                        onChange();
+                    }).keyup(function () {
+                        $(this).trigger('change');
+                    });
+                }
+            }
+            getComPorts(settings.serialport);
+
+            // Signal to admin, that no changes yet
+            onChange(false);
+
+            M.updateTextFields();
+        }
+
+
+        // ... and the function save has to exist.
+        // you have to make sure the callback is called with the settings object as first param!
+        function save(callback) {
+            // example: select elements with class=value and build settings object
+            var obj = {};
+            $('.value').each(function () {
+                var $this = $(this);
+                obj[$this.attr('id')] = $this.val();
+            });
+            callback(obj);
+        }
+
+
+
+    </script>
+</head>
+<body>
+    <!-- you have to put your config page in a div with id adapter-container -->
+    <div class="m adapter-container">
+
+        <div class="row">
+            <div class="col s12">
+                <ul class="tabs">
+                    <li class="tab col s2"><a href="#tab-main" class="translate active">Main settings</a></li>
+                    <li class="tab col s2 le-settings"><a href="#tab-notused" class="translate">not used</a></li>
+                </ul>
+            </div>
+
+            <!--  main - settings  -->
+
+
+            <div id="tab-main" class="col s12 page">
+                <div class="row">
+                    <div class="col s6 m4 l2">
+                        <img src="myhomecontrol.png" class="logo">
+                    </div>
+                </div>
+
+                <div class="input-field col s6 col-mysql-ip">
+                    <select id="serialport" class="value"></select>
+                    <label for="serialport" class="translate">serialport</label>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s6">
+                        <select id="baudrate" class="value">
+                            <option value="110">110</option>
+                            <option value="150">150</option>
+                            <option value="300">300</option>
+                            <option value="600">600</option>
+                            <option value="1200">1200</option>
+                            <option value="2400">2400</option>
+                            <option value="4800">4800</option>
+                            <option value="9600">9600</option>
+                            <option value="19200">19200</option>
+                            <option value="38400">38400</option>
+                            <option value="56000">56000</option>
+                            <option value="57600">57600</option>
+                            <option value="115200">115200</option>
+                        </select>
+                        <label for="baudrate" class="translate">baudrate</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s6">
+                        <select id="device" class="value">
+                            <option value="CUL" class="translate">option_cul</option>
+                            <option value="HomeControl" class="translate">option_homeControl</option>
+                        </select>
+                        <label for="device" class="translate">select_device</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s6">
+                        <select id="mode" class="value">
+                            <option value="raw data" class="translate">option_rawdata</option>
+                            <option value="telegram" class="translate">option_telegramdata</option>
+                        </select>
+                        <label for="mode" class="translate">select_mode</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="input-field col s6">
+                        <input type="number" id="sendIntervalBroadcast" class="value" />
+                        <label for="sendIntervalBroadcast" class="translate">send_interval_broadcast</label>
+
+                    </div>
+                    <div class="col s6 ">
+                        <span class="translate">disable_broadcast_hint</span>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+        </div>
+
+    </div>
+                <!--
+
+                <table>
+                    <tr>
+                        <td class="translate">Serial port</td>
+                        <td>
+                            <select class="value" id="serialport"></select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="translate">Baud rate</td>
+                        <td>
+                            <select id="baudrate" class="value">
+                                <option value="110">110</option>
+                                <option value="150">150</option>
+                                <option value="300">300</option>
+                                <option value="600">600</option>
+                                <option value="1200">1200</option>
+                                <option value="2400">2400</option>
+                                <option value="4800">4800</option>
+                                <option value="9600">9600</option>
+                                <option value="19200">19200</option>
+                                <option value="38400">38400</option>
+                                <option value="56000">56000</option>
+                                <option value="57600">57600</option>
+                                <option value="115200">115200</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="translate">select Device</td>
+                        <td>
+                            <select id="device" class="value">
+                                <option value="CUL">CUL (needs a modified culfw)</option>
+                                <option value="HomeControl">HomeControl</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="translate">select Mode</td>
+                        <td>
+                            <select id="mode" class="value">
+                                <option value="raw data">interpretes raw data (default)</option>
+                                <option value="telegram">telegram data (obsolete)</option>
+                            </select>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="translate">send Interval broadcast [s]</td>
+                        <td>
+                            <input type="text" id="sendIntervalBroadcast" class="value" />
+                        </td>
+                        <td>
+                            to disable sending broadcast data set interval to -1; 0 will use hardcoded standard value.
+                        </td>
+                    </tr>
+                </table>
+
+            </div>
+        -->
+    </body>
+</html>

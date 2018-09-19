@@ -1,11 +1,15 @@
 {
   "common": {
     "name": "myhomecontrol",
-    "version": "0.0.17",
+    "version": "0.0.18",
     "news": {
+      "0.0.18": {
+        "en": "update to admin3"
+
+      },
       "0.0.17": {
-        "en": "update serial port lib",
-        
+        "en": "update serial port lib"
+
       },
       "0.0.16": {
         "en": "protocol extension: wind average speed, wind gust and wind direction added",
@@ -76,7 +80,8 @@
     "loglevel": "debug",
     "stopBeforeUpdate": true,
     "type": "hardware",
-    "license": "MIT"
+    "license": "MIT",
+    "materialize": true
   },
   "native": {
     "serialport": "COM7",

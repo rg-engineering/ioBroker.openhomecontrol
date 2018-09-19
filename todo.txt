@@ -1,4 +1,0 @@
-
-
-* Konfiguration, welche Daten wohin gesendet werden
-
