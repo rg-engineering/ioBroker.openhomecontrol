@@ -7,7 +7,7 @@ systemDictionary = {
     "disable_broadcast_hint":
         {
             "en": "to disable sending broadcast data set interval to -1; 0 will use hardcoded standard value.",
-            "de": "um das Senden des Broadcast-Datensatzintervalls auf -1 zu deaktivieren; 0 wird den fest codierten Standardwert verwenden.",
+            "de": "um das Senden des Broadcast-Datensatzintervalls zu deaktivieren auf -1 setzen; 0 wird den fest codierten Standardwert verwendet.",
             "ru": "для отключения отправки интервала набора данных передачи до -1; 0 будет использовать стандартное значение hardcoded.",
             "pt": "para desabilitar o envio do intervalo do conjunto de dados de transmissão para -1; 0 usará o valor padrão codificado.",
             "nl": "om het verzenden van uitzendgegevensinterval naar -1 uit te schakelen; 0 gebruikt de standaardwaarde met harde codes.",
@@ -19,7 +19,7 @@ systemDictionary = {
     "select_device":
         {
             "en": "select Device",
-            "de": "Wählen Sie Gerät",
+            "de": "Gerät",
             "ru": "выберите устройство",
             "pt": "Selecionar dispositivo",
             "nl": "selecteer apparaat",
@@ -31,7 +31,7 @@ systemDictionary = {
     "select_mode":
         {
             "en": "select Mode",
-            "de": "Auswahlmodus",
+            "de": "Mode",
             "ru": "выберите режим",
             "pt": "modo de seleção",
             "nl": "Selecteer modus",
@@ -123,9 +123,19 @@ systemDictionary = {
             "it": "interpreta i dati del telegramma (obsoleto)",
             "es": "interpreta datos de telegramas (obsoletos)",
             "pl": "interpretuje dane telegramów (przestarzałe)"
+        },
+    "devices":
+        {
+            "en": "devices",
+            "de": "Geräte",
+            "ru": "приборы",
+            "pt": "dispositivos",
+            "nl": "apparaten",
+            "fr": "dispositifs",
+            "it": "dispositivi",
+            "es": "dispositivos",
+            "pl": "pomysłowość"
         }
-
-
     
     
 };

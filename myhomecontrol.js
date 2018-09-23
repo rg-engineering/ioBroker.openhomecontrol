@@ -4,19 +4,6 @@
  * Created: 15.09.2016 21:31:28
  *  Author: Rene
 
-Copyright(C)[2016, 2017][René Glaß]
-
-Dieses Programm ist freie Software.Sie können es unter den Bedingungen der GNU General Public License, wie von der Free Software 
-Foundation veröffentlicht, weitergeben und/ oder modifizieren, entweder gemäß Version 3 der Lizenz oder (nach Ihrer Option) jeder 
-späteren Version.
-
-Die Veröffentlichung dieses Programms erfolgt in der Hoffnung, daß es Ihnen von Nutzen sein wird, aber OHNE IRGENDEINE GARANTIE,
-    sogar ohne die implizite Garantie der MARKTREIFE oder der VERWENDBARKEIT FÜR EINEN BESTIMMTEN ZWECK.Details finden Sie in der
-GNU General Public License.
-
-Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Programm erhalten haben.Falls nicht,
-    siehe < http://www.gnu.org/licenses/>.
-
 */
 
 
@@ -27,7 +14,7 @@ Sie sollten ein Exemplar der GNU General Public License zusammen mit diesem Prog
 // you have to require the utils module and call adapter function
 var utils =    require(__dirname + '/lib/utils'); // Get common adapter utils
 
-var version = "0.0.16";
+var version = "0.0.18";
 
 
 // you have to call the adapter function and pass a options object
@@ -54,6 +41,10 @@ var IDX_SOURCE = 1;
 var IDX_START = 0;
 
 var AlreadySending = false;
+
+const newDevices = [];
+
+
 
 try {
     var SerialPort = require('serialport');
@@ -91,6 +82,11 @@ adapter.on('message', function (obj) {
                         adapter.sendTo(obj.from, obj.command, [{comName: 'Not available'}], obj.callback);
                     }
                 }
+                break;
+            case 'listDevices':
+                ListDevices(obj);
+
+                
                 break;
     	}
     }
@@ -317,7 +313,7 @@ function receiveSerialData(data) {
 
     receivedData = receivedData + data;
 
-    adapter.log.debug(receivedData);
+    //adapter.log.debug(receivedData);
 
     if (adapter.config.device == "CUL") {
 
@@ -381,7 +377,7 @@ function receiveSerialData(data) {
 
                 //telegram starts with I and ends with J
                 if (receivedData.indexOf("I") >= 0 && receivedData.indexOf("J") > 0) {
-                    adapter.log.debug('now going to interprete ' + receivedData);
+                    //adapter.log.debug('now going to interprete ' + receivedData);
                     receiveSerialDataRaw(receivedData);
                 }
                 else if (receivedData.indexOf("I") < 0) {
@@ -579,12 +575,15 @@ ce, 12, 83, 18, 00, 00, fe, fe, fe, fe, fe, fe, 01, 04, 01, 03, e8, 2b, b1, 41, 
 
 function InterpreteDatapoint(dataArray, bytenumber, source) {
 
-    adapter.log.debug(dataArray);
+
+
+
+    //adapter.log.debug(dataArray);
     var stype = "unknown";
     var type = parseInt( dataArray[bytenumber],16);
     bytenumber++;
 
-    adapter.log.debug("type " + type);
+    //adapter.log.debug("type " + type);
     switch (type) {
         case 0x01:
             stype = "Temperature";
@@ -636,7 +635,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
     var datatype = parseInt( dataArray[bytenumber],16);
     bytenumber++;
     var value;
-    adapter.log.debug("datatype " + datatype);
+    //adapter.log.debug("datatype " + datatype);
     switch (datatype) {
         case 0x01: // Byte 
             value = parseInt(dataArray[bytenumber], 16);
@@ -651,7 +650,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
         case 0x03: // float
 
             var farr = new Float32Array(1);
-            
+
             var barr = new Int8Array(farr.buffer);
 
             barr[0] = parseInt(dataArray[bytenumber], 16);
@@ -662,21 +661,52 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
             value = (farr[0]).toFixed(2);
             bytenumber = bytenumber + 4;
             break;
-        case 0x04: // string 
-            //to do..
+        case 0x04: // string
+
             break;
+        /*
+            myhomecontrol.0	2018 - 09 - 23 13: 45: 28.512	debug	update101010101010.Time with 0: 0: 0 bytenumber: 32
+            myhomecontrol.0	2018 - 09 - 23 13: 45: 28.512	debug	type 5 datatype 6 dataunit 0
+            myhomecontrol.0	2018 - 09 - 23 13: 45: 28.511	warn--- 00 d 00 2d 00 1c
+            myhomecontrol.0	2018 - 09 - 23 13: 45: 28.510	debug	update101010101010.Date with 0.0.7168 bytenumber: 23
+            myhomecontrol.0	2018 - 09 - 23 13: 45: 28.510	debug	type 4 datatype 5 dataunit 0
+            myhomecontrol.0	2018 - 09 - 23 13: 45: 28.509	warn+++ 00 17 00 09 07 e2
+            myhomecontrol.0	2018 - 09 - 23 13: 45: 28.507	debug(2) from 101010101010(Zentrale) with 2 DPs
+            */
         case 0x05: // date
-            var day = parseInt(dataArray[bytenumber], 16) << 8 + parseInt(dataArray[bytenumber + 1], 16);
-            var month = parseInt(dataArray[bytenumber + 2], 16) << 8 + parseInt(dataArray[bytenumber + 3], 16);
-            var year = parseInt(dataArray[bytenumber + 4], 16) << 8 + parseInt(dataArray[bytenumber + 5], 16);
-            bytenumber = bytenumber + 3 * 2;
+
+            //adapter.log.warn("+++ " + dataArray[bytenumber] + " " + dataArray[bytenumber + 1] + " " + dataArray[bytenumber +2 ] + " " + dataArray[bytenumber + 3] + " " + dataArray[bytenumber +4] + " " + dataArray[bytenumber + 5]  );
+
+            var a = parseInt(dataArray[bytenumber], 16) << 8;
+            var b = parseInt(dataArray[bytenumber + 1], 16);
+            var day = a + b;
+
+            a = parseInt(dataArray[bytenumber + 2], 16) << 8;
+            b = parseInt(dataArray[bytenumber + 3], 16);
+            var month = a + b;
+
+            a = parseInt(dataArray[bytenumber + 4], 16) << 8;
+            b = parseInt(dataArray[bytenumber + 5], 16);
+            var year = a + b;
+            bytenumber = bytenumber + (3 * 2);
             value = day + "." + month + "." + year;
             break;
         case 0x06: // time
-            var hour = parseInt(dataArray[bytenumber], 16) << 8 + parseInt(dataArray[bytenumber + 1], 16);
-            var minute = parseInt(dataArray[bytenumber + 2], 16) << 8 + parseInt(dataArray[bytenumber + 3], 16);
-            var second = parseInt(dataArray[bytenumber + 4], 16) << 8 + parseInt(dataArray[bytenumber + 5], 16);
-            bytenumber = bytenumber + 3 * 2;
+
+            //adapter.log.warn("--- " + dataArray[bytenumber] + " " + dataArray[bytenumber + 1] + " " + dataArray[bytenumber + 2] + " " + dataArray[bytenumber + 3] + " " + dataArray[bytenumber + 4] + " " + dataArray[bytenumber + 5]);
+
+            var a = parseInt(dataArray[bytenumber], 16) << 8;
+            var b = parseInt(dataArray[bytenumber + 1], 16);
+            var hour = a + b;
+
+            a = parseInt(dataArray[bytenumber + 2], 16) << 8;
+            b = parseInt(dataArray[bytenumber + 3], 16);
+            var minute = a + b;
+
+            a = parseInt(dataArray[bytenumber + 4], 16) << 8;
+            b = parseInt(dataArray[bytenumber + 5], 16);
+            var second = a + b;
+            bytenumber = bytenumber + (3 * 2);
             value = hour + ":" + minute + ":" + second;
             break;
     }
@@ -684,7 +714,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
     var sdataunit = "unknown";
     var dataunit = parseInt( dataArray[bytenumber],16);
     bytenumber++;
-    adapter.log.debug("dataunit " + dataunit);
+    //adapter.log.debug("dataunit " + dataunit);
     switch (dataunit) {
         case 0x00:
             sdataunit = ""; //ohne
@@ -708,6 +738,8 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
             sdataunit = "deg";
             break;
     }
+    adapter.log.debug("type " + type + " datatype " + datatype + " dataunit " + dataunit );
+    
 
     adapter.setObjectNotExists(source + "." + stype, {
         type: "state",
@@ -721,7 +753,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
         }
     });
 
-    adapter.log.debug("update" + source + "." + stype + " with " + value + " " + sdataunit + " bytenumber: " + bytenumber);
+    adapter.log.debug("update " + source + "." + stype + " with " + value + " " + sdataunit + " bytenumber: " + bytenumber);
 
     adapter.setState(source + '.' + stype, { val: value, ack: true });
 
@@ -1405,5 +1437,34 @@ function DeleteDevices() {
             //adapter.deleteDevice(devices[d]._id);
             log(devices[d]._id);
         }
+    });
+}
+
+
+
+function ListDevices(obj) {
+    
+    const allDevices = [];
+    /*
+    myhomecontrol.0	2018 - 09 - 23 17: 09: 26.031	debug	Device found { "type": "device", "common": { "name": "Sensor " }, "from": "system.adapter.myhomecontrol.0", "ts": 1537693476876, "_id": "myhomecontrol.0.160631030800" }
+    myhomecontrol.0	2018 - 09 - 23 17: 09: 26.030	debug	Device found { "type": "device", "common": { "name": "Display " }, "from": "system.adapter.myhomecontrol.0", "ts": 1537693473527, "_id": "myhomecontrol.0.87FB30030800" }
+    myhomecontrol.0	2018 - 09 - 23 17: 09: 26.029	debug	Device found { "type": "device", "common": { "name": "Zentrale " }, "from": "system.adapter.myhomecontrol.0", "ts": 1537693444909, "_id": "myhomecontrol.0.101010101010" }
+    myhomecontrol.0	2018 - 09 - 23 17: 09: 26.027	debug	Device found { "type": "device", "common": { "name": "unknown" }, "from": "system.adapter.myhomecontrol.0", "ts": 1537690121483, "_id": "myhomecontrol.0.200DBMI00160" }
+    */
+
+    adapter.getDevices(function (err, devices) {
+        if (Array.isArray(devices)) {
+            for (var i = 0; i < devices.length; i++) {
+                adapter.log.debug('Device found ' + JSON.stringify(devices[i]));
+
+                allDevices.push({
+                    name: devices[i]._id,
+                    type: devices[i].common.name,
+                    isNew: false
+                });
+            }
+        }
+
+        adapter.sendTo(obj.from, obj.command, allDevices, obj.callback);
     });
 }

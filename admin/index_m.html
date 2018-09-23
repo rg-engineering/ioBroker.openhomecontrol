@@ -11,7 +11,7 @@
     <script type="text/javascript" src="../../lib/js/materialize.js"></script>
     <script type="text/javascript" src="../../js/adapter-settings.js"></script>
     <script type="text/javascript" src="words.js"></script>
-    
+
     <style>
         .polled {
             height: 100px !important;
@@ -29,24 +29,53 @@
 
         var timeout;
 
-        function getComPorts(actualValue) {
+        function getDevices(onChange, instance) {
             timeout = setTimeout(function () {
-                getComPorts(actualValue);
+                getDevices();
             }, 2000);
 
             //function sendTo(_adapter_instance, command, message, callback)
-            sendTo('myhomecontrol.0', 'listUart', null, function (list) {
+            sendTo(instance, 'listDevices', null, function (list) {
                 if (timeout) {
                     clearTimeout(timeout);
                     timeout = null;
                 }
 
+                console.log('got devices');
+
+                values2table('values', list, onChange);
+
+                /*
+                var $sel = $('#device_table');
                 for (var i = 0; i < list.length; i++) {
-                    $('#serialport').append('<option value="' + list[i].comName + '" ' + ((actualValue == list[i].comName) ? 'selected' : '') + '>' + list[i].comName + '</option>');
+                    $sel.append('<tr> <td>' + list[i].name + '</td> <td>' + list[i].type + '</td> <td>' + list[i].isNew + '</td>  </tr>');
                 }
+                $sel.select();
+                */
+            });
+        }
+
+
+        function getComPorts(actualValue, instance) {
+            timeout = setTimeout(function () {
+                getComPorts(actualValue);
+            }, 2000);
+
+            //function sendTo(_adapter_instance, command, message, callback)
+            sendTo(instance, 'listUart', null, function (list) {
+                if (timeout) {
+                    clearTimeout(timeout);
+                    timeout = null;
+                }
+
+                var $sel = $('#serialport');
+                for (var i = 0; i < list.length; i++) {
+                    $sel.append('<option value="' + list[i].comName + '" ' + ((actualValue == list[i].comName) ? 'selected' : '') + '>' + list[i].comName + '</option>');
+                }
+                $sel.select();
             });
 
-            M.updateTextFields();
+
         }
 
 
@@ -70,12 +99,28 @@
                     });
                 }
             }
-            getComPorts(settings.serialport);
+
 
             // Signal to admin, that no changes yet
             onChange(false);
 
             M.updateTextFields();
+
+            getAdapterInstances('myhomecontrol', function (arr) {
+                for (var i = 0; i < arr.length; i++) {
+
+                    var _id = arr[i]._id.replace('system.adapter.', '');
+
+                    console.log('got instance ' + _id);
+
+                    getComPorts(settings.serialport, _id);
+
+                    getDevices(onChange, _id);
+
+                }
+            });
+
+
         }
 
 
@@ -88,6 +133,9 @@
                 var $this = $(this);
                 obj[$this.attr('id')] = $this.val();
             });
+
+            obj.devices = table2values('values');
+
             callback(obj);
         }
 
@@ -103,13 +151,11 @@
             <div class="col s12">
                 <ul class="tabs">
                     <li class="tab col s2"><a href="#tab-main" class="translate active">Main settings</a></li>
-                    <li class="tab col s2 le-settings"><a href="#tab-notused" class="translate">not used</a></li>
+                    <li class="tab col s2 le-settings"><a href="#tab-devices" class="translate">devices</a></li>
                 </ul>
             </div>
 
-            <!--  main - settings  -->
-
-
+            <!-- tab "main - settings"  -->
             <div id="tab-main" class="col s12 page">
                 <div class="row">
                     <div class="col s6 m4 l2">
@@ -117,12 +163,12 @@
                     </div>
                 </div>
 
-                <div class="input-field col s6 col-mysql-ip">
-                    <select id="serialport" class="value"></select>
-                    <label for="serialport" class="translate">serialport</label>
-                </div>
-
                 <div class="row">
+                    <div class="input-field col s6">
+                        <select id="serialport" class="value"></select>
+                        <label for="serialport" class="translate">serialport</label>
+                    </div>
+
                     <div class="input-field col s6">
                         <select id="baudrate" class="value">
                             <option value="110">110</option>
@@ -151,9 +197,7 @@
                         </select>
                         <label for="device" class="translate">select_device</label>
                     </div>
-                </div>
 
-                <div class="row">
                     <div class="input-field col s6">
                         <select id="mode" class="value">
                             <option value="raw data" class="translate">option_rawdata</option>
@@ -167,79 +211,37 @@
                     <div class="input-field col s6">
                         <input type="number" id="sendIntervalBroadcast" class="value" />
                         <label for="sendIntervalBroadcast" class="translate">send_interval_broadcast</label>
-
                     </div>
                     <div class="col s6 ">
                         <span class="translate">disable_broadcast_hint</span>
                     </div>
                 </div>
+            </div>
 
+            <!-- tab "devices" -->
+            <div id="tab-devices" class="col s12 page">
+                <div class="col s12" id="values">
+                    <a class="btn-floating waves-effect waves-light blue table-button-add"><i class="material-icons">add</i></a>
+                    <a id="table-button-search" class="btn-floating waves-effect waves-light blue disabled"><i class="material-icons">search</i><span class="translate">Search</span></a>
+                    <div class="table-values-div">
+                        <table class="table-values" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                    <th data-name="name" style="width: 40%">device</th>
+                                    <th data-name="type" >type</th>
+                                    <th data-name="isNew" data-type="checkbox">is new</th>
+                                    <th data-buttons="delete" style="width: 40px"></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
 
+                </div>
 
             </div>
 
         </div>
-
     </div>
-                <!--
-
-                <table>
-                    <tr>
-                        <td class="translate">Serial port</td>
-                        <td>
-                            <select class="value" id="serialport"></select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="translate">Baud rate</td>
-                        <td>
-                            <select id="baudrate" class="value">
-                                <option value="110">110</option>
-                                <option value="150">150</option>
-                                <option value="300">300</option>
-                                <option value="600">600</option>
-                                <option value="1200">1200</option>
-                                <option value="2400">2400</option>
-                                <option value="4800">4800</option>
-                                <option value="9600">9600</option>
-                                <option value="19200">19200</option>
-                                <option value="38400">38400</option>
-                                <option value="56000">56000</option>
-                                <option value="57600">57600</option>
-                                <option value="115200">115200</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="translate">select Device</td>
-                        <td>
-                            <select id="device" class="value">
-                                <option value="CUL">CUL (needs a modified culfw)</option>
-                                <option value="HomeControl">HomeControl</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="translate">select Mode</td>
-                        <td>
-                            <select id="mode" class="value">
-                                <option value="raw data">interpretes raw data (default)</option>
-                                <option value="telegram">telegram data (obsolete)</option>
-                            </select>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td class="translate">send Interval broadcast [s]</td>
-                        <td>
-                            <input type="text" id="sendIntervalBroadcast" class="value" />
-                        </td>
-                        <td>
-                            to disable sending broadcast data set interval to -1; 0 will use hardcoded standard value.
-                        </td>
-                    </tr>
-                </table>
-
-            </div>
-        -->
-    </body>
+</body>
 </html>
