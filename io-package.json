@@ -4,12 +4,26 @@
     "version": "0.0.18",
     "news": {
       "0.0.18": {
-        "en": "update to admin3"
-
+        "en": "new devices are shown in admin and needs to be confirmed before they are used as objects",
+        "de": "Neue Geräte werden in admin angezeigt und müssen bestätigt werden, bevor sie als Objekte verwendet werden",
+        "ru": "новые устройства отображаются в админе и должны быть подтверждены до того, как они будут использованы в качестве объектов",
+        "pt": "novos dispositivos são mostrados no admin e precisam ser confirmados antes de serem usados ​​como objetos",
+        "nl": "nieuwe apparaten worden in admin getoond en moeten worden bevestigd voordat ze als objecten worden gebruikt",
+        "fr": "les nouveaux appareils sont affichés dans admin et doivent être confirmés avant d'être utilisés comme objets",
+        "it": "i nuovi dispositivi sono mostrati in admin e devono essere confermati prima di essere usati come oggetti",
+        "es": "los nuevos dispositivos se muestran en la administración y deben ser confirmados antes de ser utilizados como objetos",
+        "pl": "nowe urządzenia są wyświetlane w panelu administracyjnym i muszą zostać potwierdzone, zanim zostaną użyte jako obiekty"
       },
       "0.0.17": {
-        "en": "update serial port lib"
-
+        "en": "update serial port lib",
+        "de": "Update serielle Schnittstelle lib",
+        "ru": "обновить последовательный порт lib",
+        "pt": "atualizar a porta serial lib",
+        "nl": "update seriële poort lib",
+        "fr": "mettre à jour le port série lib",
+        "it": "aggiornare la porta seriale lib",
+        "es": "actualizar el puerto serie lib",
+        "pl": "aktualizacja portu szeregowego lib"
       },
       "0.0.16": {
         "en": "protocol extension: wind average speed, wind gust and wind direction added",
@@ -87,8 +101,9 @@
     "serialport": "COM7",
     "baudrate": 57600,
     "device": "HomeControl",
-    "mode": "telegram",
+    
     "sendInterval2Display": 180,
-    "sendIntervalBroadcast": 60
+    "sendIntervalBroadcast": 60,
+    "devices": []
   }
 }

@@ -14,7 +14,6 @@
 // you have to require the utils module and call adapter function
 var utils =    require(__dirname + '/lib/utils'); // Get common adapter utils
 
-var version = "0.0.18";
 
 
 // you have to call the adapter function and pass a options object
@@ -85,8 +84,6 @@ adapter.on('message', function (obj) {
                 break;
             case 'listDevices':
                 ListDevices(obj);
-
-                
                 break;
     	}
     }
@@ -104,19 +101,20 @@ adapter.on('unload', function (callback) {
 });
 
 // is called if a subscribed object changes
+/*
 adapter.on('objectChange', function (id, obj) {
     // Warning, obj can be null if it was deleted
-    adapter.log.debug('objectChange ' + id + ' ' + JSON.stringify(obj));
-
-    //feuert auch, wenn adapter im admin anghalten oder gestartet wird...
+    adapter.log.debug('###objectChange ' + id + ' ' + obj + "/" + JSON.stringify(obj));
 
     if (obj == null && myPort != null) {
         myPort.close();
     }
 
 });
+*/
 
 // is called if a subscribed state changes
+/*
 adapter.on('stateChange', function (id, state) {
     // Warning, state can be null if it was deleted
     adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
@@ -126,23 +124,20 @@ adapter.on('stateChange', function (id, state) {
         adapter.log.info('ack is not set!');
     }
 
-    /*
-    stateChange myhomecontrol.0.98EF82180000.WeatherIcon2Display
-    {"val":"partlycloudy","ack":false,"ts":1488721037466,"q":0,"from":"system.adapter.javascript.0","lc":1488719660182}
-    */
+    
+    //stateChange myhomecontrol.0.98EF82180000.WeatherIcon2Display
+    //{"val":"partlycloudy","ack":false,"ts":1488721037466,"q":0,"from":"system.adapter.javascript.0","lc":1488719660182}
+    
 
 
 
 });
-
+*/
 
 
 // is called when databases are connected and adapter received configuration.
 // start here!
 adapter.on('ready', function () {
-
-    adapter.log.info("version " + version);
-
     try {
         main();
     }
@@ -152,22 +147,22 @@ adapter.on('ready', function () {
 });
 
 function main() {
-    //adapter.log.debug("111");
+
     var options = {
         //serialport: adapter.config.serialport || '/dev/ttyACM0',
         serialport: adapter.config.serialport || 'COM13',
         baudrate: parseInt(adapter.config.baudrate) || 57600,
-        device: adapter.config.device || "HomeControl",
+        //device: adapter.config.device || "HomeControl",
         sendInterval2Display: parseInt(adapter.config.sendInterval2Display) || 180,
         sendIntervalBroadcast: parseInt(adapter.config.sendIntervalBroadcast) || 30
     };
-    //adapter.log.debug("222");
+
     SerialPort.list(function (err, ports) {
         ports.forEach(function (port) {
             adapter.log.info(port.comName + ' ' + port.pnpId + ' ' + port.manufacturer);
         });
     });
-    //adapter.log.debug("333");
+
 
     //Rechte im Linux gesetzt??? 
     try {
@@ -178,35 +173,34 @@ function main() {
     } catch (e) {
         adapter.log.error('Serial port is not created [' + e + ']');
     }
-    //adapter.log.debug("444");
-    //adapter.log.info('port created; portname: ' + options.serialport + ' ' + myPort.comName + ' ' + myPort.pnpId + ' ' + myPort.manufacturer + ' Data rate: ' + myPort.options.baudRate + ' ' + options.baudrate);
-    //with serialport 5.0.0:
-    adapter.log.info('port created; portname: ' + options.serialport + ' Data rate: ' + myPort.baudRate + ' ' + options.baudrate);
-    //adapter.log.info('port created; portname: ' + options.serialport);
-    //adapter.log.debug("555");
+
+    adapter.log.info('port created; portname: ' + options.serialport + ' Data rate: ' + myPort.baudRate );
+
 
     myPort.on('open', showPortOpen);
     myPort.on('data', receiveSerialData);
     myPort.on('close', showPortClose);
     myPort.on('error', showError);
 
+    /*
     if (adapter.config.device == "CUL") {
         adapter.log.info("CUL used");
     }
-    else if (adapter.config.device == "HomeControl") {
-        if (adapter.config.mode == "telegram") {
-            adapter.log.info("HomeControl used in telegram mode");
-        }
-        else if (adapter.config.mode == "raw data") {
+    */
+    //else if (adapter.config.device == "HomeControl") {
+        //if (adapter.config.mode == "telegram") {
+        //    adapter.log.info("HomeControl used in telegram mode");
+        //}
+        //else if (adapter.config.mode == "raw data") {
             adapter.log.info("HomeControl used in raw mode");
-        }
-        else {
-            adapter.log.warn("HomeControl used in unknown mode");
-        }
-    }
-    else {
-        adapter.log.warn("unknown device");
-    }
+        //}
+        //else {
+        //    adapter.log.warn("HomeControl used in unknown mode");
+        //}
+    //}
+    //else {
+    //    adapter.log.warn("unknown device");
+    //}
 
     try {
         if (!SendTimerBroadcast && options.sendIntervalBroadcast > 0) {
@@ -265,11 +259,13 @@ function showPortOpen() {
             //adapter.log.debug('port open: ' + myPort.options.baudRate + ' ' + myPort.comName);
             //with serialport 5.0.0:
 			adapter.log.debug('port open: ' + myPort.baudRate);
+            /*
             if (adapter.config.device == "CUL") {
                 //to enable homecontrol mode on CUL
                 myPort.write("V\n\r");
                 myPort.write("hr\n\r");
             }
+            */
 		}
 	}
 
@@ -280,9 +276,9 @@ function showPortOpen() {
 
 function SetMode() {
     if (myPort != null) {
-        if (adapter.config.device == "HomeControl") {
+        //if (adapter.config.device == "HomeControl") {
             //send configuration to nano
-            if (adapter.config.mode == "telegram") {
+            /* if (adapter.config.mode == "telegram") {
                 //adapter.log.debug('telegram mode set on ' + myPort.comName);
                 //with serialport 5.0.0:
                 adapter.log.debug('telegram mode set on ' + myPort.path);
@@ -290,17 +286,19 @@ function SetMode() {
                 //myPort.write(0x0D);
             }
             else
-                if (adapter.config.mode == "raw data") {
+            */
+             //   if (adapter.config.mode == "raw data") {
                     //adapter.log.debug('raw data mode set on ' + myPort.comName);
                     //with serialport 5.0.0:
                     adapter.log.debug('raw data mode set on ' + myPort.path);
                     myPort.write("mr\n\r");
                     //myPort.write(0x0D);
-                }
+            /*    }
                 else {
                     adapter.log.error('unknown receive mode');
                 }
-        }
+                */
+        //}
     }
 }
 
@@ -314,7 +312,7 @@ function receiveSerialData(data) {
     receivedData = receivedData + data;
 
     //adapter.log.debug(receivedData);
-
+    /*
     if (adapter.config.device == "CUL") {
 
         try {
@@ -344,7 +342,8 @@ function receiveSerialData(data) {
             adapter.log.error('exception in  sendSerialData 4 [' + e + ']');
         }
     }
-    else if (adapter.config.device == "HomeControl") {
+    */
+    //else if (adapter.config.device == "HomeControl") {
         // filter out everyting not needed...
         // if got data not in then drop message
 
@@ -361,6 +360,7 @@ function receiveSerialData(data) {
             }, 2000);
         }
 
+/*
         if (adapter.config.mode == "telegram") {
 
             if (receivedData.indexOf("data from") <= 0) {
@@ -373,7 +373,8 @@ function receiveSerialData(data) {
             }
         }
         else
-            if (adapter.config.mode == "raw data") {
+*/
+ //           if (adapter.config.mode == "raw data") {
 
                 //telegram starts with I and ends with J
                 if (receivedData.indexOf("I") >= 0 && receivedData.indexOf("J") > 0) {
@@ -385,11 +386,12 @@ function receiveSerialData(data) {
                     receivedData = "";
                     return;
                 }
-            }
+ /*           }
             else {
                 adapter.log.error('unknown receive mode');
             }
     }
+*/
 }
 
 function AddDatapoints4Display(id) {
@@ -459,6 +461,16 @@ function AddDatapoints4Display(id) {
     });
 }
 
+
+function findObjectByKey(array, key, value) {
+    for (var i = 0; i < array.length; i++) {
+        if (array[i][key] === value) {
+            return array[i];
+        }
+    }
+    return null;
+}
+
 //this will be the new function to interprete raw data sent by nano
 /*
  Protokollbeschreibung:
@@ -506,46 +518,77 @@ function receiveSerialDataRaw(dataorg) {
         var stype = "unknown";
         switch (type) {
             case 0x01:
-                stype = "Sensor ";
+                stype = "Sensor";
                 break;
             case 0x02:
-                stype = "Actor ";
+                stype = "Actor";
                 break;
             case 0x03:
-                stype = "Display ";
-                AddDatapoints4Display(source);
+                stype = "Display";
                 break;
             case 0x10:
-                stype = "Zentrale ";
+                stype = "Zentrale";
                 break;
         }
-        adapter.log.debug("(2) from " + source + " (" + stype + ") with " + datapoints+ " DPs");
-        adapter.setObjectNotExists(source, {
-            type: "device",
-            common: {
-                name: stype,
+        adapter.log.debug("(2) from " + source + " (" + stype + ") with " + datapoints + " DPs");
+
+
+        //check wether device is already accepted; if not then just add it into newDevices - list
+
+        var obj = findObjectByKey(adapter.config.devices, 'name', source);
+
+        if (obj != null && obj.isUsed) {
+
+            adapter.setObjectNotExists(source, {
+                type: "device",
+                common: {
+                    name: stype,
+                }
+            });
+
+
+            if (stype === "Display") {
+                AddDatapoints4Display(source);
             }
-        });
-        // than all datapoints
-        for (var i = 0; i < datapoints; i++) {
-            bytenumber = InterpreteDatapoint(dataArray,bytenumber,source);
+
+
+            // than all datapoints
+            for (var i = 0; i < datapoints; i++) {
+                bytenumber = InterpreteDatapoint(dataArray, bytenumber, source);
+            }
+
+            adapter.setObjectNotExists(source + ".LastUpdate", {
+                type: "state",
+                common: {
+                    name: "Last update",
+                    type: "datetime",
+                    role: "indicator.date",
+                    read: true,
+                    write: false
+                }
+            });
+            var theDate = new Date();
+            adapter.setState(source + ".LastUpdate", { val: theDate.toString(), ack: true });
+
+            if (type == 0x03) {
+                SendData2Display(source);
+            }
         }
+        else {
 
-        adapter.setObjectNotExists(source + ".LastUpdate", {
-            type: "state",
-            common: {
-                name: "Last update",
-                type: "datetime",
-                role: "indicator.date",
-                read: true,
-                write: false
+            var obj1 = findObjectByKey(newDevices, 'name', source);
+
+            if (obj1==null) {
+                adapter.log.debug(source + " is new");
+                newDevices.push({
+                    name: source,
+                    type: stype,
+                    isUsed: false
+                });
             }
-        });
-        var theDate = new Date();
-        adapter.setState(source + ".LastUpdate", { val: theDate.toString(), ack: true });
-
-        if (type == 0x03) {
-            SendData2Display(source);
+            else {
+                adapter.log.debug(source + " already in list");
+            }
         }
     }
     catch (e) {
@@ -764,6 +807,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
 //this is the obsolete old function which will be removed in one of the next releases
 //here we need to interprete telegram data on nano. Nano sends then a interpreted telegram like:
 //got data from Sensor :3FAF82180000 with 2 DP as broadcast Temp 30.64 C Press 958.32 mBar
+/*
 function receiveSerialDataTelegram(data) {
 
     try {
@@ -911,7 +955,7 @@ function receiveSerialDataTelegram(data) {
         SendData2Display(toSendId);
     }
 }
-
+*/
 function showPortClose() {
     adapter.log.debug('port closed.');
 }
@@ -953,7 +997,7 @@ function AddHeader(target, DisplayID) {
 
         //DisplayId ist string
         //wir brauchen die Werte
-
+        /*
         adapter.log.debug('add header: ' + DisplayID + ' = ' +
             parseInt(DisplayID.substr(0, 2),16) + ' ' +
             parseInt(DisplayID.substr(2, 2),16) + ' ' +
@@ -962,7 +1006,7 @@ function AddHeader(target, DisplayID) {
             parseInt(DisplayID.substr(8, 2),16) + ' ' +
             parseInt(DisplayID.substr(10, 2),16)
         );
-
+        */
         DataToSend[IDX_TARGET] = parseInt(DisplayID.substr(0, 2),16);
         DataToSend[IDX_TARGET + 1] = parseInt(DisplayID.substr(2, 2),16);
         DataToSend[IDX_TARGET + 2] = parseInt(DisplayID.substr(4, 2),16);
@@ -1420,7 +1464,7 @@ function sendSerialDataRaw() {
         myPort.write(buffer);
 
         myPort.write("\n\r");
-        adapter.log.debug(sTemp);
+        //adapter.log.debug(sTemp);
 
         buffer = null;
     }
@@ -1445,26 +1489,25 @@ function DeleteDevices() {
 function ListDevices(obj) {
     
     const allDevices = [];
-    /*
-    myhomecontrol.0	2018 - 09 - 23 17: 09: 26.031	debug	Device found { "type": "device", "common": { "name": "Sensor " }, "from": "system.adapter.myhomecontrol.0", "ts": 1537693476876, "_id": "myhomecontrol.0.160631030800" }
-    myhomecontrol.0	2018 - 09 - 23 17: 09: 26.030	debug	Device found { "type": "device", "common": { "name": "Display " }, "from": "system.adapter.myhomecontrol.0", "ts": 1537693473527, "_id": "myhomecontrol.0.87FB30030800" }
-    myhomecontrol.0	2018 - 09 - 23 17: 09: 26.029	debug	Device found { "type": "device", "common": { "name": "Zentrale " }, "from": "system.adapter.myhomecontrol.0", "ts": 1537693444909, "_id": "myhomecontrol.0.101010101010" }
-    myhomecontrol.0	2018 - 09 - 23 17: 09: 26.027	debug	Device found { "type": "device", "common": { "name": "unknown" }, "from": "system.adapter.myhomecontrol.0", "ts": 1537690121483, "_id": "myhomecontrol.0.200DBMI00160" }
-    */
 
-    adapter.getDevices(function (err, devices) {
-        if (Array.isArray(devices)) {
-            for (var i = 0; i < devices.length; i++) {
-                adapter.log.debug('Device found ' + JSON.stringify(devices[i]));
+    //first known devices
+    for (var i = 0; i < adapter.config.devices.length; i++) {
+        allDevices.push({
+            name: adapter.config.devices[i].name,
+            type: adapter.config.devices[i].type,
+            isUsed: true
+        });
+    }
+    //then all new devices
+    for (var i = 0; i < newDevices.length; i++) {
+        allDevices.push({
+            name: newDevices[i].name,
+            type: newDevices[i].type,
+            isUsed: false
+        });
+    }
+    //clear the array
+    newDevices.length = 0
 
-                allDevices.push({
-                    name: devices[i]._id,
-                    type: devices[i].common.name,
-                    isNew: false
-                });
-            }
-        }
-
-        adapter.sendTo(obj.from, obj.command, allDevices, obj.callback);
-    });
+    adapter.sendTo(obj.from, obj.command, allDevices, obj.callback);
 }

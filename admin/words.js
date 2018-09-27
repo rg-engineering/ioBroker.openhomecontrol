@@ -16,30 +16,7 @@ systemDictionary = {
             "es": "deshabilitar el envío del intervalo del conjunto de datos de difusión a -1; 0 usará el valor estándar codificado.",
             "pl": "wyłączyć interwał czasowy wysyłania transmisji do -1; 0 użyje zakodowanej wartości standardowej."
         },
-    "select_device":
-        {
-            "en": "select Device",
-            "de": "Gerät",
-            "ru": "выберите устройство",
-            "pt": "Selecionar dispositivo",
-            "nl": "selecteer apparaat",
-            "fr": "Choisir un appareil",
-            "it": "seleziona dispositivo",
-            "es": "seleccione el dispositivo",
-            "pl": "Wybierz urządzenie"
-        },
-    "select_mode":
-        {
-            "en": "select Mode",
-            "de": "Mode",
-            "ru": "выберите режим",
-            "pt": "modo de seleção",
-            "nl": "Selecteer modus",
-            "fr": "sélectionnez le mode",
-            "it": "selezionare Modalità",
-            "es": "Seleccionar modo",
-            "pl": "Wybierz tryb"
-        },
+    
     "serialport":
         {
             "en": "serialport",
@@ -76,54 +53,6 @@ systemDictionary = {
             "es": "enviar transmisión por intervalos [s]",
             "pl": "wyślij transmisję Interwał [s]"
         },
-    "option_cul":
-        {
-            "en": "CUL (needs a modified culfw)",
-            "de": "CUL (braucht einen modifizierten culfw)",
-            "ru": "CUL (требуется модифицированный куб)",
-            "pt": "CUL (precisa de um culfw modificado)",
-            "nl": "CUL (heeft een aangepaste culfw nodig)",
-            "fr": "CUL (nécessite un procédé modifié)",
-            "it": "CUL (ha bisogno di una modifica modificata)",
-            "es": "CUL (necesita un culfw modificado)",
-            "pl": "CUL (potrzebuje zmodyfikowanego culfw)"
-        },
-    "option_homeControl":
-        {
-            "en": "HomeControl",
-            "de": "HomeControl",
-            "ru": "HomeControl",
-            "pt": "HomeControl",
-            "nl": "HomeControl",
-            "fr": "HomeControl",
-            "it": "homecontrol",
-            "es": "HomeControl",
-            "pl": "HomeControl"
-        },
-    "option_rawdata":
-        {
-            "en": "interpretes raw data(default)",
-            "de": "interpretiert Rohdaten (Standard)",
-            "ru": "интерпретирует необработанные данные (по умолчанию)",
-            "pt": "interpreta dados brutos (padrão)",
-            "nl": "interpreteert onbewerkte gegevens (standaard)",
-            "fr": "interprète les données brutes (par défaut)",
-            "it": "interpreta i dati grezzi (predefinito)",
-            "es": "interpreta datos sin procesar (predeterminado)",
-            "pl": "interpretuje dane surowe (domyślne)"
-        },
-    "option_telegramdata":
-        {
-            "en": "interpretes telegram data(obsolete)",
-            "de": "interpretiert Telegrammdaten (veraltet)",
-            "ru": "интерпретирует данные телеграммы (устаревшие)",
-            "pt": "interpreta dados de telegrama (obsoletos)",
-            "nl": "interpreteert telegramgegevens (verouderd)",
-            "fr": "interprète les données de télégrammes (obsolètes)",
-            "it": "interpreta i dati del telegramma (obsoleto)",
-            "es": "interpreta datos de telegramas (obsoletos)",
-            "pl": "interpretuje dane telegramów (przestarzałe)"
-        },
     "devices":
         {
             "en": "devices",
@@ -135,7 +64,41 @@ systemDictionary = {
             "it": "dispositivi",
             "es": "dispositivos",
             "pl": "pomysłowość"
+        },
+    "device":
+        {
+            "en": "device",
+            "de": "Gerät",
+            "ru": "устройство",
+            "pt": "dispositivo",
+            "nl": "apparaat",
+            "fr": "dispositif",
+            "it": "dispositivo",
+            "es": "dispositivo",
+            "pl": "urządzenie"
+        },
+    "type":
+        {
+            "en": "type",
+            "de": "Art",
+            "ru": "тип",
+            "pt": "tipo",
+            "nl": "type",
+            "fr": "type",
+            "it": "genere",
+            "es": "tipo",
+            "pl": "rodzaj"
+        },
+    "used":
+        {
+            "en": "used",
+            "de": "benutzt",
+            "ru": "используемый",
+            "pt": "usava",
+            "nl": "gebruikt",
+            "fr": "utilisé",
+            "it": "Usato",
+            "es": "usado",
+            "pl": "używany"
         }
-    
-    
 };
