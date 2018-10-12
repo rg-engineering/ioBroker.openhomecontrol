@@ -6,7 +6,6 @@
     "name": "René G.",
     "email": "info@rg-engineering.eu"
   },
-
   "homepage": "https://github.com/rg-engineering/ioBroker.myhomecontrol",
   "license": "MIT",
   "keywords": [
@@ -27,8 +26,12 @@
     "mocha": "^5.2.0",
     "chai": "^4.1.2"
   },
+  "main": "main.js",
   "bugs": {
     "url": "https://github.com/rg-engineering/ioBroker.myhomecontrol"
+  },
+  "scripts": {
+    "test": "node node_modules/mocha/bin/mocha --exit"
   },
   "readmeFilename": "README.md"
 }

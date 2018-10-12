@@ -27,9 +27,9 @@ var adapter = utils.adapter('myhomecontrol');
 var myPort = null;
 var receivedData = "";
 var SendTimerBroadcast = null;
-//var SendTimer2Display = null;
+var Watchdog = null;
+var Waitung4Watchdog = false;
 
-//var WeatherTimer = null;
 
 var DataToSend = {};
 var DataToSendLength = 0;
@@ -43,18 +43,12 @@ var AlreadySending = false;
 
 const newDevices = [];
 
-
-
 try {
     var SerialPort = require('serialport');
 } catch (e) {
     console.warn('Serial port is not installed [' + e + ']');
 }
 
-
-//used for GetWeatherData
-//var request = require('request');
-//var xmlparser = require('xml2json');
 
 //Some message was sent to adapter instance over message box. Used by email, pushover, text2speech, ...
 adapter.on('message', function (obj) {
@@ -100,39 +94,7 @@ adapter.on('unload', function (callback) {
     }
 });
 
-// is called if a subscribed object changes
-/*
-adapter.on('objectChange', function (id, obj) {
-    // Warning, obj can be null if it was deleted
-    adapter.log.debug('###objectChange ' + id + ' ' + obj + "/" + JSON.stringify(obj));
 
-    if (obj == null && myPort != null) {
-        myPort.close();
-    }
-
-});
-*/
-
-// is called if a subscribed state changes
-/*
-adapter.on('stateChange', function (id, state) {
-    // Warning, state can be null if it was deleted
-    adapter.log.debug('stateChange ' + id + ' ' + JSON.stringify(state));
-
-    // you can use the ack flag to detect if it is status (true) or command (false)
-    if (state && !state.ack) {
-        adapter.log.info('ack is not set!');
-    }
-
-    
-    //stateChange myhomecontrol.0.98EF82180000.WeatherIcon2Display
-    //{"val":"partlycloudy","ack":false,"ts":1488721037466,"q":0,"from":"system.adapter.javascript.0","lc":1488719660182}
-    
-
-
-
-});
-*/
 
 
 // is called when databases are connected and adapter received configuration.
@@ -174,7 +136,7 @@ function main() {
         adapter.log.error('Serial port is not created [' + e + ']');
     }
 
-    adapter.log.info('port created; portname: ' + options.serialport + ' Data rate: ' + myPort.baudRate );
+    adapter.log.info('port created; portname: ' + options.serialport + ' Data rate: ' + myPort.baudRate);
 
 
     myPort.on('open', showPortOpen);
@@ -182,25 +144,9 @@ function main() {
     myPort.on('close', showPortClose);
     myPort.on('error', showError);
 
-    /*
-    if (adapter.config.device == "CUL") {
-        adapter.log.info("CUL used");
-    }
-    */
-    //else if (adapter.config.device == "HomeControl") {
-        //if (adapter.config.mode == "telegram") {
-        //    adapter.log.info("HomeControl used in telegram mode");
-        //}
-        //else if (adapter.config.mode == "raw data") {
-            adapter.log.info("HomeControl used in raw mode");
-        //}
-        //else {
-        //    adapter.log.warn("HomeControl used in unknown mode");
-        //}
-    //}
-    //else {
-    //    adapter.log.warn("unknown device");
-    //}
+
+    adapter.log.info("HomeControl used in raw mode");
+
 
     try {
         if (!SendTimerBroadcast && options.sendIntervalBroadcast > 0) {
@@ -211,63 +157,31 @@ function main() {
             SendTimerBroadcast = _SendTimerBroadcast;
         }
 
-/*
-        if (!SendTimer2Display && options.sendInterval2Display > 0) {
-            adapter.log.debug("init timer to display with " + options.sendInterval2Display + "s");
-            var _SendTimer2Display = setInterval(function () {
-                SendData2Display();
-            }, options.sendInterval2Display * 1000);
-            SendTimer2Display = _SendTimer2Display;
-        }
-   */
+        var _Watchdog = setInterval(function () {
+            WatchDog();
+        }, 60000);
+        Watchdog = _Watchdog;
+
     }
     catch (e) {
         adapter.log.error('exception in  init timer [' + e + ']');
     }
-/*
-    if (!WeatherTimer) {
-        var _WeatherTimer = setInterval(function () {
-            GetWeatherData();
-        }, 33 * 1000);  //intervall evtl. einstellbar??
-        WeatherTimer = _WeatherTimer;
-    }
-    */
-    //test only =====================================================
-    /*   adapter.delObject("CE1283180000",function (err, obj) {
-           if (err) {
-               adapter.log.error(err);
-               return -1;
-           }
-           else
-           {
-               adapter.log.info("object deleted");
-           }
-       }
-       
-               );
-               */
-    //until here =====================================================
 
-    //adapter.subscribeStates('*'); //nicht notwendig; wir lesen einfach zeitgesteuert...
 }
 
 
+
+
 function showPortOpen() {
-	
-	try{
+
+    try {
         if (myPort != null) {
             //adapter.log.debug('port open: ' + myPort.options.baudRate + ' ' + myPort.comName);
             //with serialport 5.0.0:
-			adapter.log.debug('port open: ' + myPort.baudRate);
-            /*
-            if (adapter.config.device == "CUL") {
-                //to enable homecontrol mode on CUL
-                myPort.write("V\n\r");
-                myPort.write("hr\n\r");
-            }
-            */
-		}
-	}
+            adapter.log.debug('port open: ' + myPort.baudRate);
+
+        }
+    }
 
     catch (e) {
         adapter.log.error('exception in  showPortOpen [' + e + ']');
@@ -275,35 +189,22 @@ function showPortOpen() {
 }
 
 function SetMode() {
-    if (myPort != null) {
-        //if (adapter.config.device == "HomeControl") {
-            //send configuration to nano
-            /* if (adapter.config.mode == "telegram") {
-                //adapter.log.debug('telegram mode set on ' + myPort.comName);
-                //with serialport 5.0.0:
-                adapter.log.debug('telegram mode set on ' + myPort.path);
-                myPort.write("mi\n\r");
-                //myPort.write(0x0D);
-            }
-            else
-            */
-             //   if (adapter.config.mode == "raw data") {
-                    //adapter.log.debug('raw data mode set on ' + myPort.comName);
-                    //with serialport 5.0.0:
-                    adapter.log.debug('raw data mode set on ' + myPort.path);
-                    myPort.write("mr\n\r");
-                    //myPort.write(0x0D);
-            /*    }
-                else {
-                    adapter.log.error('unknown receive mode');
-                }
-                */
-        //}
+    try {
+        if (myPort != null) {
+            adapter.log.debug('raw data mode set on ' + myPort.path);
+            myPort.write("mr\n\r");
+        }
+    }
+
+    catch (e) {
+        adapter.log.error('exception in  SetMode [' + e + ']');
     }
 }
 
 function receiveSerialData(data) {
     data = data.toString();
+
+    adapter.log.debug('-- ' + data);
 
     if (data.length < 2) {
         return;
@@ -311,91 +212,45 @@ function receiveSerialData(data) {
 
     receivedData = receivedData + data;
 
-    //adapter.log.debug(receivedData);
-    /*
-    if (adapter.config.device == "CUL") {
+    // filter out everyting not needed...
+    // if got data not in then drop message
 
-        try {
-            //.contains geht unter linux nicht; unter win schon ???
-            if (receivedData.indexOf("receive off") > 0) {
-                adapter.log.debug('port reopen. ');
+    if (receivedData.indexOf("for Nano") >= 0) {
 
-                myPort.write("V\n\r");
-                myPort.write("hr\n\r");
-                receivedData = "";
-                return;
-            }
+        adapter.log.warn('watchdog ' + receivedData );
+        Waitung4Watchdog = false;
+        receivedData = "";
+        
 
-            if (data.indexOf("receive on") > 0) {
-
-                receivedData = "";
-                return;
-            }
-
-            if (receivedData.indexOf("HC-culfw Build") > 0) {
-
-                receivedData = "";
-                return;
-            }
-        }
-        catch (e) {
-            adapter.log.error('exception in  sendSerialData 4 [' + e + ']');
-        }
     }
-    */
-    //else if (adapter.config.device == "HomeControl") {
-        // filter out everyting not needed...
-        // if got data not in then drop message
 
-        if (receivedData.indexOf("too long") >= 0) {
-            receivedData = "";
-            adapter.log.error('message to sender too long');
-            return;
-        }
-
-        //only once after boot of Nano
-        if (receivedData.indexOf("RAM") >= 0) {
-            setTimeout(function () {
-                SetMode();
-            }, 2000);
-        }
-
-/*
-        if (adapter.config.mode == "telegram") {
-
-            if (receivedData.indexOf("data from") <= 0) {
-
-                receivedData = "";
-                return;
-            }
-            else {
-                receiveSerialDataTelegram(receivedData);
-            }
-        }
-        else
-*/
- //           if (adapter.config.mode == "raw data") {
-
-                //telegram starts with I and ends with J
-                if (receivedData.indexOf("I") >= 0 && receivedData.indexOf("J") > 0) {
-                    //adapter.log.debug('now going to interprete ' + receivedData);
-                    receiveSerialDataRaw(receivedData);
-                }
-                else if (receivedData.indexOf("I") < 0) {
-                    //ignore the rest...
-                    receivedData = "";
-                    return;
-                }
- /*           }
-            else {
-                adapter.log.error('unknown receive mode');
-            }
+    if (receivedData.indexOf("too long") >= 0) {
+        receivedData = "";
+        adapter.log.error('message to sender too long');
+        
     }
-*/
+
+    //only once after boot of Nano
+    if (receivedData.indexOf("RAM") >= 0) {
+        receivedData = "";
+        setTimeout(function () {
+            SetMode();
+        }, 2000);
+    }
+
+    //telegram starts with I and ends with J
+    if (receivedData.indexOf("I") >= 0 && receivedData.indexOf("J") > 0) {
+        //adapter.log.debug('now going to interprete ' + receivedData);
+        receiveSerialDataRaw(receivedData);
+    }
+    else if (receivedData.indexOf("I") < 0) {
+        //ignore the rest...
+        receivedData = "";
+    }
 }
 
 function AddDatapoints4Display(id) {
-    adapter.log.debug("found a display; add datapoints");
+    //adapter.log.debug("found a display; add datapoints");
     adapter.setObjectNotExists(id + "." + "Temp2Display", {
         type: "state",
         common: {
@@ -530,7 +385,7 @@ function receiveSerialDataRaw(dataorg) {
                 stype = "Zentrale";
                 break;
         }
-        adapter.log.debug("(2) from " + source + " (" + stype + ") with " + datapoints + " DPs");
+        //adapter.log.debug("(2) from " + source + " (" + stype + ") with " + datapoints + " DPs");
 
 
         //check wether device is already accepted; if not then just add it into newDevices - list
@@ -547,16 +402,21 @@ function receiveSerialDataRaw(dataorg) {
             });
 
 
-            if (stype === "Display") {
+            if (type == 0x03) {
                 AddDatapoints4Display(source);
             }
 
-
-            // than all datapoints
-            for (var i = 0; i < datapoints; i++) {
-                bytenumber = InterpreteDatapoint(dataArray, bytenumber, source);
+            if (datapoints > 100) // shouldnt be... 
+            {
+                //too many! 87,fb,30,03,08,00,fe,fe,fe,fe,fe,fe,03,80,J
+                adapter.log.warn("too many! " + dataArray);
             }
-
+            else {
+                // than all datapoints
+                for (var i = 0; i < datapoints; i++) {
+                    bytenumber = InterpreteDatapoint(dataArray, bytenumber, source);
+                }
+            }
             adapter.setObjectNotExists(source + ".LastUpdate", {
                 type: "state",
                 common: {
@@ -579,7 +439,7 @@ function receiveSerialDataRaw(dataorg) {
             var obj1 = findObjectByKey(newDevices, 'name', source);
 
             if (obj1==null) {
-                adapter.log.debug(source + " is new");
+                //adapter.log.debug(source + " is new");
                 newDevices.push({
                     name: source,
                     type: stype,
@@ -587,7 +447,7 @@ function receiveSerialDataRaw(dataorg) {
                 });
             }
             else {
-                adapter.log.debug(source + " already in list");
+                //adapter.log.debug(source + " already in list");
             }
         }
     }
@@ -781,7 +641,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
             sdataunit = "deg";
             break;
     }
-    adapter.log.debug("type " + type + " datatype " + datatype + " dataunit " + dataunit );
+    //adapter.log.debug("type " + type + " datatype " + datatype + " dataunit " + dataunit );
     
 
     adapter.setObjectNotExists(source + "." + stype, {
@@ -796,7 +656,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
         }
     });
 
-    adapter.log.debug("update " + source + "." + stype + " with " + value + " " + sdataunit + " bytenumber: " + bytenumber);
+    //adapter.log.debug("update " + source + "." + stype + " with " + value + " " + sdataunit + " bytenumber: " + bytenumber);
 
     adapter.setState(source + '.' + stype, { val: value, ack: true });
 
@@ -804,158 +664,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
 }
 
 
-//this is the obsolete old function which will be removed in one of the next releases
-//here we need to interprete telegram data on nano. Nano sends then a interpreted telegram like:
-//got data from Sensor :3FAF82180000 with 2 DP as broadcast Temp 30.64 C Press 958.32 mBar
-/*
-function receiveSerialDataTelegram(data) {
 
-    try {
-        var res = data.split(" ");
-        var id = res[4].substr(0);
-        var toSendId = "";
-
-        if (id == "FFFFFFFFFFFF") {
-            return;
-        }
-        var type = res[3].substr(0);
-        var datapoints = 0;
-        if (adapter.config.device == "CUL") {
-            datapoints = parseInt(res[7].substr(0));
-        }
-        else if (adapter.config.device == "HomeControl") {
-            datapoints = parseInt(res[8].substr(0));
-        }
-
-        adapter.log.debug("from " + id + " with " + datapoints);
-
-        //adapter.log.info("split size " + res.length);
-
-        //CUL
-        //got data from Sensor :CE1283180000 with 1 DP as broadcast Bright 0 lux
-        //got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.80 C Hum 57.50 %
-        //got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.67 C Press 962.35 mBar 
-        //got data from Sensor :CE1283180000 with 2 DP as broadcast Temp 24.66 C Press 962.33 mBar 
-        //   
-        //HomeControl
-        //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 31 
-        //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 31.03 C Press 959.00 mBar
-        //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 30.93 C Press 958.94 mBar
-        //got data from Sensor: 3FAF82820000 as broadcast with 1 DP Bright 29.00 lux
-        //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 30.80 C Hum 38.30 %
-        //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 30.98 C Press 958.88 mBar
-        //got data from Sensor: 3FAF82820000 as broadcast with 1 DP Bright 28.00 lux
-        //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 30.80 C Hum 38.30 %
-        //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 31.00 C Press 958.85 mBar
-        //got data from Sensor: 3FAF82820000 as broadcast with 1 DP Bright 28.00 lux
-        //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 30.80 C Hum 38.40 %
-        //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 31.02 C Press 958.94 mBar
-        //got data from Sensor: 3FAF82820000 as broadcast with 1 DP Bright 29.00 lux
-        //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 30.30 C Hum 39.00 %
-        //got data from Sensor: 3FAF82820000 as broadcast with 2 DP Temp 31.03 C Press 959.00 mBar
-
-
-        //collect all devices also those without datapoint
-        adapter.setObjectNotExists(id, {
-            type: "device",
-            common: {
-                name: type,
-            }
-        });
-
-        //add writable datapoints for display
-        if (type.indexOf("Display") >= 0) {
-            AddDatapoints4Display(id);
-            
-
-            toSendId = id;
-        }
-
-
-        for (var _i = 0; _i < datapoints; _i++) {
-            var _idx = 0;
-            if (adapter.config.device == "CUL") {
-                _idx = 11 + (_i * 5);
-            }
-            else if (adapter.config.device == "HomeControl") {
-                _idx = 10 + (_i * 3);
-            }
-            //adapter.log.info("index " + _idx);
-            var _state = res[_idx];
-
-            var _value;
-            var found = false;
-            var k = 1;
-            while (!found) {
-                _value = parseFloat(res[_idx + k].substr(0));
-
-                k++;
-                if (!isNaN(_value)) //check NaN
-                {
-                    found = true;
-                }
-
-                else if (k > 5) {
-                    adapter.log.warn("value not found")
-                    found = true;
-                }
-            }
-            adapter.log.debug("on index " + _idx + " : " + _state + " = " + _value);
-
-            
-            //collect datapoints
-            //to do: different functions weather, ...
-            adapter.setObjectNotExists(id + "." + _state, {
-                type: "state",
-                common: {
-                    name: _state,
-                    type: "state",
-                    role: "sensor",
-                    function: "Wetter",
-                    read: true,
-                    write: false
-                }
-            });
-
-            adapter.setState(id + '.' + _state, { val: _value, ack: true });
-            
-        }
-
-
-        adapter.setObjectNotExists(id + ".LastUpdate", {
-            type: "state",
-            common: {
-                name: "Last update",
-                type: "datetime",
-                role: "indicator.date",
-                read: true,
-                write: false
-            }
-        });
-        var theDate = new Date();
-        adapter.setState(id + ".LastUpdate", { val: theDate.toString(), ack: true });
-
-    }
-
-    catch (e) {
-        var sText = e.toString();
-        if (sText.indexOf("Cannot read property 'substr' of undefined") > 0) {
-
-        }
-        else {
-            adapter.log.error('exception in  sendSerialData 2 [' + e + ']');
-        }
-        return;
-    }
-
-    receivedData = "";
-
-    //if Display then answer with data
-    if (toSendId.length > 0) {
-        SendData2Display(toSendId);
-    }
-}
-*/
 function showPortClose() {
     adapter.log.debug('port closed.');
 }
@@ -1045,7 +754,7 @@ function AddTime(){
 
     DataToSendLength += 9;
 
-    adapter.log.debug('Time ' + hour + ':' + minute + ':' + second);
+    //adapter.log.debug('Time ' + hour + ':' + minute + ':' + second);
 
     CheckDataLength();
 }
@@ -1074,7 +783,7 @@ function AddDate(){
 
     DataToSendLength += 9;
 
-    adapter.log.debug('Date ' + day + '.' + month + '.' + year);
+    //adapter.log.debug('Date ' + day + '.' + month + '.' + year);
 
     CheckDataLength();
 }
@@ -1112,7 +821,7 @@ function AddTemperature(DisplayID) {
 
                     DataToSendLength += 7;
 
-                    adapter.log.debug('Temperature ' + temperature);
+                    //adapter.log.debug('Temperature ' + temperature);
 
                     CheckDataLength();
                 }
@@ -1159,7 +868,7 @@ function AddHumidity(DisplayID) {
 
                     DataToSendLength += 7;
 
-                    adapter.log.debug('Humidity ' + humidity);
+                    //adapter.log.debug('Humidity ' + humidity);
 
                     CheckDataLength();
                 }
@@ -1196,7 +905,7 @@ function AddPoP(DisplayID) {
 
                     DataToSendLength += 5;
 
-                    adapter.log.debug('PoP ' + pop);
+                    //adapter.log.debug('PoP ' + pop);
 
                     CheckDataLength();
                 }
@@ -1240,7 +949,7 @@ function AddAirPressure(DisplayID) {
 
                     DataToSendLength += 7;
 
-                    adapter.log.debug('Pressure ' + pressure);
+                    //adapter.log.debug('Pressure ' + pressure);
 
                     CheckDataLength();
                 }
@@ -1386,7 +1095,7 @@ function AddWeatherIconId(DisplayID) {
 
                     DataToSendLength += 4;
 
-                    adapter.log.debug('WeatherIcon ' + icon + " = " + icon_id);
+                    //adapter.log.debug('WeatherIcon ' + icon + " = " + icon_id);
 
                     CheckDataLength();
                 }
@@ -1403,12 +1112,33 @@ function CheckDataLength() {
 }
 
 
+function WatchDog() {
+
+    if (Waitung4Watchdog) {
+        adapter.log.error('##watchdog error');
+    }
+
+    try {
+        if (myPort != null) {
+            adapter.log.debug('##watchdog ' + myPort.path);
+            myPort.write("v\n\r");
+            Waitung4Watchdog = true;
+        }
+    }
+
+    catch (e) {
+        adapter.log.error('exception in  watchdog [' + e + ']');
+    }
+}
+
 /*
 Zeit/Datum-Telegramm
 s 0  0  0  0  0  0  0  fe  fe  fe  fe  fe  fe  1 2 4 5 0 15 0  1 7 e1  0 5 6 0  e 0 37 0 22 0  -> HEX 0 als Absender
   0 16 16 16 16 16 16 254 254 254 254 254 254 16 2 5 6 0 14 0 55 0 34  0 4 5 0 22 0  1 7 225 0 -> DEC Date/Time vertauscht
   0 16 16 16 16 16 16 254 254 254 254 254 254 16 2 4 5 0 22 0  1 7 225 0 5 6 0 14 0 55 0 34 0 -> DEC wie oben Zentrale als Absender
 */
+
+
 
 function SendDataBroadcast() {
     //adapter.log.debug('Send data');
@@ -1433,7 +1163,7 @@ function SendData2Display(DisplayID) {
     if (AlreadySending)
         return;
 
-    adapter.log.debug('Send data to Display ' + DisplayID);
+    //adapter.log.debug('Send data to Display ' + DisplayID);
 
     AlreadySending = true;
     try {
@@ -1464,7 +1194,7 @@ function sendSerialDataRaw() {
         myPort.write(buffer);
 
         myPort.write("\n\r");
-        //adapter.log.debug(sTemp);
+        adapter.log.debug("sent" + sTemp);
 
         buffer = null;
     }

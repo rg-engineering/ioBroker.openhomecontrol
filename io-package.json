@@ -95,7 +95,13 @@
     "stopBeforeUpdate": true,
     "type": "hardware",
     "license": "MIT",
-    "materialize": true
+    "materialize": true,
+    "authors": [
+      {
+        "name": "René G.",
+        "email": "info@rg-engineering.eu"
+      }
+    ]
   },
   "native": {
     "serialport": "COM7",
