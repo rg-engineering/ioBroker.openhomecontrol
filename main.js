@@ -25,6 +25,7 @@ var adapter = utils.adapter('myhomecontrol');
 
 
 var myPort = null;
+var SerialPort = null;
 var receivedData = "";
 var SendTimerBroadcast = null;
 var Watchdog = null;
@@ -43,11 +44,7 @@ var AlreadySending = false;
 
 const newDevices = [];
 
-try {
-    var SerialPort = require('serialport');
-} catch (e) {
-    console.warn('Serial port is not installed [' + e + ']');
-}
+
 
 
 //Some message was sent to adapter instance over message box. Used by email, pushover, text2speech, ...
@@ -56,7 +53,7 @@ adapter.on('message', function (obj) {
         switch (obj.command) {
         	case 'send':
         		// e.g. send email or pushover or whatever
-        		console.log('send command');
+                adapter.log.debug('send command');
 
         		// Send response in callback if required
         		if (obj.callback) adapter.sendTo(obj.from, obj.command, 'Message received', obj.callback);
@@ -119,12 +116,25 @@ function main() {
         sendIntervalBroadcast: parseInt(adapter.config.sendIntervalBroadcast) || 30
     };
 
-    SerialPort.list(function (err, ports) {
-        ports.forEach(function (port) {
-            adapter.log.info(port.comName + ' ' + port.pnpId + ' ' + port.manufacturer);
-        });
-    });
+    try {
+        var SerialPort = require('serialport');
 
+        adapter.log.error('Serial port is installed successfully');
+    } catch (e) {
+        adapter.log.error('Serial port is not installed [' + e + ']');
+    }
+
+
+    try {
+
+        SerialPort.list(function (err, ports) {
+            ports.forEach(function (port) {
+                adapter.log.info(port.comName + ' ' + port.pnpId + ' ' + port.manufacturer);
+            });
+        });
+    } catch (e) {
+        adapter.log.error('Serial port does not exist [' + e + ']');
+    }
 
     //Rechte im Linux gesetzt??? 
     try {
@@ -192,7 +202,8 @@ function SetMode() {
     try {
         if (myPort != null) {
             adapter.log.debug('raw data mode set on ' + myPort.path);
-            myPort.write("mr\n\r");
+            myPort.write("mr");
+            myPort.write("\n\r");
         }
     }
 
@@ -1121,7 +1132,8 @@ function WatchDog() {
     try {
         if (myPort != null) {
             adapter.log.debug('##watchdog ' + myPort.path);
-            myPort.write("v\n\r");
+            myPort.write("v");
+            myPort.write("\n\r");
             Waitung4Watchdog = true;
         }
     }
