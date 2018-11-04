@@ -27,9 +27,12 @@ var adapter = utils.adapter('myhomecontrol');
 var myPort = null;
 var SerialPort = null;
 var receivedData = "";
+var SentData2Compare = "";
+var CompareErrCnt = 0;
+
 var SendTimerBroadcast = null;
-var Watchdog = null;
-var Waitung4Watchdog = false;
+//var Watchdog = null;
+//var Waitung4Watchdog = false;
 
 
 var DataToSend = {};
@@ -117,9 +120,9 @@ function main() {
     };
 
     try {
-        var SerialPort = require('serialport');
+        SerialPort = require('serialport');
 
-        adapter.log.error('Serial port is installed successfully');
+        adapter.log.info('Serial port is installed successfully');
     } catch (e) {
         adapter.log.error('Serial port is not installed [' + e + ']');
     }
@@ -166,12 +169,12 @@ function main() {
             }, options.sendIntervalBroadcast * 1000);
             SendTimerBroadcast = _SendTimerBroadcast;
         }
-
+        /*
         var _Watchdog = setInterval(function () {
             WatchDog();
         }, 60000);
         Watchdog = _Watchdog;
-
+        */
     }
     catch (e) {
         adapter.log.error('exception in  init timer [' + e + ']');
@@ -213,34 +216,29 @@ function SetMode() {
 }
 
 function receiveSerialData(data) {
+
+
     data = data.toString();
-
-    adapter.log.debug('-- ' + data);
-
-    if (data.length < 2) {
-        return;
-    }
 
     receivedData = receivedData + data;
 
     // filter out everyting not needed...
     // if got data not in then drop message
-
+    /*
     if (receivedData.indexOf("for Nano") >= 0) {
 
         adapter.log.warn('watchdog ' + receivedData );
         Waitung4Watchdog = false;
         receivedData = "";
-        
-
     }
-
+*/
     if (receivedData.indexOf("too long") >= 0) {
         receivedData = "";
         adapter.log.error('message to sender too long');
         
     }
 
+    /*
     //only once after boot of Nano
     if (receivedData.indexOf("RAM") >= 0) {
         receivedData = "";
@@ -248,16 +246,29 @@ function receiveSerialData(data) {
             SetMode();
         }, 2000);
     }
+    */
 
     //telegram starts with I and ends with J
     if (receivedData.indexOf("I") >= 0 && receivedData.indexOf("J") > 0) {
         //adapter.log.debug('now going to interprete ' + receivedData);
         receiveSerialDataRaw(receivedData);
     }
-    else if (receivedData.indexOf("I") < 0) {
+    /*
+    else if (receivedData.indexOf("X") >= 0 && receivedData.indexOf("Y") > 0) {
+        adapter.log.debug('now going to interprete ' + receivedData);
+        receiveSerialDataRaw(receivedData);
+    }
+    else if (receivedData.indexOf("I") < 0 && receivedData.indexOf("X") < 0) {
         //ignore the rest...
         receivedData = "";
     }
+    */
+    else if (receivedData.indexOf("I") < 0 ) {
+        //ignore the rest...
+        receivedData = "";
+    }
+
+
 }
 
 function AddDatapoints4Display(id) {
@@ -396,7 +407,7 @@ function receiveSerialDataRaw(dataorg) {
                 stype = "Zentrale";
                 break;
         }
-        //adapter.log.debug("(2) from " + source + " (" + stype + ") with " + datapoints + " DPs");
+        adapter.log.debug("(2) from " + source + " (" + stype + ") with " + datapoints + " DPs");
 
 
         //check wether device is already accepted; if not then just add it into newDevices - list
@@ -442,6 +453,7 @@ function receiveSerialDataRaw(dataorg) {
             adapter.setState(source + ".LastUpdate", { val: theDate.toString(), ack: true });
 
             if (type == 0x03) {
+                
                 SendData2Display(source);
             }
         }
@@ -652,7 +664,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
             sdataunit = "deg";
             break;
     }
-    //adapter.log.debug("type " + type + " datatype " + datatype + " dataunit " + dataunit );
+    adapter.log.debug("type " + type + " datatype " + datatype +  value + " " + dataunit  );
     
 
     adapter.setObjectNotExists(source + "." + stype, {
@@ -801,6 +813,7 @@ function AddDate(){
 
 function AddTemperature(DisplayID) {
     try {
+        //adapter.log.debug("add temperatur");
 
         adapter.getState(DisplayID + '.Temp2Display', function (err, obj) {
             if (err) {
@@ -848,6 +861,8 @@ function AddTemperature(DisplayID) {
 
 function AddHumidity(DisplayID) {
     try {
+        //adapter.log.debug("add humidity");
+
         adapter.getState(DisplayID + '.Humidity2Display', function (err, obj) {
             if (err) {
                 adapter.log.error(err);
@@ -894,6 +909,9 @@ function AddHumidity(DisplayID) {
 
 function AddPoP(DisplayID) {
     try {
+
+        //adapter.log.debug("add pop");
+
         adapter.getState(DisplayID + '.PoP2Display', function (err, obj) {
             if (err) {
                 adapter.log.error(err);
@@ -931,6 +949,7 @@ function AddPoP(DisplayID) {
 
 function AddAirPressure(DisplayID) {
     try {
+        //adapter.log.debug("add pressure");
 
         adapter.getState(DisplayID + '.Pressure2Display', function (err, obj) {
             if (err) {
@@ -975,6 +994,8 @@ function AddAirPressure(DisplayID) {
 
 function AddWeatherIconId(DisplayID) {
     try {
+
+        //adapter.log.debug("add icon");
 
         adapter.getState(DisplayID + '.WeatherIcon2Display', function (err, obj) {
             if (err) {
@@ -1122,7 +1143,7 @@ function AddWeatherIconId(DisplayID) {
 function CheckDataLength() {
 }
 
-
+/*
 function WatchDog() {
 
     if (Waitung4Watchdog) {
@@ -1142,6 +1163,7 @@ function WatchDog() {
         adapter.log.error('exception in  watchdog [' + e + ']');
     }
 }
+*/
 
 /*
 Zeit/Datum-Telegramm
@@ -1155,10 +1177,13 @@ s 0  0  0  0  0  0  0  fe  fe  fe  fe  fe  fe  1 2 4 5 0 15 0  1 7 e1  0 5 6 0  
 function SendDataBroadcast() {
     //adapter.log.debug('Send data');
 
-    if (AlreadySending)
+    if (AlreadySending) {
+        adapter.log.warn("broadcast: already sending");
         return;
+    }
 
     AlreadySending = true;
+    adapter.log.debug("send broadcast");
     try {
         AddHeader(0xFE,"");
         AddDate();
@@ -1172,12 +1197,13 @@ function SendDataBroadcast() {
 
 function SendData2Display(DisplayID) {
 
-    if (AlreadySending)
+    if (AlreadySending) {
+        adapter.log.warn("send to display:  already sending");
         return;
-
-    //adapter.log.debug('Send data to Display ' + DisplayID);
+    }
 
     AlreadySending = true;
+    adapter.log.debug("send data to " + DisplayID);
     try {
         AddHeader(0x00, DisplayID);
         AddTemperature(DisplayID); //from there we add humidity and then air pressure; don't do it here because it's a asynchron call
@@ -1192,23 +1218,31 @@ function SendData2Display(DisplayID) {
 function sendSerialDataRaw() {
 
     try {
-        var sTemp = "";
-        myPort.write("s");
 
-        var buffer = new Buffer(DataToSendLength+1);
+        var length = DataToSendLength + 2;
+        //adapter.log.debug('sendSerialDataRaw ' + length);
+
+        var buffer = new Buffer(length);
         //copy into buffer for data conversion...
+        buffer[0] = 0x53; //== 'S'
+        buffer[1] = DataToSendLength;
         for (var i = 0; i < DataToSendLength; i++) {
-            buffer[i] = DataToSend[i];
-            sTemp += buffer[i];
-            sTemp += " ";
+            buffer[i + 2] = DataToSend[i];
         }
-        //buffer[DataToSendLength] = 0x0D; //final return
+
         myPort.write(buffer);
 
-        myPort.write("\n\r");
-        adapter.log.debug("sent" + sTemp);
+        var sTemp = "";
+        for (var j = 0; j < buffer.length; j++) {
+            sTemp += buffer[j].toString(16);
+            sTemp += " ";
+        }
+        adapter.log.debug("sent :" + sTemp);
+
+        SentData2Compare = sTemp;
 
         buffer = null;
+
     }
     catch (e) {
         adapter.log.error('exception in  sendSerialDataRaw [' + e + ']');

@@ -11,14 +11,14 @@
 
 This adapter implements interpretation of data received from HomeControl sensor via RF.
 
-protocol description for raw data can be found under
-http://wiki.rg-engineering.eu/index.php?title=Funk-Protokoll
+protocol description for data can be found under
+https://www.rg-engineering.eu/index.php/produkte/myhomecontrol/protokollbeschreibung
 
 The system can be used with our sensors:
-http://wiki.rg-engineering.eu/index.php?title=Umwelt-Funk-Sensor
+https://www.rg-engineering.eu/index.php/produkte/myhomecontrol
 
 The sensors are Atmel based. Software is available in github
-
+(link to do)
 
 
 ## Changelog
@@ -82,7 +82,7 @@ The sensors are Atmel based. Software is available in github
 ## License
 
 
-Copyright (C) <2017>  <info@rg-engineering.eu>
+Copyright (C) <2017-2018>  <info@rg-engineering.eu>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
