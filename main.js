@@ -222,6 +222,8 @@ function receiveSerialData(data) {
 
     receivedData = receivedData + data;
 
+    //adapter.log.debug('--' + data);
+
     // filter out everyting not needed...
     // if got data not in then drop message
     /*
@@ -232,7 +234,7 @@ function receiveSerialData(data) {
         receivedData = "";
     }
 */
-    if (receivedData.indexOf("too long") >= 0) {
+    if (receivedData.indexOf("too many data") >= 0) {
         receivedData = "";
         adapter.log.error('message to sender too long');
         
@@ -286,6 +288,20 @@ function AddDatapoints4Display(id) {
         }
     });
 
+    adapter.setObjectNotExists(id + "." + "TempForecast2Display", {
+        type: "state",
+        common: {
+            name: "Temperature Forecast",
+            type: "number",
+            role: "sensor",
+            function: "Wetter",
+            read: true,
+            write: true,
+            unit: "°C"
+        }
+    });
+
+
     adapter.setObjectNotExists(id + "." + "Humidity2Display", {
         type: "state",
         common: {
@@ -312,11 +328,23 @@ function AddDatapoints4Display(id) {
         }
     });
 
-    adapter.setObjectNotExists(id + "." + "WeatherIcon2Display", {
+    adapter.setObjectNotExists(id + "." + "WeatherIconString2Display", {
         type: "state",
         common: {
-            name: "WeatherIcon",
+            name: "WeatherIcon String Forecast",
             type: "string",
+            role: "sensor",
+            function: "Wetter",
+            read: true,
+            write: true
+        }
+    });
+
+    adapter.setObjectNotExists(id + "." + "WeatherIconID2Display", {
+        type: "state",
+        common: {
+            name: "WeatherIcon ID Forecast",
+            type: "number",
             role: "sensor",
             function: "Wetter",
             read: true,
@@ -327,13 +355,26 @@ function AddDatapoints4Display(id) {
     adapter.setObjectNotExists(id + "." + "PoP2Display", {
         type: "state",
         common: {
-            name: "Percentage of precipitation",
+            name: "Percentage of precipitation Forecast",
             type: "number",
             role: "sensor",
             function: "Wetter",
             read: true,
             write: true,
             unit: "%"
+        }
+    });
+
+    adapter.setObjectNotExists(id + "." + "Rain2Display", {
+        type: "state",
+        common: {
+            name: "Rain Forecast",
+            type: "number",
+            role: "sensor",
+            function: "Wetter",
+            read: true,
+            write: true,
+            unit: "mm"
         }
     });
 }
@@ -556,22 +597,31 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
         case 0x0F:
             stype = "WindDir"
             break;
+        case 0x10:
+            stype = "Rain_forecast"
+            break;
+        case 0x11:
+            stype = "Temperature_forecast"
+            break;
     }
 
     var datatype = parseInt( dataArray[bytenumber],16);
     bytenumber++;
     var value;
     //adapter.log.debug("datatype " + datatype);
+    var sDataType = "unknown";
     switch (datatype) {
         case 0x01: // Byte 
             value = parseInt(dataArray[bytenumber], 16);
             bytenumber++;
+            sDataType = "byte";
             break;
         case 0x02: // int 
             value = parseInt(dataArray[bytenumber], 16) << 8;
             bytenumber++;
             value = value + parseInt(dataArray[bytenumber], 16);
             bytenumber++;
+            sDataType = "int";
             break;
         case 0x03: // float
 
@@ -586,9 +636,10 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
 
             value = (farr[0]).toFixed(2);
             bytenumber = bytenumber + 4;
+            sDataType = "float";
             break;
         case 0x04: // string
-
+            sDataType = "string";
             break;
         /*
             myhomecontrol.0	2018 - 09 - 23 13: 45: 28.512	debug	update101010101010.Time with 0: 0: 0 bytenumber: 32
@@ -616,6 +667,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
             var year = a + b;
             bytenumber = bytenumber + (3 * 2);
             value = day + "." + month + "." + year;
+            sDataType = "date";
             break;
         case 0x06: // time
 
@@ -634,6 +686,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
             var second = a + b;
             bytenumber = bytenumber + (3 * 2);
             value = hour + ":" + minute + ":" + second;
+            sDataType = "time";
             break;
     }
 
@@ -663,8 +716,11 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
         case 0x06:
             sdataunit = "deg";
             break;
+        case 0x07:
+            sdataunit = "mm";
+            break;
     }
-    adapter.log.debug("type " + type + " datatype " + datatype +  value + " " + dataunit  );
+    adapter.log.debug(stype + " (" + sDataType + ") " + value + " " + sdataunit  );
     
 
     adapter.setObjectNotExists(source + "." + stype, {
@@ -983,7 +1039,7 @@ function AddAirPressure(DisplayID) {
 
                     CheckDataLength();
                 }
-                AddWeatherIconId(DisplayID);
+                AddWeatherIconIdFromString(DisplayID);
             }
         });
     }
@@ -992,12 +1048,12 @@ function AddAirPressure(DisplayID) {
     }
 }
 
-function AddWeatherIconId(DisplayID) {
+function AddWeatherIconIdFromString(DisplayID) {
     try {
 
         //adapter.log.debug("add icon");
 
-        adapter.getState(DisplayID + '.WeatherIcon2Display', function (err, obj) {
+        adapter.getState(DisplayID + '.WeatherIconString2Display', function (err, obj) {
             if (err) {
                 adapter.log.error(err);
                 AlreadySending = false;
@@ -1005,13 +1061,13 @@ function AddWeatherIconId(DisplayID) {
                 if (obj != null) {
 
                     //set ack-flag
-                    adapter.setState(DisplayID + '.WeatherIcon2Display', { ack: true });
+                    adapter.setState(DisplayID + '.WeatherIconString2Display', { ack: true });
 
                     var icon = obj.val;
 
                     var icon_id = -1;
 
-
+                    // das ist WU
                     switch (icon) {
                         case "clear":
                         case "nt_clear":
@@ -1071,7 +1127,7 @@ function AddWeatherIconId(DisplayID) {
                         case "nt_chancethunderstorm":
                             icon_id = 14;
                             break;
-                    
+
                         case "tstorms":
                         case "nt_tstorms":
                         case "thunderstorm":
@@ -1117,6 +1173,7 @@ function AddWeatherIconId(DisplayID) {
 
 
 
+
                     DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
                     DataToSend[DataToSendLength] = 0x0B; //WeatherIcon
                     DataToSend[DataToSendLength + 1] = 0x01; //byte
@@ -1130,15 +1187,155 @@ function AddWeatherIconId(DisplayID) {
                     //adapter.log.debug('WeatherIcon ' + icon + " = " + icon_id);
 
                     CheckDataLength();
+
+                    //do not add another icon...
+                    AddTemperatureForecast(DisplayID);
                 }
-                sendSerialDataRaw();
+                else {
+                    AddWeatherIconIdFromID(DisplayID);
+                    //sendSerialDataRaw();
+                }
             }
         });
     }
     catch (e) {
-        adapter.log.error('exception in  AddWeatherIconId [' + e + ']');
+        adapter.log.error('exception in  AddWeatherIconIdFromString [' + e + ']');
     }
 }
+
+function AddWeatherIconIdFromID(DisplayID) {
+    try {
+
+        //adapter.log.debug("add icon");
+
+        adapter.getState(DisplayID + '.WeatherIconID2Display', function (err, obj) {
+            if (err) {
+                adapter.log.error(err);
+                AlreadySending = false;
+            } else {
+                if (obj != null) {
+
+                    //set ack-flag
+                    adapter.setState(DisplayID + '.WeatherIconID2Display', { ack: true });
+
+                    var icon_id = obj.val;
+
+                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+                    DataToSend[DataToSendLength] = 0x0B; //WeatherIcon
+                    DataToSend[DataToSendLength + 1] = 0x01; //byte
+
+                    DataToSend[DataToSendLength + 2] = icon_id;
+
+                    DataToSend[DataToSendLength + 3] = 0x00; //ohne
+
+                    DataToSendLength += 4;
+
+                    //adapter.log.debug('WeatherIcon from id : ' +  icon_id);
+
+                    CheckDataLength();
+                }
+                AddTemperatureForecast(DisplayID);
+                
+            }
+        });
+    }
+    catch (e) {
+        adapter.log.error('exception in  AddWeatherIconIdFromID [' + e + ']');
+    }
+}
+
+function AddTemperatureForecast(DisplayID) {
+    try {
+        //adapter.log.debug("add temperatur");
+
+        adapter.getState(DisplayID + '.TempForecast2Display', function (err, obj) {
+            if (err) {
+                adapter.log.error(err);
+                AlreadySending = false;
+            } else {
+
+                if (obj != null) {
+                    //set ack-flag
+                    adapter.setState(DisplayID + '.TempForecast2Display', { ack: true });
+                    var temperature = obj.val;
+                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+                    DataToSend[DataToSendLength] = 0x11;  //Temperature forecast
+                    DataToSend[DataToSendLength + 1] = 0x03; //float
+
+
+                    var farr = new Float32Array(1);
+                    farr[0] = temperature;
+                    var barr = new Int8Array(farr.buffer);
+
+
+                    DataToSend[DataToSendLength + 2] = barr[0];
+                    DataToSend[DataToSendLength + 3] = barr[1];
+                    DataToSend[DataToSendLength + 4] = barr[2];
+                    DataToSend[DataToSendLength + 5] = barr[3];
+
+
+                    DataToSend[DataToSendLength + 6] = 0x01; //°C
+
+                    DataToSendLength += 7;
+
+                    //adapter.log.debug('Temperature ' + temperature);
+
+                    CheckDataLength();
+                }
+                AddRainForecast(DisplayID);
+
+            }
+        });
+    }
+    catch (e) {
+        adapter.log.error('exception in  AddTemperatureForecast [' + e + ']');
+    }
+
+
+}
+
+function AddRainForecast(DisplayID) {
+    try {
+
+        //adapter.log.debug("add pop");
+
+        adapter.getState(DisplayID + '.Rain2Display', function (err, obj) {
+            if (err) {
+                adapter.log.error(err);
+                AlreadySending = false;
+            } else {
+
+                if (obj != null) {
+                    //set ack-flag
+                    adapter.setState(DisplayID + '.Rain2Display', { ack: true });
+                    var rain = obj.val;
+
+                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+                    DataToSend[DataToSendLength] = 0x10;  //rain forecast
+                    DataToSend[DataToSendLength + 1] = 0x02; //int
+
+                    DataToSend[DataToSendLength + 2] = highByte(rain);
+                    DataToSend[DataToSendLength + 3] = lowByte(rain);
+
+                    DataToSend[DataToSendLength + 4] = 0x07; //mm
+
+                    DataToSendLength += 5;
+
+                    //adapter.log.debug('rain ' + rain);
+
+                    CheckDataLength();
+                }
+
+                sendSerialDataRaw();
+                
+            }
+        });
+    }
+    catch (e) {
+        adapter.log.error('exception in  AddRainForecast [' + e + ']');
+    }
+}
+
 
 function CheckDataLength() {
 }
@@ -1287,3 +1484,9 @@ function ListDevices(obj) {
 
     adapter.sendTo(obj.from, obj.command, allDevices, obj.callback);
 }
+
+
+/*
+ 
+ RSSI 220 dBm got data from Zentrale: 10 10 10 10 10 10 Target=87 FB 30 03 08 00 with 5 DP Temperature 3.20°C Humidity 82.00% WeatherIcon  12 unknown type 15.00°C unknown type   2unknown
+ */

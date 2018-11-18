@@ -1,8 +1,11 @@
 {
   "common": {
     "name": "myhomecontrol",
-    "version": "0.0.18",
+    "version": "0.0.19",
     "news": {
+      "0.0.19": {
+        
+      },
       "0.0.18": {
         "en": "new devices are shown in admin and needs to be confirmed before they are used as objects",
         "de": "Neue Geräte werden in admin angezeigt und müssen bestätigt werden, bevor sie als Objekte verwendet werden",

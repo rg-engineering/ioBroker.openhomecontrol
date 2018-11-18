@@ -23,6 +23,8 @@ The sensors are Atmel based. Software is available in github
 
 ## Changelog
 
+### 0.0.19
+
 ### 0.0.18
 * (René) support only for HomeControl raw data
 * (René) new devices are shown in admin and needs to be confirmed before they are used as objects
