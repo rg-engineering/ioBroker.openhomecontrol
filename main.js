@@ -79,6 +79,8 @@ adapter.on('message', function (obj) {
             case 'listDevices':
                 ListDevices(obj);
                 break;
+            default:
+                break;
     	}
     }
 });

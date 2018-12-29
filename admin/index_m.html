@@ -58,7 +58,7 @@
 
         function getComPorts(actualValue, instance) {
             timeout = setTimeout(function () {
-                getComPorts(actualValue);
+                getComPorts(actualValue, instance);
             }, 2000);
 
             //function sendTo(_adapter_instance, command, message, callback)
