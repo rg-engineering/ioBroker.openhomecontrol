@@ -12,14 +12,15 @@
 "use strict";
 
 // you have to require the utils module and call adapter function
-var utils =    require(__dirname + '/lib/utils'); // Get common adapter utils
-
+//var utils =    require(__dirname + '/lib/utils'); // Get common adapter utils
+const utils = require('@iobroker/adapter-core');
 
 
 // you have to call the adapter function and pass a options object
 // name has to be set and has to be equal to adapters folder name and main file name excluding extension
 // adapter will be restarted automatically every time as the configuration changed, e.g system.adapter.template.0
-var adapter = utils.adapter('myhomecontrol');
+//this is the old version without compact
+//var adapter = utils.adapter('myhomecontrol');
 
 
 
@@ -47,11 +48,63 @@ var AlreadySending = false;
 
 const newDevices = [];
 
+let adapter;
+function startAdapter(options) {
+    options = options || {};
+    Object.assign(options, {
+        name: 'myhomecontrol',
+        ready: function () {
+            try {
+                //adapter.log.debug('start');
+                main();
+            }
+            catch (e) {
+                adapter.log.error('exception catch after ready [' + e + ']');
+            }
+        },
+        //Some message was sent to adapter instance over message box. Used by email, pushover, text2speech, ...
+        message: function (obj) {
+            if (obj) {
+                switch (obj.command) {
+                    case 'send':
+                        // e.g. send email or pushover or whatever
+                        adapter.log.debug('send command');
 
+                        // Send response in callback if required
+                        if (obj.callback) adapter.sendTo(obj.from, obj.command, 'Message received', obj.callback);
+                        break;
+                    case 'listUart':
+                        //cmd comes typically from adpater settings page
+                        if (obj.callback) {
+                            if (SerialPort) {
+                                // read all found serial ports
+                                SerialPort.list(function (err, ports) {
+                                    adapter.log.info('List of port: ' + JSON.stringify(ports));
+                                    adapter.sendTo(obj.from, obj.command, ports, obj.callback);
+                                });
+                            } else {
+                                adapter.log.warn('Module serialport is not available');
+                                adapter.sendTo(obj.from, obj.command, [{ comName: 'Not available' }], obj.callback);
+                            }
+                        }
+                        break;
+                    case 'listDevices':
+                        ListDevices(obj);
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+    });
+    adapter = new utils.Adapter(options);
 
+    return adapter;
+};
+        
 
 //Some message was sent to adapter instance over message box. Used by email, pushover, text2speech, ...
-adapter.on('message', function (obj) {
+/*adapter.on('message', function (obj) {
 	if (obj) {
         switch (obj.command) {
         	case 'send':
@@ -84,9 +137,10 @@ adapter.on('message', function (obj) {
     	}
     }
 });
+*/
 
 // is called when adapter shuts down - callback has to be called under any circumstances!
-adapter.on('unload', function (callback) {
+/*adapter.on('unload', function (callback) {
     try {
         adapter.log.debug('cleaned everything up...');
         callback();
@@ -95,13 +149,13 @@ adapter.on('unload', function (callback) {
         callback();
     }
 });
-
+*/
 
 
 
 // is called when databases are connected and adapter received configuration.
 // start here!
-adapter.on('ready', function () {
+/*adapter.on('ready', function () {
     try {
         main();
     }
@@ -109,6 +163,7 @@ adapter.on('ready', function () {
         adapter.log.error('exception catch after ready [' + e + ']');
     }
 });
+*/
 
 function main() {
 
@@ -1492,3 +1547,11 @@ function ListDevices(obj) {
  
  RSSI 220 dBm got data from Zentrale: 10 10 10 10 10 10 Target=87 FB 30 03 08 00 with 5 DP Temperature 3.20°C Humidity 82.00% WeatherIcon  12 unknown type 15.00°C unknown type   2unknown
  */
+
+// If started as allInOne/compact mode => return function to create instance
+if (module && module.parent) {
+    module.exports = startAdapter;
+} else {
+    // or start the instance directly
+    startAdapter();
+} 

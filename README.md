@@ -23,6 +23,9 @@ The sensors are Atmel based. Software is available in github
 
 ## Changelog
 
+### 0.0.20 (2019-01-08)
+* (René) support of compact mode
+
 ### 0.0.19
 
 ### 0.0.18
@@ -62,11 +65,11 @@ The sensors are Atmel based. Software is available in github
 ### 0.0.8
 
 ### 0.0.7
-* (René)error telegarm added
+* (René) error telegarm added
 		ignore sensor ID FFFFFFFFFFFF
 
 ### 0.0.6
-* (René)just cleanups
+* (René) just cleanups
 
 ### 0.0.5
 * (René) supports HomeControl and CUL (with modified culfw)
@@ -84,7 +87,7 @@ The sensors are Atmel based. Software is available in github
 ## License
 
 
-Copyright (C) <2017-2018>  <info@rg-engineering.eu>
+Copyright (C) <2017-2019>  <info@rg-engineering.eu>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 

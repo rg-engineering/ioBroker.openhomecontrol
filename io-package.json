@@ -1,10 +1,21 @@
 {
   "common": {
     "name": "myhomecontrol",
-    "version": "0.0.19",
+    "version": "0.0.20",
     "news": {
+      "0.0.20": {
+        "en": "support of compact adapter",
+        "de": "Unterstützung des Kompaktadapters",
+        "ru": "поддержка компактного адаптера",
+        "pt": "suporte de adaptador compacto",
+        "nl": "ondersteuning voor compacte adapter",
+        "fr": "support de l'adaptateur compact",
+        "it": "supporto di adattatore compatto",
+        "es": "soporte de adaptador compacto",
+        "pl": "obsługa adaptera kompaktowego"
+      },
       "0.0.19": {
-        
+
       },
       "0.0.18": {
         "en": "new devices are shown in admin and needs to be confirmed before they are used as objects",
@@ -99,6 +110,7 @@
     "type": "hardware",
     "license": "MIT",
     "materialize": true,
+    "compact": true,
     "authors": [
       {
         "name": "René G.",
