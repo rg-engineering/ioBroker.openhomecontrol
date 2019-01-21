@@ -6,3 +6,5 @@ node_modules
 /todo.txt
 /typings/
 /todo1.txt
+/.project
+/.settings/
