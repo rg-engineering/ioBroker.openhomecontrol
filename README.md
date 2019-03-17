@@ -1,6 +1,6 @@
 ![Logo](admin/myhomecontrol.png)
 # ioBroker.myHomeControl
-===========================
+![Number of Installations](http://iobroker.live/badges/myhomecontrol-installed.svg) ![Number of Installations](http://iobroker.live/badges/myhomecontrol-stable.svg) 
 
 [![NPM version](https://img.shields.io/npm/v/iobroker.myhomecontrol.svg)](https://www.npmjs.com/package/iobroker.myhomecontrol)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.myhomecontrol.svg)](https://www.npmjs.com/package/iobroker.myhomecontrol)
