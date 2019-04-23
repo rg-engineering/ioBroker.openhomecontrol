@@ -9,16 +9,64 @@
 [![NPM](https://nodei.co/npm/iobroker.myhomecontrol.png?downloads=true)](https://nodei.co/npm/iobroker.myhomecontrol/)
 
 
-This adapter implements interpretation of data received from HomeControl sensor via RF.
+Implementation of open protocol to control different sensors, actors and visualisation devices.
+The devices must be connected to serial port. The adpater reads data from serial port. 
+A implementation of RF transceiver based on Atmel Atmega328p and CC1101 is available. We also provide
+sample implementation of environemant sensor based on Atmel Atmega Atmega328p and a Display based on Atmel Atmega644
 
-protocol description for data can be found under
-https://www.rg-engineering.eu/index.php/produkte/myhomecontrol/protokollbeschreibung
+Eveytime a new device is recognized it will be added to a list in admin page only. If you enable that device in admin the adpater creates
+datapoints and will update datapoints whenever new telegram will be received.
 
-The system can be used with our sensors:
-https://www.rg-engineering.eu/index.php/produkte/myhomecontrol
+With broadcast function adapter sends date and time information to every device. Device can use that information if needed.
 
-The sensors are Atmel based. Software is available in github
-(link to do)
+### protocol
+
+#### general
+Byte 		description
+0 			Start-Byte
+1 - 6 		source ID (6Byte)
+7 - 12 		target ID (6Byte), 0xFE for broadcast, 0x10 for central receiver
+13 			modul type 
+					0x01 sensor
+					0x02 actor
+					0x03 display
+					0x10 central station
+14 			number of following datapoints
+
+#### datapoint
+Byte 		description
+0 			type of datapoint 
+					0x01 temperature
+					0x02 hunidity
+					0x03 air quality
+					0x04 date
+					0x05 time
+					0x06 brightness
+					0x07 battery state
+					0x08 sabotage
+					0x09 air pressur
+					0x0A error message
+					0x0B Weather Icon
+					0x0C cance of rain
+					0x0D average wind speed
+					0x0E wind gust
+					0x0F wind direction
+1 			type of data 
+					0x01 Byte 
+					0x02 int 
+					0x03 float 
+					0x04 string 
+					0x05 date 
+					0x06 time
+2 - n 		data
+n + 1 		unit 
+					0x00 without
+					0x01 °C
+					0x02 %
+					0x03 mBar
+					0x04 lux
+					0x05 m/s
+					0x06 deg
 
 
 ## Changelog

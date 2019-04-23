@@ -92,6 +92,7 @@ function startAdapter(options) {
                         ListDevices(obj);
                         break;
                     default:
+                        adapter.log.error('unknown message ' + obj.command);
                         break;
                 }
             }
@@ -1537,7 +1538,7 @@ function ListDevices(obj) {
         });
     }
     //clear the array
-    newDevices.length = 0
+    newDevices.length = 0;
 
     adapter.sendTo(obj.from, obj.command, allDevices, obj.callback);
 }
