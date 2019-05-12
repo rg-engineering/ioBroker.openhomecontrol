@@ -1,110 +1,25 @@
 {
   "common": {
-    "name": "myhomecontrol",
-    "version": "0.0.20",
+    "name": "openhomecontrol",
+    "version": "1.0.0",
     "news": {
-      "0.0.20": {
-        "en": "support of compact adapter",
-        "de": "Unterstützung des Kompaktadapters",
-        "ru": "поддержка компактного адаптера",
-        "pt": "suporte de adaptador compacto",
-        "nl": "ondersteuning voor compacte adapter",
-        "fr": "support de l'adaptateur compact",
-        "it": "supporto di adattatore compatto",
-        "es": "soporte de adaptador compacto",
-        "pl": "obsługa adaptera kompaktowego"
-      },
-      "0.0.19": {
-
-      },
-      "0.0.18": {
-        "en": "new devices are shown in admin and needs to be confirmed before they are used as objects",
-        "de": "Neue Geräte werden in admin angezeigt und müssen bestätigt werden, bevor sie als Objekte verwendet werden",
-        "ru": "новые устройства отображаются в админе и должны быть подтверждены до того, как они будут использованы в качестве объектов",
-        "pt": "novos dispositivos são mostrados no admin e precisam ser confirmados antes de serem usados ​​como objetos",
-        "nl": "nieuwe apparaten worden in admin getoond en moeten worden bevestigd voordat ze als objecten worden gebruikt",
-        "fr": "les nouveaux appareils sont affichés dans admin et doivent être confirmés avant d'être utilisés comme objets",
-        "it": "i nuovi dispositivi sono mostrati in admin e devono essere confermati prima di essere usati come oggetti",
-        "es": "los nuevos dispositivos se muestran en la administración y deben ser confirmados antes de ser utilizados como objetos",
-        "pl": "nowe urządzenia są wyświetlane w panelu administracyjnym i muszą zostać potwierdzone, zanim zostaną użyte jako obiekty"
-      },
-      "0.0.17": {
-        "en": "update serial port lib",
-        "de": "Update serielle Schnittstelle lib",
-        "ru": "обновить последовательный порт lib",
-        "pt": "atualizar a porta serial lib",
-        "nl": "update seriële poort lib",
-        "fr": "mettre à jour le port série lib",
-        "it": "aggiornare la porta seriale lib",
-        "es": "actualizar el puerto serie lib",
-        "pl": "aktualizacja portu szeregowego lib"
-      },
-      "0.0.16": {
-        "en": "protocol extension: wind average speed, wind gust and wind direction added",
-        "de": "Erweiterung des Protokolls: Windgeschwindigkeit, Windböen und Windrichtung hinzugefügt"
-      },
-      "0.0.15": {
-        "en": "Percentage of precipitation (PoP) to send added",
-        "de": "Senden der Regenwahrscheinlichkeit hinzugefügt"
-      },
-      "0.0.14": {
-        "en": "bug fixing",
-        "de": "Fehlerbehebung"
-      },
-      "0.0.13": {
-        "en": "raw data interpretation works now",
-        "de": "Rohdaten-Interpretierung funktioniert nun"
-      },
-      "0.0.12": {
-        "en": "configuration for display changed",
-        "de": "Konfiguration für Display geändert"
-      },
-      "0.0.11": {
-        "en": "renamed to myHomeControl",
-        "de": "Umbenennung nach myHomeControl"
-      },
-      "0.0.10": {
-        "en": "interpretes raw data instead of telegram",
-        "de": "Rohdaten-Interpretation anstatt Telegram"
-      },
-      "0.0.9": {
-        "en": "new datapoint last update",
-        "de": "neuer Datenpunkt last update"
-      },
-      "0.0.8": {
-        "en": "ignore Sensor ID FFFFFFFFFFFF",
-        "de": "Sensor ID FFFFFFFFFFFF wird ignoriert"
-      },
-      "0.0.7": {
-        "en": "error telegram added",
-        "de": "Fehlertelegramm hinzugefügt"
-      },
-      "0.0.6": {
-        "en": "just cleanup",
-        "de": "einige Aufräumarbeiten"
-      },
-      "0.0.5": {
-        "en": "support for HomeControl sensors",
-        "de": "unterstützt HomeControl Sensoren"
-      },
-      "0.0.4": {
-        "en": "receive function optimized",
-        "de": "Empfangsfunktion optimiert"
+      "1.0.0": {
+        "en": "first official release"
       }
     },
-    "title": "myHomeControl",
+    "title": "OpenHomeControl",
     "desc": {
-      "en": "myHomeControl Adapter",
-      "de": "myHomeControl Adapter"
+      "en": "OpenHomeControl Adapter",
+      "de": "OpenHomeControl Adapter"
     },
     "platform": "Javascript/Node.js",
     "mode": "daemon",
-    "icon": "myhomecontrol.png",
+    "icon": "openhomecontrol.png",
     "enabled": true,
     "messagebox": true,
-    "extIcon": "https://raw.githubusercontent.com/rg-engineering/ioBroker.myhomecontrol/master/admin/myhomecontrol.png",
-    "keywords": [ "myhomecontrol" ],
-    "readme": "https://github.com/rg-engineering/ioBroker.myhomecontrol/blob/master/README.md",
+    "extIcon": "https://raw.githubusercontent.com/rg-engineering/ioBroker.openhomecontrol/master/admin/openhomecontrol.png",
+    "keywords": [ "openhomecontrol" ],
+    "readme": "https://github.com/rg-engineering/ioBroker.openhomecontrol/blob/master/README.md",
     "loglevel": "debug",
     "stopBeforeUpdate": true,
     "type": "hardware",
@@ -121,8 +36,8 @@
   "native": {
     "serialport": "COM7",
     "baudrate": 57600,
-    "device": "HomeControl",
     
+
     "sendInterval2Display": 180,
     "sendIntervalBroadcast": 60,
     "devices": []

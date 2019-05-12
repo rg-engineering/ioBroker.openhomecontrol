@@ -1,25 +1,25 @@
 {
-  "name": "iobroker.myhomecontrol",
-  "version": "0.0.20",
-  "description": "ioBroker myHomeControl Adapter",
+  "name": "iobroker.openhomecontrol",
+  "version": "1.0.0",
+  "description": "ioBroker OpenHomeControl Adapter",
   "author": {
     "name": "René G.",
     "email": "info@rg-engineering.eu"
   },
-  "homepage": "https://github.com/rg-engineering/ioBroker.myhomecontrol",
+  "homepage": "https://github.com/rg-engineering/ioBroker.openhomecontrol",
   "license": "MIT",
   "keywords": [
     "ioBroker",
-    "myHomeControl",
+    "OpenHomeControl",
     "Smart Home",
     "home automation"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/rg-engineering/ioBroker.myhomecontrol"
+    "url": "https://github.com/rg-engineering/ioBroker.openhomecontrol"
   },
   "dependencies": {
-    "serialport": "^7.0.2",
+    "serialport": "^7.1.5",
     "@iobroker/adapter-core": "^1.0.3"
   },
   "devDependencies": {
@@ -30,7 +30,7 @@
   },
   "main": "main.js",
   "bugs": {
-    "url": "https://github.com/rg-engineering/ioBroker.myhomecontrol"
+    "url": "https://github.com/rg-engineering/ioBroker.openhomecontrol"
   },
   "scripts": {
     "test": "npm run test:package && npm run test:unit",

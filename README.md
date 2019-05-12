@@ -1,12 +1,12 @@
-![Logo](admin/myhomecontrol.png)
-# ioBroker.myHomeControl
-![Number of Installations](http://iobroker.live/badges/myhomecontrol-installed.svg) ![Number of Installations](http://iobroker.live/badges/myhomecontrol-stable.svg) 
+![Logo](admin/openhomecontrol.png)
+# ioBroker.OpenHomeControl
+![Number of Installations](http://iobroker.live/badges/openhomecontrol-installed.svg) ![Number of Installations](http://iobroker.live/badges/openhomecontrol-stable.svg) 
 
-[![NPM version](https://img.shields.io/npm/v/iobroker.myhomecontrol.svg)](https://www.npmjs.com/package/iobroker.myhomecontrol)
-[![Downloads](https://img.shields.io/npm/dm/iobroker.myhomecontrol.svg)](https://www.npmjs.com/package/iobroker.myhomecontrol)
-[![Tests](https://travis-ci.org/rg-engineering/ioBroker.myhomecontrol.svg?branch=master)](https://travis-ci.org/rg-engineering/ioBroker.myhomecontrol)
+[![NPM version](https://img.shields.io/npm/v/iobroker.openhomecontrol.svg)](https://www.npmjs.com/package/iobroker.openhomecontrol)
+[![Downloads](https://img.shields.io/npm/dm/iobroker.openhomecontrol.svg)](https://www.npmjs.com/package/iobroker.openhomecontrol)
+[![Tests](https://travis-ci.org/rg-engineering/ioBroker.openhomecontrol.svg?branch=master)](https://travis-ci.org/rg-engineering/ioBroker.openhomecontrol)
 
-[![NPM](https://nodei.co/npm/iobroker.myhomecontrol.png?downloads=true)](https://nodei.co/npm/iobroker.myhomecontrol/)
+[![NPM](https://nodei.co/npm/iobroker.openhomecontrol.png?downloads=true)](https://nodei.co/npm/iobroker.openhomecontrol/)
 
 
 Implementation of open protocol to control different sensors, actors and visualisation devices.
@@ -67,6 +67,9 @@ n + 1 		unit
 					0x04 lux
 					0x05 m/s
 					0x06 deg
+
+## known issues
+* please create issues at [github](https://github.com/rg-engineering/ioBroker.myhomecontrol/issues) if you find bugs or whish new features
 
 
 ## Changelog
