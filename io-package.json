@@ -4,13 +4,30 @@
     "version": "1.0.0",
     "news": {
       "1.0.0": {
-        "en": "first official release"
+        "en": "first public release",
+        "de": "erste öffentliche Veröffentlichung",
+        "ru": "первый публичный релиз",
+        "pt": "primeiro lançamento público",
+        "nl": "eerste publieke release",
+        "fr": "première version publique",
+        "it": "prima pubblicazione pubblica",
+        "es": "primer lanzamiento público",
+        "pl": "pierwsze publiczne wydanie",
+        "zh-cn": "首次公开发布"
       }
     },
     "title": "OpenHomeControl",
     "desc": {
       "en": "OpenHomeControl Adapter",
-      "de": "OpenHomeControl Adapter"
+      "de": "OpenHomeControl Adapter",
+      "ru": "OpenHomeControl Adapter",
+      "pt": "Adaptador OpenHomeControl",
+      "nl": "OpenHomeControl-adapter",
+      "fr": "Adaptateur OpenHomeControl",
+      "it": "OpenHomeControl Adapter",
+      "es": "Adaptador OpenHomeControl",
+      "pl": "Adapter OpenHomeControl",
+      "zh-cn": "OpenHomeControl适配器"
     },
     "platform": "Javascript/Node.js",
     "mode": "daemon",

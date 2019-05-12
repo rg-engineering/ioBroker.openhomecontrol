@@ -11,10 +11,11 @@
 
 Implementation of open protocol to control different sensors, actors and visualisation devices.
 The devices must be connected to serial port. The adapter reads data from serial port. 
+
 A implementation of RF transceiver based on Atmel Atmega328p and CC1101 is available. We also provide
 sample implementation of environemant sensor based on Atmel Atmega Atmega328p and a Display based on Atmel Atmega644
 
-Eveyytime a new device is recognized it will be added to a list in admin page only. If you enable that device in admin the adpater creates
+Everytime a new device is recognized it will be added to a list in admin page only. If you enable that device in admin the adapter creates
 datapoints and will update datapoints whenever new telegram will be received.
 
 With broadcast function adapter sends date and time information to every device. Device can use that information if needed.
@@ -23,60 +24,65 @@ With broadcast function adapter sends date and time information to every device.
 
 #### general
 
-| Byte    | 		description |
-|--------|---------------------|
-| 0 	  |		    Start-Byte  |
-| 1 - 6   | 		source ID (6Byte) |
-| 7 - 12  | 		target ID (6Byte), 0xFE for broadcast, 0x10 for central receiver |
-| 13      | 		modul type |
-|         |					0x01 sensor |
-|         |					0x02 actor |
-|         |					0x03 display |
-|         |					0x10 central station |
-| 14      | 			number of following datapoints |
+| Byte    | description                    | length  | 
+|---------|--------------------------------|---------|
+| 0 	  | Start-Byte                     | 1 Byte  |
+| 1 - 6   | source ID                      | 6 Byte  |
+| 7 - 12  | target ID                      | 6 Byte  |
+|         |	0xFE for broadcast             |         |
+|         |	0x10 for central receiver      |         |
+| 13      | modul type                     | 1 Byte  |
+|         |	0x01 sensor                    |         | 
+|         |	0x02 actor                     |         |
+|         |	0x03 display                   |         |
+|         |	0x10 central station           |         |
+| 14      | number of following datapoints | 1 Byte  |
 
 #### datapoint
 
-| Byte 	|	description|
-|--------|---------------------|
-|0 		|	type of datapoint |
-|         |					0x01 temperature |
-|         |					0x02 hunidity |
-|         |					0x03 air quality |
-|         |					0x04 date |
-|         |					0x05 time |
-|         |					0x06 brightness |
-|         |					0x07 battery state |
-|         |					0x08 sabotage |
-|         |					0x09 air pressur |
-|         |					0x0A error message |
-|         |					0x0B Weather Icon |
-|         |					0x0C cance of rain |
-|         |					0x0D average wind speed |
-|         |					0x0E wind gust |
-|         |					0x0F wind direction |
-1 		  |	type of data  |
-|         |					0x01 Byte | 
-|         |					0x02 int  |
-|         |					0x03 float  |
-|         |					0x04 string  |
-|         |					0x05 date  |
-|         |					0x06 time |
-|2 - n 	  |	data |
-|n + 1 	  |	unit  |
-|         |					0x00 without |
-|         |					0x01 °C |
-|         |					0x02 % |
-|         |					0x03 mBar |
-|         |					0x04 lux |
-|         |					0x05 m/s |
-|         |					0x06 deg |
+| Byte 	  |	description             |
+|---------|-------------------------|
+| 0		  |	type of datapoint       |
+|         |	0x01 temperature        |
+|         |	0x02 hunidity           |
+|         |	0x03 air quality        |
+|         |	0x04 date               |
+|         |	0x05 time               |
+|         |	0x06 brightness         |
+|         |	0x07 battery state      |
+|         |	0x08 sabotage           |
+|         |	0x09 air pressur        |
+|         |	0x0A error message      |
+|         |	0x0B Weather Icon       |
+|         |	0x0C cance of rain      |
+|         |	0x0D average wind speed |
+|         |	0x0E wind gust          |
+|         |	0x0F wind direction     |
+1 		  |	type of data            |
+|         |	0x01 Byte               | 
+|         |	0x02 int                |
+|         |	0x03 float              |
+|         |	0x04 string             |
+|         |	0x05 date               |
+|         |	0x06 time               |
+| 2 - n	  |	data                    |
+| n + 1	  |	unit                    |
+|         |	0x00 without            |
+|         |	0x01 °C                 |
+|         |	0x02 %                  |
+|         |	0x03 mBar               |
+|         |	0x04 lux                |
+|         |	0x05 m/s                |
+|         |	0x06 deg                |
 
 ## known issues
-* please create issues at [github](https://github.com/rg-engineering/ioBroker.myhomecontrol/issues) if you find bugs or whish new features
+* please create issues at [github](https://github.com/rg-engineering/ioBroker.openhomecontrol/issues) if you find bugs or whish new features
 
 
 ## Changelog
+
+### 1.0.0 (2019-05-xx)
+* (René) first public release version
 
 ### 0.0.20 (2019-01-08)
 * (René) support of compact mode

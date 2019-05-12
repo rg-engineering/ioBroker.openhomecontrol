@@ -52,7 +52,7 @@ let adapter;
 function startAdapter(options) {
     options = options || {};
     Object.assign(options, {
-        name: 'myhomecontrol',
+        name: 'openhomecontrol',
         ready: function () {
             try {
                 //adapter.log.debug('start');
@@ -246,7 +246,7 @@ function main() {
 function showPortOpen() {
 
     try {
-        if (myPort != null) {
+        if (myPort !== null) {
             //adapter.log.debug('port open: ' + myPort.options.baudRate + ' ' + myPort.comName);
             //with serialport 5.0.0:
             adapter.log.debug('port open: ' + myPort.baudRate);
@@ -261,7 +261,7 @@ function showPortOpen() {
 
 function SetMode() {
     try {
-        if (myPort != null) {
+        if (myPort !== null) {
             adapter.log.debug('raw data mode set on ' + myPort.path);
             myPort.write("mr");
             myPort.write("\n\r");
@@ -513,7 +513,7 @@ function receiveSerialDataRaw(dataorg) {
 
         var obj = findObjectByKey(adapter.config.devices, 'name', source);
 
-        if (obj != null && obj.isUsed) {
+        if (obj !== null && obj.isUsed) {
 
             adapter.setObjectNotExists(source, {
                 type: "device",
@@ -523,7 +523,7 @@ function receiveSerialDataRaw(dataorg) {
             });
 
 
-            if (type == 0x03) {
+            if (type === 0x03) {
                 AddDatapoints4Display(source);
             }
 
@@ -551,7 +551,7 @@ function receiveSerialDataRaw(dataorg) {
             var theDate = new Date();
             adapter.setState(source + ".LastUpdate", { val: theDate.toString(), ack: true });
 
-            if (type == 0x03) {
+            if (type === 0x03) {
                 
                 SendData2Display(source);
             }
@@ -560,7 +560,7 @@ function receiveSerialDataRaw(dataorg) {
 
             var obj1 = findObjectByKey(newDevices, 'name', source);
 
-            if (obj1==null) {
+            if (obj1===null) {
                 //adapter.log.debug(source + " is new");
                 newDevices.push({
                     name: source,
@@ -935,7 +935,7 @@ function AddTemperature(DisplayID) {
                 AlreadySending = false;
             } else {
                 
-                if (obj != null) {
+                if (obj !== null) {
                     //set ack-flag
                     adapter.setState(DisplayID + '.Temp2Display', { ack: true });
                     var temperature = obj.val;
@@ -983,7 +983,7 @@ function AddHumidity(DisplayID) {
                 AlreadySending = false;
             } else {
 
-                if (obj != null) {
+                if (obj !== null) {
                     //set ack-flag
                     adapter.setState(DisplayID + '.Humidity2Display', { ack: true });
                     var humidity = obj.val;
@@ -1032,7 +1032,7 @@ function AddPoP(DisplayID) {
                 AlreadySending = false;
             } else {
 
-                if (obj != null) {
+                if (obj !== null) {
                     //set ack-flag
                     adapter.setState(DisplayID + '.PoP2Display', { ack: true });
                     var pop = obj.val;
@@ -1070,7 +1070,7 @@ function AddAirPressure(DisplayID) {
                 adapter.log.error(err);
                 AlreadySending = false;
             } else {
-                if (obj != null) {
+                if (obj !== null) {
                     //set ack-flag
                     adapter.setState(DisplayID + '.Pressure2Display', { ack: true });
                     var pressure = obj.val;
@@ -1116,7 +1116,7 @@ function AddWeatherIconIdFromString(DisplayID) {
                 adapter.log.error(err);
                 AlreadySending = false;
             } else {
-                if (obj != null) {
+                if (obj !== null) {
 
                     //set ack-flag
                     adapter.setState(DisplayID + '.WeatherIconString2Display', { ack: true });
@@ -1271,7 +1271,7 @@ function AddWeatherIconIdFromID(DisplayID) {
                 adapter.log.error(err);
                 AlreadySending = false;
             } else {
-                if (obj != null) {
+                if (obj !== null) {
 
                     //set ack-flag
                     adapter.setState(DisplayID + '.WeatherIconID2Display', { ack: true });
@@ -1312,7 +1312,7 @@ function AddTemperatureForecast(DisplayID) {
                 AlreadySending = false;
             } else {
 
-                if (obj != null) {
+                if (obj !== null) {
                     //set ack-flag
                     adapter.setState(DisplayID + '.TempForecast2Display', { ack: true });
                     var temperature = obj.val;
@@ -1363,7 +1363,7 @@ function AddRainForecast(DisplayID) {
                 AlreadySending = false;
             } else {
 
-                if (obj != null) {
+                if (obj !== null) {
                     //set ack-flag
                     adapter.setState(DisplayID + '.Rain2Display', { ack: true });
                     var rain = obj.val;
@@ -1520,9 +1520,9 @@ function DeleteDevices() {
 function ListDevices(obj) {
     
     const allDevices = [];
-
+    let i;
     //first known devices
-    for (var i = 0; i < adapter.config.devices.length; i++) {
+    for (i = 0; i < adapter.config.devices.length; i++) {
         allDevices.push({
             name: adapter.config.devices[i].name,
             type: adapter.config.devices[i].type,
@@ -1530,7 +1530,7 @@ function ListDevices(obj) {
         });
     }
     //then all new devices
-    for (var i = 0; i < newDevices.length; i++) {
+    for (i = 0; i < newDevices.length; i++) {
         allDevices.push({
             name: newDevices[i].name,
             type: newDevices[i].type,
