@@ -37,39 +37,40 @@ With broadcast function adapter sends date and time information to every device.
 
 #### datapoint
 
-Byte 		description
-0 			type of datapoint 
-					0x01 temperature
-					0x02 hunidity
-					0x03 air quality
-					0x04 date
-					0x05 time
-					0x06 brightness
-					0x07 battery state
-					0x08 sabotage
-					0x09 air pressur
-					0x0A error message
-					0x0B Weather Icon
-					0x0C cance of rain
-					0x0D average wind speed
-					0x0E wind gust
-					0x0F wind direction
-1 			type of data 
-					0x01 Byte 
-					0x02 int 
-					0x03 float 
-					0x04 string 
-					0x05 date 
-					0x06 time
-2 - n 		data
-n + 1 		unit 
-					0x00 without
-					0x01 °C
-					0x02 %
-					0x03 mBar
-					0x04 lux
-					0x05 m/s
-					0x06 deg
+| Byte 	|	description|
+|--------|---------------------|
+|0 		|	type of datapoint |
+|         |					0x01 temperature |
+|         |					0x02 hunidity |
+|         |					0x03 air quality |
+|         |					0x04 date |
+|         |					0x05 time |
+|         |					0x06 brightness |
+|         |					0x07 battery state |
+|         |					0x08 sabotage |
+|         |					0x09 air pressur |
+|         |					0x0A error message |
+|         |					0x0B Weather Icon |
+|         |					0x0C cance of rain |
+|         |					0x0D average wind speed |
+|         |					0x0E wind gust |
+|         |					0x0F wind direction |
+1 		  |	type of data  |
+|         |					0x01 Byte | 
+|         |					0x02 int  |
+|         |					0x03 float  |
+|         |					0x04 string  |
+|         |					0x05 date  |
+|         |					0x06 time |
+|2 - n 	  |	data |
+|n + 1 	  |	unit  |
+|         |					0x00 without |
+|         |					0x01 °C |
+|         |					0x02 % |
+|         |					0x03 mBar |
+|         |					0x04 lux |
+|         |					0x05 m/s |
+|         |					0x06 deg |
 
 ## known issues
 * please create issues at [github](https://github.com/rg-engineering/ioBroker.myhomecontrol/issues) if you find bugs or whish new features
