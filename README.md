@@ -10,11 +10,11 @@
 
 
 Implementation of open protocol to control different sensors, actors and visualisation devices.
-The devices must be connected to serial port. The adpater reads data from serial port. 
+The devices must be connected to serial port. The adapter reads data from serial port. 
 A implementation of RF transceiver based on Atmel Atmega328p and CC1101 is available. We also provide
 sample implementation of environemant sensor based on Atmel Atmega Atmega328p and a Display based on Atmel Atmega644
 
-Eveytime a new device is recognized it will be added to a list in admin page only. If you enable that device in admin the adpater creates
+Eveyytime a new device is recognized it will be added to a list in admin page only. If you enable that device in admin the adpater creates
 datapoints and will update datapoints whenever new telegram will be received.
 
 With broadcast function adapter sends date and time information to every device. Device can use that information if needed.
@@ -22,16 +22,16 @@ With broadcast function adapter sends date and time information to every device.
 ### protocol
 
 #### general
-Byte 		description
-0 			Start-Byte
-1 - 6 		source ID (6Byte)
-7 - 12 		target ID (6Byte), 0xFE for broadcast, 0x10 for central receiver
-13 			modul type 
-					0x01 sensor
-					0x02 actor
-					0x03 display
-					0x10 central station
-14 			number of following datapoints
+|Byte | 		description|
+|0 	  |		    Start-Byte |
+|1 - 6| 		source ID (6Byte)|
+|7 - 12| 		target ID (6Byte), 0xFE for broadcast, 0x10 for central receiver|
+|13| 			modul type |
+| |					0x01 sensor|
+| |					0x02 actor|
+| |					0x03 display|
+| |					0x10 central station|
+|14| 			number of following datapoints|
 
 #### datapoint
 Byte 		description
