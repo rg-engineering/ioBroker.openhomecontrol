@@ -22,16 +22,16 @@ With broadcast function adapter sends date and time information to every device.
 ### protocol
 
 #### general
-|Byte | 		description|
-|0 	  |		    Start-Byte |
-|1 - 6| 		source ID (6Byte)|
-|7 - 12| 		target ID (6Byte), 0xFE for broadcast, 0x10 for central receiver|
-|13| 			modul type |
-| |					0x01 sensor|
-| |					0x02 actor|
-| |					0x03 display|
-| |					0x10 central station|
-|14| 			number of following datapoints|
+| Byte    | 		description |
+| 0 	  |		    Start-Byte  |
+| 1 - 6   | 		source ID (6Byte) |
+| 7 - 12  | 		target ID (6Byte), 0xFE for broadcast, 0x10 for central receiver |
+| 13      | 		modul type |
+|         |					0x01 sensor |
+|         |					0x02 actor |
+|         |					0x03 display |
+|         |					0x10 central station |
+| 14      | 			number of following datapoints |
 
 #### datapoint
 Byte 		description
