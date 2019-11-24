@@ -106,19 +106,20 @@
 
             M.updateTextFields();
 
-            getAdapterInstances('openhomecontrol', function (arr) {
-                for (var i = 0; i < arr.length; i++) {
+            //getAdapterInstances('openhomecontrol', function (arr) {
+            //    for (var i = 0; i < arr.length; i++) {
 
-                    var _id = arr[i]._id.replace('system.adapter.', '');
+            //        var _id = arr[i]._id.replace('system.adapter.', '');
 
-                    console.log('got instance ' + _id);
+            //        console.log('got instance ' + _id);
+            var _id = 'openhomecontrol.' + instance;
+            console.log('my instance ' + _id);
+            getComPorts(settings.serialport, _id);
 
-                    getComPorts(settings.serialport, _id);
+            getDevices(onChange, _id);
 
-                    getDevices(onChange, _id);
-
-                }
-            });
+            //    }
+            //});
 
 
         }
@@ -224,8 +225,6 @@
             <!-- tab "devices" -->
             <div id="tab-devices" class="col s12 page">
                 <div class="col s12" id="values">
-                    <a class="btn-floating waves-effect waves-light blue table-button-add"><i class="material-icons">add</i></a>
-                    <a id="table-button-search" class="btn-floating waves-effect waves-light blue disabled"><i class="material-icons">search</i><span class="translate">Search</span></a>
                     <div class="table-values-div">
                         <table class="table-values" style="width: 100%;">
                             <thead>
@@ -242,8 +241,8 @@
 
                 </div>
 
-            </div>
 
+            </div>
         </div>
     </div>
 </body>
