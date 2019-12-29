@@ -8,6 +8,10 @@
 
 [![NPM](https://nodei.co/npm/iobroker.openhomecontrol.png?downloads=true)](https://nodei.co/npm/iobroker.openhomecontrol/)
 
+**If you like it, please consider a donation:**
+                                                                          
+[![paypal](https://www.paypalobjects.com/en_US/DK/i/btn/btn_donateCC_LG.gif)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=YBAZTEBT9SYC2&source=url)
+
 
 Implementation of open protocol to control different sensors, actors and visualisation devices.
 The devices must be connected to serial port. The adapter reads data from serial port. 
