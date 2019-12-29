@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "ioBroker OpenHomeControl Adapter",
   "author": {
-    "name": "René G.",
+    "name": "RenÃ© G.",
     "email": "info@rg-engineering.eu"
   },
   "homepage": "https://github.com/rg-engineering/ioBroker.openhomecontrol",
@@ -19,14 +19,14 @@
     "url": "https://github.com/rg-engineering/ioBroker.openhomecontrol"
   },
   "dependencies": {
-    "serialport": "^7.1.5",
-    "@iobroker/adapter-core": "^1.0.3"
+    "serialport": "^8.0.6",
+    "@iobroker/adapter-core": "^2.0.0"
   },
   "devDependencies": {
     "gulp": "^4.0.0",
     "mocha": "^6.0.2",
     "chai": "^4.2.0",
-    "@iobroker/testing": "^1.2.0"
+    "@iobroker/testing": "^2.0.0"
   },
   "main": "main.js",
   "bugs": {
