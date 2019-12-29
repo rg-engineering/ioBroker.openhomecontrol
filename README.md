@@ -6,7 +6,9 @@
 [![Downloads](https://img.shields.io/npm/dm/iobroker.openhomecontrol.svg)](https://www.npmjs.com/package/iobroker.openhomecontrol)
 [![Tests](https://travis-ci.org/rg-engineering/ioBroker.openhomecontrol.svg?branch=master)](https://travis-ci.org/rg-engineering/ioBroker.openhomecontrol)
 
-[![NPM](https://nodei.co/npm/iobroker.openhomecontrol.png?downloads=true)](https://nodei.co/npm/iobroker.openhomecontrol/) [![Greenkeeper badge](https://badges.greenkeeper.io/rg-engineering/ioBroker.openhomecontrol.svg)](https://greenkeeper.io/)
+[![NPM](https://nodei.co/npm/iobroker.openhomecontrol.png?downloads=true)](https://nodei.co/npm/iobroker.openhomecontrol/) 
+
+[![Greenkeeper badge](https://badges.greenkeeper.io/rg-engineering/ioBroker.openhomecontrol.svg)](https://greenkeeper.io/)
 
 **If you like it, please consider a donation:**
                                                                           
