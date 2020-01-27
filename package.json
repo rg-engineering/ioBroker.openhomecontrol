@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "serialport": "^8.0.6",
-    "@iobroker/adapter-core": "^2.0.0"
+    "@iobroker/adapter-core": "^2.2.1"
   },
   "devDependencies": {
     "gulp": "^4.0.0",
