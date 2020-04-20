@@ -8,7 +8,7 @@
 
 [![NPM](https://nodei.co/npm/iobroker.openhomecontrol.png?downloads=true)](https://nodei.co/npm/iobroker.openhomecontrol/) 
 
-[![Greenkeeper badge](https://badges.greenkeeper.io/rg-engineering/ioBroker.openhomecontrol.svg)](https://greenkeeper.io/)
+
 
 **If you like it, please consider a donation:**
                                                                           
