@@ -64,7 +64,10 @@ With broadcast function adapter sends date and time information to every device.
 |         |	0x0D average wind speed |
 |         |	0x0E wind gust          |
 |         |	0x0F wind direction     |
-1 		  |	type of data            |
+|         | 0x10 Rain Forecast      |
+|         | 0x11 Temperature Forecast|
+|         | 0x12 Rain               |
+| 1       |	type of data            |
 |         |	0x01 Byte               | 
 |         |	0x02 int                |
 |         |	0x03 float              |
@@ -80,6 +83,7 @@ With broadcast function adapter sends date and time information to every device.
 |         |	0x04 lux                |
 |         |	0x05 m/s                |
 |         |	0x06 deg                |
+|         |	0x07 mm                 |
 
 ## known issues
 * please create issues at [github](https://github.com/rg-engineering/ioBroker.openhomecontrol/issues) if you find bugs or whish new features
@@ -87,7 +91,9 @@ With broadcast function adapter sends date and time information to every device.
 
 ## Changelog
 
-### 1.0.0 (2019-05-xx)
+### 1.1.0 (2020-06-xx)
+
+### 1.0.0 (2019-05-01)
 * (René) first public release version
 
 ### 0.0.20 (2019-01-08)

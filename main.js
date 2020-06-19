@@ -13,38 +13,30 @@
 
 // you have to require the utils module and call adapter function
 //var utils =    require(__dirname + '/lib/utils'); // Get common adapter utils
-const utils = require('@iobroker/adapter-core');
-
-
-// you have to call the adapter function and pass a options object
-// name has to be set and has to be equal to adapters folder name and main file name excluding extension
-// adapter will be restarted automatically every time as the configuration changed, e.g system.adapter.template.0
-//this is the old version without compact
-//var adapter = utils.adapter('myhomecontrol');
+const utils = require("@iobroker/adapter-core");
 
 
 
+let myPort = null;
+let SerialPort = null;
+let receivedData = "";
+//let SentData2Compare = "";
+//let CompareErrCnt = 0;
 
-var myPort = null;
-var SerialPort = null;
-var receivedData = "";
-var SentData2Compare = "";
-var CompareErrCnt = 0;
-
-var SendTimerBroadcast = null;
+let SendTimerBroadcast = null;
 //var Watchdog = null;
 //var Waitung4Watchdog = false;
 
 
-var DataToSend = {};
-var DataToSendLength = 0;
-var IDX_DATENPUNKTE = 14;
-var IDX_TYPE = 13;
-var IDX_TARGET = 7;
-var IDX_SOURCE = 1;
-var IDX_START = 0;
+const DataToSend = {};
+let DataToSendLength = 0;
+const IDX_DATENPUNKTE = 14;
+const IDX_TYPE = 13;
+const IDX_TARGET = 7;
+const IDX_SOURCE = 1;
+const IDX_START = 0;
 
-var AlreadySending = false;
+let AlreadySending = false;
 
 const newDevices = [];
 
@@ -52,190 +44,141 @@ let adapter;
 function startAdapter(options) {
     options = options || {};
     Object.assign(options, {
-        name: 'openhomecontrol',
+        name: "openhomecontrol",
         ready: function () {
             try {
                 //adapter.log.debug('start');
                 main();
             }
             catch (e) {
-                adapter.log.error('exception catch after ready [' + e + ']');
+                adapter.log.error("exception catch after ready [" + e + "]");
             }
         },
         //Some message was sent to adapter instance over message box. Used by email, pushover, text2speech, ...
         message: function (obj) {
             if (obj) {
                 switch (obj.command) {
-                    case 'send':
+                    case "send":
                         // e.g. send email or pushover or whatever
-                        adapter.log.debug('send command');
+                        adapter.log.debug("send command");
 
                         // Send response in callback if required
-                        if (obj.callback) adapter.sendTo(obj.from, obj.command, 'Message received', obj.callback);
+                        if (obj.callback) adapter.sendTo(obj.from, obj.command, "Message received", obj.callback);
                         break;
-                    case 'listUart':
+                    case "listUart":
                         //cmd comes typically from adpater settings page
-                        if (obj.callback) {
-                            if (SerialPort) {
-                                // read all found serial ports
-                                SerialPort.list(function (err, ports) {
-                                    adapter.log.info('List of port: ' + JSON.stringify(ports));
-                                    adapter.sendTo(obj.from, obj.command, ports, obj.callback);
-                                });
-                            } else {
-                                adapter.log.warn('Module serialport is not available');
-                                adapter.sendTo(obj.from, obj.command, [{ comName: 'Not available' }], obj.callback);
-                            }
-                        }
+
+                        ListUarts(obj);
+
                         break;
-                    case 'listDevices':
+                    case "listDevices":
                         ListDevices(obj);
                         break;
                     default:
-                        adapter.log.error('unknown message ' + obj.command);
+                        adapter.log.error("unknown message " + obj.command);
                         break;
                 }
+            }
+        },
+        //#######################################
+        //  is called when adapter shuts down
+        unload: function (callback) {
+            try {
+                if (SendTimerBroadcast != null) {
+                    clearTimeout(SendTimerBroadcast);
+                    adapter.log.debug("timer killed");
+                }
+                callback();
+            } catch (e) {
+                callback();
             }
         }
     });
     adapter = new utils.Adapter(options);
 
     return adapter;
-};
+}
         
 
-//Some message was sent to adapter instance over message box. Used by email, pushover, text2speech, ...
-/*adapter.on('message', function (obj) {
-	if (obj) {
-        switch (obj.command) {
-        	case 'send':
-        		// e.g. send email or pushover or whatever
-                adapter.log.debug('send command');
 
-        		// Send response in callback if required
-        		if (obj.callback) adapter.sendTo(obj.from, obj.command, 'Message received', obj.callback);
-        		break;
-        	case 'listUart':
-        		//cmd comes typically from adpater settings page
-                if (obj.callback) {
-                    if (SerialPort) {
-                        // read all found serial ports
-                    	SerialPort.list(function (err, ports) {
-                            adapter.log.info('List of port: ' + JSON.stringify(ports));
-                            adapter.sendTo(obj.from, obj.command, ports, obj.callback);
-                        });
-                    } else {
-                        adapter.log.warn('Module serialport is not available');
-                        adapter.sendTo(obj.from, obj.command, [{comName: 'Not available'}], obj.callback);
-                    }
-                }
-                break;
-            case 'listDevices':
-                ListDevices(obj);
-                break;
-            default:
-                break;
-    	}
-    }
-});
-*/
+async function main() {
 
-// is called when adapter shuts down - callback has to be called under any circumstances!
-/*adapter.on('unload', function (callback) {
-    try {
-        adapter.log.debug('cleaned everything up...');
-        callback();
-    }
-    catch (e) {
-        callback();
-    }
-});
-*/
-
-
-
-// is called when databases are connected and adapter received configuration.
-// start here!
-/*adapter.on('ready', function () {
-    try {
-        main();
-    }
-    catch (e) {
-        adapter.log.error('exception catch after ready [' + e + ']');
-    }
-});
-*/
-
-function main() {
-
-    var options = {
-        //serialport: adapter.config.serialport || '/dev/ttyACM0',
-        serialport: adapter.config.serialport || 'COM13',
-        baudrate: parseInt(adapter.config.baudrate) || 57600,
-        //device: adapter.config.device || "HomeControl",
-        sendInterval2Display: parseInt(adapter.config.sendInterval2Display) || 180,
-        sendIntervalBroadcast: parseInt(adapter.config.sendIntervalBroadcast) || 30
+    const options = {
+        serialport: adapter.config.serialport || "COM13",
+        baudrate: parseInt(adapter.config.baudrate) || 9600,
+        sendIntervalBroadcast: parseInt(adapter.config.sendIntervalBroadcast) || 0
     };
 
     try {
-        SerialPort = require('serialport');
 
-        adapter.log.info('Serial port is installed successfully');
+        // https://serialport.io/docs/api-stream
+        SerialPort = require("serialport");
+
+        adapter.log.info("Serial port is installed successfully");
     } catch (e) {
-        adapter.log.error('Serial port is not installed [' + e + ']');
+        adapter.log.error("Serial port is not installed [" + e + "]");
+    }
+
+    let portFound = false;
+    try {
+        const ports = await SerialPort.list();
+        ports.forEach(function (port) {
+            adapter.log.info(port.path + " " + port.pnpId + " " + port.manufacturer);
+            if (port.path == options.serialport) {
+                portFound = true;
+            }
+        });
+
+    } catch (e) {
+        adapter.log.error("Serial port does not exist [" + e + "]");
     }
 
 
-    try {
-
-        SerialPort.list(function (err, ports) {
-            ports.forEach(function (port) {
-                adapter.log.info(port.comName + ' ' + port.pnpId + ' ' + port.manufacturer);
+    if (portFound) {
+        //Rechte im Linux gesetzt??? 
+        try {
+            myPort = new SerialPort(options.serialport, {
+                baudRate: options.baudrate
             });
-        });
-    } catch (e) {
-        adapter.log.error('Serial port does not exist [' + e + ']');
+
+        } catch (e) {
+            adapter.log.error("Serial port is not created [" + e + "]");
+        }
+    }
+    else {
+        adapter.log.warn("port " + options.serialport + " not found, please select correct port");
     }
 
-    //Rechte im Linux gesetzt??? 
-    try {
-        myPort = new SerialPort(options.serialport, {
-            baudRate: options.baudrate
-        });
-
-    } catch (e) {
-        adapter.log.error('Serial port is not created [' + e + ']');
+    if (myPort != null) {
+        adapter.log.info("port created; portname: " + options.serialport + " Data rate: " + myPort.baudRate);
     }
 
-    adapter.log.info('port created; portname: ' + options.serialport + ' Data rate: ' + myPort.baudRate);
+    myPort.on("open", showPortOpen);
+    myPort.on("data", receiveSerialData);
+    myPort.on("close", showPortClose);
+    myPort.on("error", showError);
 
 
-    myPort.on('open', showPortOpen);
-    myPort.on('data', receiveSerialData);
-    myPort.on('close', showPortClose);
-    myPort.on('error', showError);
-
-
-    adapter.log.info("HomeControl used in raw mode");
+    adapter.log.info("OpenHomeControl used in raw mode");
 
 
     try {
-        if (!SendTimerBroadcast && options.sendIntervalBroadcast > 0) {
+        if (SendTimerBroadcast==null && options.sendIntervalBroadcast > 0) {
             adapter.log.debug("init timer broadcast with " + options.sendIntervalBroadcast + "s");
-            var _SendTimerBroadcast = setInterval(function () {
+            SendTimerBroadcast = setInterval(function () {
                 SendDataBroadcast();
             }, options.sendIntervalBroadcast * 1000);
-            SendTimerBroadcast = _SendTimerBroadcast;
+            
         }
-        /*
-        var _Watchdog = setInterval(function () {
-            WatchDog();
-        }, 60000);
-        Watchdog = _Watchdog;
-        */
+
+        //var _Watchdog = setInterval(function () {
+        //     WatchDog();
+        // }, 60000);
+        // Watchdog = _Watchdog;
+
     }
     catch (e) {
-        adapter.log.error('exception in  init timer [' + e + ']');
+        adapter.log.error("exception in  init timer [" + e + "]");
     }
 
 }
@@ -249,16 +192,17 @@ function showPortOpen() {
         if (myPort !== null) {
             //adapter.log.debug('port open: ' + myPort.options.baudRate + ' ' + myPort.comName);
             //with serialport 5.0.0:
-            adapter.log.debug('port open: ' + myPort.baudRate);
+            adapter.log.debug("port open: " + myPort.baudRate);
 
         }
     }
 
     catch (e) {
-        adapter.log.error('exception in  showPortOpen [' + e + ']');
+        adapter.log.error("exception in  showPortOpen [" + e + "]");
     }
 }
 
+/*
 function SetMode() {
     try {
         if (myPort !== null) {
@@ -272,7 +216,7 @@ function SetMode() {
         adapter.log.error('exception in  SetMode [' + e + ']');
     }
 }
-
+*/
 function receiveSerialData(data) {
 
 
@@ -280,7 +224,7 @@ function receiveSerialData(data) {
 
     receivedData = receivedData + data;
 
-    //adapter.log.debug('--' + data);
+    //adapter.log.debug("--" + data);
 
     // filter out everyting not needed...
     // if got data not in then drop message
@@ -294,7 +238,7 @@ function receiveSerialData(data) {
 */
     if (receivedData.indexOf("too many data") >= 0) {
         receivedData = "";
-        adapter.log.error('message to sender too long');
+        adapter.log.error("message to sender too long");
         
     }
 
@@ -439,7 +383,7 @@ function AddDatapoints4Display(id) {
 
 
 function findObjectByKey(array, key, value) {
-    for (var i = 0; i < array.length; i++) {
+    for (let i = 0; i < array.length; i++) {
         if (array[i][key] === value) {
             return array[i];
         }
@@ -460,7 +404,7 @@ function findObjectByKey(array, key, value) {
 */
 function receiveSerialDataRaw(dataorg) {
 
-
+    adapter.log.debug("raw " + dataorg);
 
     /*
     myhomecontrol.0	2017- 03 - 13 19:56:54.041	debug	s
@@ -472,26 +416,31 @@ function receiveSerialDataRaw(dataorg) {
     now going to interprete I 00 98 ef 82 18 00 00 fe fe fe fe fe fe 03 00 J
     */
 
-    var data = dataorg.substr(5, dataorg.length - 6);
-    var dataArray = data.split(" ");
+    const data = dataorg.substr(5, dataorg.length - 6);
+    const dataArray = data.split(" ");
+
+    /*
+     (2) from A0000FEFE(Sensor) with 1 DPs to EFEFEFEFEFE
+     I 0 c a 0 0 0 0 fe fe fe fe fe fe 1 1 d 3 0 0 0 0 5 J
+    */
 
     try {
         //interprete header
-        var bytenumber = 0;
-        var source = data.substr(bytenumber, 17);
-        source = source.replace(/ /g, ''); //alle Leerzeichen entfernen
+        let bytenumber = 0;
+        let source = data.substr(bytenumber, 17);
+        source = source.replace(/ /g, ""); //alle Leerzeichen entfernen
         source = source.toUpperCase(); //und alles in Großbuchstaben
         bytenumber += 6;
-        var target = data.substr(bytenumber * 2, 17);
-        target = target.replace(/ /g, ''); //alle Leerzeichen entfernen
+        let target = data.substr(bytenumber * 2, 17);
+        target = target.replace(/ /g, ""); //alle Leerzeichen entfernen
         target = target.toUpperCase(); //und alles in Großbuchstaben
         bytenumber += 6;
-        var type = parseInt(dataArray[bytenumber], 16);
+        const type = parseInt(dataArray[bytenumber], 16);
         bytenumber += 1;
-        var datapoints = parseInt(dataArray[bytenumber], 16);
+        const datapoints = parseInt(dataArray[bytenumber], 16);
         bytenumber += 1;
 
-        var stype = "unknown";
+        let stype = "unknown";
         switch (type) {
             case 0x01:
                 stype = "Sensor";
@@ -506,14 +455,17 @@ function receiveSerialDataRaw(dataorg) {
                 stype = "Zentrale";
                 break;
         }
-        adapter.log.debug("(2) from " + source + " (" + stype + ") with " + datapoints + " DPs");
+        adapter.log.debug("(2) from " + source + " (" + stype + ") with " + datapoints + " DPs to " + target);
 
 
         //check wether device is already accepted; if not then just add it into newDevices - list
 
-        var obj = findObjectByKey(adapter.config.devices, 'name', source);
+        const obj = findObjectByKey(adapter.config.devices, "name", source);
 
         if (obj !== null && obj.isUsed) {
+
+
+            // Object openhomecontrol.0.600000FEFE.Humidity is invalid: obj.common.type has an invalid value (state) but has to be one of number, string, boolean, array, object, mixed, file, json
 
             adapter.setObjectNotExists(source, {
                 type: "device",
@@ -534,7 +486,7 @@ function receiveSerialDataRaw(dataorg) {
             }
             else {
                 // than all datapoints
-                for (var i = 0; i < datapoints; i++) {
+                for (let i = 0; i < datapoints; i++) {
                     bytenumber = InterpreteDatapoint(dataArray, bytenumber, source);
                 }
             }
@@ -548,7 +500,7 @@ function receiveSerialDataRaw(dataorg) {
                     write: false
                 }
             });
-            var theDate = new Date();
+            const theDate = new Date();
             adapter.setState(source + ".LastUpdate", { val: theDate.toString(), ack: true });
 
             if (type === 0x03) {
@@ -558,7 +510,7 @@ function receiveSerialDataRaw(dataorg) {
         }
         else {
 
-            var obj1 = findObjectByKey(newDevices, 'name', source);
+            const obj1 = findObjectByKey(newDevices, "name", source);
 
             if (obj1===null) {
                 //adapter.log.debug(source + " is new");
@@ -574,7 +526,7 @@ function receiveSerialDataRaw(dataorg) {
         }
     }
     catch (e) {
-        adapter.log.error('exception in receiveSerialDataRaw [' + e + ']');
+        adapter.log.error("exception in receiveSerialDataRaw [" + e + "]");
     }
     receivedData = "";
 }
@@ -604,8 +556,8 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
 
 
     //adapter.log.debug(dataArray);
-    var stype = "unknown";
-    var type = parseInt( dataArray[bytenumber],16);
+    let stype = "unknown";
+    const type = parseInt( dataArray[bytenumber],16);
     bytenumber++;
 
     //adapter.log.debug("type " + type);
@@ -641,60 +593,68 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
             stype = "Error";
             break;
         case 0x0B:
-            stype = "WeatherIcon"
+            stype = "WeatherIcon";
             break;
         case 0x0C:
-            stype = "PoP"
+            stype = "PoP";
             break;
         case 0x0D:
-            stype = "AvgWindSpeed"
+            stype = "AvgWindSpeed";
             break;
         case 0x0E:
-            stype = "WindGust"
+            stype = "WindGust";
             break;
         case 0x0F:
-            stype = "WindDir"
+            stype = "WindDir";
             break;
         case 0x10:
-            stype = "Rain_forecast"
+            stype = "Rain_forecast";
             break;
         case 0x11:
-            stype = "Temperature_forecast"
+            stype = "Temperature_forecast";
+            break;
+        case 0x12:
+            stype = "Rain";
             break;
     }
 
-    var datatype = parseInt( dataArray[bytenumber],16);
+    const datatype = parseInt( dataArray[bytenumber],16);
     bytenumber++;
-    var value;
+    let value;
     //adapter.log.debug("datatype " + datatype);
-    var sDataType = "unknown";
+    let sDataType = "unknown";
     switch (datatype) {
         case 0x01: // Byte 
-            value = parseInt(dataArray[bytenumber], 16);
-            bytenumber++;
-            sDataType = "byte";
+            {
+                value = parseInt(dataArray[bytenumber], 16);
+                bytenumber++;
+                sDataType = "byte";
+            }
             break;
         case 0x02: // int 
-            value = parseInt(dataArray[bytenumber], 16) << 8;
-            bytenumber++;
-            value = value + parseInt(dataArray[bytenumber], 16);
-            bytenumber++;
-            sDataType = "int";
+            {
+                value = parseInt(dataArray[bytenumber], 16) << 8;
+                bytenumber++;
+                value = value + parseInt(dataArray[bytenumber], 16);
+                bytenumber++;
+                sDataType = "int";
+            }
             break;
         case 0x03: // float
+            {
+                const farr = new Float32Array(1);
 
-            var farr = new Float32Array(1);
+                const barr = new Int8Array(farr.buffer);
 
-            var barr = new Int8Array(farr.buffer);
+                barr[0] = parseInt(dataArray[bytenumber], 16);
+                barr[1] = parseInt(dataArray[bytenumber + 1], 16);
+                barr[2] = parseInt(dataArray[bytenumber + 2], 16);
+                barr[3] = parseInt(dataArray[bytenumber + 3], 16);
 
-            barr[0] = parseInt(dataArray[bytenumber], 16);
-            barr[1] = parseInt(dataArray[bytenumber + 1], 16);
-            barr[2] = parseInt(dataArray[bytenumber + 2], 16);
-            barr[3] = parseInt(dataArray[bytenumber + 3], 16);
-
-            value = (farr[0]).toFixed(2);
-            bytenumber = bytenumber + 4;
-            sDataType = "float";
+                value = (farr[0]).toFixed(2);
+                bytenumber = bytenumber + 4;
+                sDataType = "float";
+            }
             break;
         case 0x04: // string
             sDataType = "string";
@@ -709,47 +669,49 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
             myhomecontrol.0	2018 - 09 - 23 13: 45: 28.507	debug(2) from 101010101010(Zentrale) with 2 DPs
             */
         case 0x05: // date
+            {
+                //adapter.log.warn("+++ " + dataArray[bytenumber] + " " + dataArray[bytenumber + 1] + " " + dataArray[bytenumber +2 ] + " " + dataArray[bytenumber + 3] + " " + dataArray[bytenumber +4] + " " + dataArray[bytenumber + 5]  );
 
-            //adapter.log.warn("+++ " + dataArray[bytenumber] + " " + dataArray[bytenumber + 1] + " " + dataArray[bytenumber +2 ] + " " + dataArray[bytenumber + 3] + " " + dataArray[bytenumber +4] + " " + dataArray[bytenumber + 5]  );
+                let a = parseInt(dataArray[bytenumber], 16) << 8;
+                let b = parseInt(dataArray[bytenumber + 1], 16);
+                const day = a + b;
 
-            var a = parseInt(dataArray[bytenumber], 16) << 8;
-            var b = parseInt(dataArray[bytenumber + 1], 16);
-            var day = a + b;
+                a = parseInt(dataArray[bytenumber + 2], 16) << 8;
+                b = parseInt(dataArray[bytenumber + 3], 16);
+                const month = a + b;
 
-            a = parseInt(dataArray[bytenumber + 2], 16) << 8;
-            b = parseInt(dataArray[bytenumber + 3], 16);
-            var month = a + b;
-
-            a = parseInt(dataArray[bytenumber + 4], 16) << 8;
-            b = parseInt(dataArray[bytenumber + 5], 16);
-            var year = a + b;
-            bytenumber = bytenumber + (3 * 2);
-            value = day + "." + month + "." + year;
-            sDataType = "date";
+                a = parseInt(dataArray[bytenumber + 4], 16) << 8;
+                b = parseInt(dataArray[bytenumber + 5], 16);
+                const year = a + b;
+                bytenumber = bytenumber + (3 * 2);
+                value = day + "." + month + "." + year;
+                sDataType = "date";
+            }
             break;
         case 0x06: // time
+            {
+                //adapter.log.warn("--- " + dataArray[bytenumber] + " " + dataArray[bytenumber + 1] + " " + dataArray[bytenumber + 2] + " " + dataArray[bytenumber + 3] + " " + dataArray[bytenumber + 4] + " " + dataArray[bytenumber + 5]);
 
-            //adapter.log.warn("--- " + dataArray[bytenumber] + " " + dataArray[bytenumber + 1] + " " + dataArray[bytenumber + 2] + " " + dataArray[bytenumber + 3] + " " + dataArray[bytenumber + 4] + " " + dataArray[bytenumber + 5]);
+                let a = parseInt(dataArray[bytenumber], 16) << 8;
+                let b = parseInt(dataArray[bytenumber + 1], 16);
+                const hour = a + b;
 
-            var a = parseInt(dataArray[bytenumber], 16) << 8;
-            var b = parseInt(dataArray[bytenumber + 1], 16);
-            var hour = a + b;
+                a = parseInt(dataArray[bytenumber + 2], 16) << 8;
+                b = parseInt(dataArray[bytenumber + 3], 16);
+                const minute = a + b;
 
-            a = parseInt(dataArray[bytenumber + 2], 16) << 8;
-            b = parseInt(dataArray[bytenumber + 3], 16);
-            var minute = a + b;
-
-            a = parseInt(dataArray[bytenumber + 4], 16) << 8;
-            b = parseInt(dataArray[bytenumber + 5], 16);
-            var second = a + b;
-            bytenumber = bytenumber + (3 * 2);
-            value = hour + ":" + minute + ":" + second;
-            sDataType = "time";
+                a = parseInt(dataArray[bytenumber + 4], 16) << 8;
+                b = parseInt(dataArray[bytenumber + 5], 16);
+                const second = a + b;
+                bytenumber = bytenumber + (3 * 2);
+                value = hour + ":" + minute + ":" + second;
+                sDataType = "time";
+            }
             break;
     }
 
-    var sdataunit = "unknown";
-    var dataunit = parseInt( dataArray[bytenumber],16);
+    let sdataunit = "unknown";
+    const dataunit = parseInt( dataArray[bytenumber],16);
     bytenumber++;
     //adapter.log.debug("dataunit " + dataunit);
     switch (dataunit) {
@@ -781,13 +743,16 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
     adapter.log.debug(stype + " (" + sDataType + ") " + value + " " + sdataunit  );
     
 
+   //Object openhomecontrol.0.600000FEFE.Humidity is invalid: obj.common.type has an invalid value(state) but has to be one of number, string, boolean, array, object, mixed, file, json
+ 
     adapter.setObjectNotExists(source + "." + stype, {
         type: "state",
         common: {
             name: stype,
-            type: "state",
-            role: "sensor",
-            function: "Wetter",
+            type: "number",
+            role: "Sensor",
+            function: "",
+            unit: sdataunit,
             read: true,
             write: false
         }
@@ -795,7 +760,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
 
     //adapter.log.debug("update " + source + "." + stype + " with " + value + " " + sdataunit + " bytenumber: " + bytenumber);
 
-    adapter.setState(source + '.' + stype, { val: value, ack: true });
+    adapter.setState(source + "." + stype, { val: value, ack: true });
 
     return bytenumber;
 }
@@ -803,11 +768,11 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
 
 
 function showPortClose() {
-    adapter.log.debug('port closed.');
+    adapter.log.debug("port closed.");
 }
 
 function showError(error) {
-    adapter.log.error('Serial port error: ' + error);
+    adapter.log.error("Serial port error: " + error);
 }
 
 
@@ -871,11 +836,11 @@ function AddTime(){
     DataToSend[DataToSendLength] = 0x05;  //Time
     DataToSend[DataToSendLength + 1] = 0x06; //time: 3*int hh::mm::ss
 
-    var theDate = new Date();
+    const theDate = new Date();
 
-    var hour = theDate.getHours();
-    var minute = theDate.getMinutes();
-    var second = theDate.getSeconds();
+    const hour = theDate.getHours();
+    const minute = theDate.getMinutes();
+    const second = theDate.getSeconds();
 
     DataToSend[DataToSendLength + 2] = highByte(hour);
     DataToSend[DataToSendLength + 3] = lowByte(hour);
@@ -901,11 +866,11 @@ function AddDate(){
     DataToSend[DataToSendLength] = 0x04;  //Date
     DataToSend[DataToSendLength + 1] = 0x05; //date: 3*int dd.mm.yyyy
 
-    var theDate = new Date();
+    const theDate = new Date();
 
-    var day = theDate.getDate();
-    var month = theDate.getMonth()+1;
-    var year = theDate.getFullYear();
+    const day = theDate.getDate();
+    const month = theDate.getMonth()+1;
+    const year = theDate.getFullYear();
 
     DataToSend[DataToSendLength + 2] = highByte(day);
     DataToSend[DataToSendLength + 3] = lowByte(day);
@@ -925,472 +890,432 @@ function AddDate(){
     CheckDataLength();
 }
 
-function AddTemperature(DisplayID) {
+async function AddTemperature(DisplayID) {
     try {
         //adapter.log.debug("add temperatur");
 
-        adapter.getState(DisplayID + '.Temp2Display', function (err, obj) {
-            if (err) {
-                adapter.log.error(err);
-                AlreadySending = false;
-            } else {
-                
-                if (obj !== null) {
-                    //set ack-flag
-                    adapter.setState(DisplayID + '.Temp2Display', { ack: true });
-                    var temperature = obj.val;
-                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
-                    DataToSend[DataToSendLength] = 0x01;  //Temperature
-                    DataToSend[DataToSendLength + 1] = 0x03; //float
+        const obj = await adapter.getStateAsync(DisplayID + ".Temp2Display");
+
+        if (obj !== null) {
+            //set ack-flag
+            adapter.setState(DisplayID + ".Temp2Display", { ack: true });
+            const temperature = obj.val;
+            DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+            DataToSend[DataToSendLength] = 0x01;  //Temperature
+            DataToSend[DataToSendLength + 1] = 0x03; //float
 
 
-                    var farr = new Float32Array(1);
-                    farr[0] = temperature;
-                    var barr = new Int8Array(farr.buffer);
+            const farr = new Float32Array(1);
+            farr[0] = temperature;
+            const barr = new Int8Array(farr.buffer);
 
 
-                    DataToSend[DataToSendLength + 2] = barr[0];
-                    DataToSend[DataToSendLength + 3] = barr[1];
-                    DataToSend[DataToSendLength + 4] = barr[2];
-                    DataToSend[DataToSendLength + 5] = barr[3];
+            DataToSend[DataToSendLength + 2] = barr[0];
+            DataToSend[DataToSendLength + 3] = barr[1];
+            DataToSend[DataToSendLength + 4] = barr[2];
+            DataToSend[DataToSendLength + 5] = barr[3];
 
 
-                    DataToSend[DataToSendLength + 6] = 0x01; //°C
+            DataToSend[DataToSendLength + 6] = 0x01; //°C
 
-                    DataToSendLength += 7;
+            DataToSendLength += 7;
 
-                    //adapter.log.debug('Temperature ' + temperature);
+            //adapter.log.debug('Temperature ' + temperature);
 
-                    CheckDataLength();
-                }
-                AddHumidity(DisplayID);
+            CheckDataLength();
+        }
+        //AddHumidity(DisplayID);
 
-            }
-        });
+
     }
     catch (e) {
-        adapter.log.error('exception in  AddTemperature [' + e + ']');
+        adapter.log.error("exception in  AddTemperature [" + e + "]");
     }
 }
 
-function AddHumidity(DisplayID) {
+async function AddHumidity(DisplayID) {
     try {
         //adapter.log.debug("add humidity");
 
-        adapter.getState(DisplayID + '.Humidity2Display', function (err, obj) {
-            if (err) {
-                adapter.log.error(err);
-                AlreadySending = false;
-            } else {
+        const obj = await adapter.getStateAsync(DisplayID + ".Humidity2Display");
 
-                if (obj !== null) {
-                    //set ack-flag
-                    adapter.setState(DisplayID + '.Humidity2Display', { ack: true });
-                    var humidity = obj.val;
+        if (obj !== null) {
+            //set ack-flag
+            adapter.setState(DisplayID + ".Humidity2Display", { ack: true });
+            const humidity = obj.val;
 
-                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
-                    DataToSend[DataToSendLength] = 0x02;  //Humidity
-                    DataToSend[DataToSendLength + 1] = 0x03; //float
+            DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+            DataToSend[DataToSendLength] = 0x02;  //Humidity
+            DataToSend[DataToSendLength + 1] = 0x03; //float
 
 
-                    var farr = new Float32Array(1);
-                    farr[0] = humidity;
-                    var barr = new Int8Array(farr.buffer);
+            const farr = new Float32Array(1);
+            farr[0] = humidity;
+            const barr = new Int8Array(farr.buffer);
 
 
-                    DataToSend[DataToSendLength + 2] = barr[0];
-                    DataToSend[DataToSendLength + 3] = barr[1];
-                    DataToSend[DataToSendLength + 4] = barr[2];
-                    DataToSend[DataToSendLength + 5] = barr[3];
+            DataToSend[DataToSendLength + 2] = barr[0];
+            DataToSend[DataToSendLength + 3] = barr[1];
+            DataToSend[DataToSendLength + 4] = barr[2];
+            DataToSend[DataToSendLength + 5] = barr[3];
 
 
-                    DataToSend[DataToSendLength + 6] = 0x02; //%
+            DataToSend[DataToSendLength + 6] = 0x02; //%
 
-                    DataToSendLength += 7;
+            DataToSendLength += 7;
 
-                    //adapter.log.debug('Humidity ' + humidity);
+            //adapter.log.debug('Humidity ' + humidity);
 
-                    CheckDataLength();
-                }
-                AddPoP(DisplayID);
-            }
-        });
+            CheckDataLength();
+        }
+        //AddPoP(DisplayID);
+
     }
     catch (e) {
-        adapter.log.error('exception in  AddHumidity [' + e + ']');
+        adapter.log.error("exception in  AddHumidity [" + e + "]");
     }
 }
 
-function AddPoP(DisplayID) {
+async function AddPoP(DisplayID) {
     try {
 
         //adapter.log.debug("add pop");
 
-        adapter.getState(DisplayID + '.PoP2Display', function (err, obj) {
-            if (err) {
-                adapter.log.error(err);
-                AlreadySending = false;
-            } else {
+        const obj = await adapter.getStateAsync(DisplayID + ".PoP2Display");
 
-                if (obj !== null) {
-                    //set ack-flag
-                    adapter.setState(DisplayID + '.PoP2Display', { ack: true });
-                    var pop = obj.val;
+        if (obj !== null) {
+            //set ack-flag
+            adapter.setState(DisplayID + ".PoP2Display", { ack: true });
+            const pop = obj.val;
 
-                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
-                    DataToSend[DataToSendLength] = 0x0C;  //pop
-                    DataToSend[DataToSendLength + 1] = 0x02; //int
+            DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+            DataToSend[DataToSendLength] = 0x0C;  //pop
+            DataToSend[DataToSendLength + 1] = 0x02; //int
 
-                    DataToSend[DataToSendLength + 2] = highByte(pop);
-                    DataToSend[DataToSendLength + 3] = lowByte(pop);
+            DataToSend[DataToSendLength + 2] = highByte(pop);
+            DataToSend[DataToSendLength + 3] = lowByte(pop);
 
-                    DataToSend[DataToSendLength + 4] = 0x02; //%
+            DataToSend[DataToSendLength + 4] = 0x02; //%
 
-                    DataToSendLength += 5;
+            DataToSendLength += 5;
 
-                    //adapter.log.debug('PoP ' + pop);
+            //adapter.log.debug('PoP ' + pop);
 
-                    CheckDataLength();
-                }
-                AddAirPressure(DisplayID);
-            }
-        });
+            CheckDataLength();
+        }
+        //AddAirPressure(DisplayID);
+
     }
     catch (e) {
-        adapter.log.error('exception in  AddPoP [' + e + ']');
+        adapter.log.error("exception in  AddPoP [" + e + "]");
     }
 }
 
-function AddAirPressure(DisplayID) {
+async function AddAirPressure(DisplayID) {
     try {
         //adapter.log.debug("add pressure");
 
-        adapter.getState(DisplayID + '.Pressure2Display', function (err, obj) {
-            if (err) {
-                adapter.log.error(err);
-                AlreadySending = false;
-            } else {
-                if (obj !== null) {
-                    //set ack-flag
-                    adapter.setState(DisplayID + '.Pressure2Display', { ack: true });
-                    var pressure = obj.val;
+        const obj = await adapter.getStateAsync(DisplayID + ".Pressure2Display");
 
-                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
-                    DataToSend[DataToSendLength] = 0x09;  //Pressure
-                    DataToSend[DataToSendLength + 1] = 0x03; //float
+        if (obj !== null) {
+            //set ack-flag
+            adapter.setState(DisplayID + ".Pressure2Display", { ack: true });
+            const pressure = obj.val;
 
-                    var farr = new Float32Array(1);
-                    farr[0] = pressure;
-                    var barr = new Int8Array(farr.buffer);
+            DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+            DataToSend[DataToSendLength] = 0x09;  //Pressure
+            DataToSend[DataToSendLength + 1] = 0x03; //float
 
-                    DataToSend[DataToSendLength + 2] = barr[0];
-                    DataToSend[DataToSendLength + 3] = barr[1];
-                    DataToSend[DataToSendLength + 4] = barr[2];
-                    DataToSend[DataToSendLength + 5] = barr[3];
+            const farr = new Float32Array(1);
+            farr[0] = pressure;
+            const barr = new Int8Array(farr.buffer);
+
+            DataToSend[DataToSendLength + 2] = barr[0];
+            DataToSend[DataToSendLength + 3] = barr[1];
+            DataToSend[DataToSendLength + 4] = barr[2];
+            DataToSend[DataToSendLength + 5] = barr[3];
 
 
-                    DataToSend[DataToSendLength + 6] = 0x03; //mBar
+            DataToSend[DataToSendLength + 6] = 0x03; //mBar
 
-                    DataToSendLength += 7;
+            DataToSendLength += 7;
 
-                    //adapter.log.debug('Pressure ' + pressure);
+            //adapter.log.debug('Pressure ' + pressure);
 
-                    CheckDataLength();
-                }
-                AddWeatherIconIdFromString(DisplayID);
-            }
-        });
+            CheckDataLength();
+        }
+        // AddWeatherIconIdFromString(DisplayID);
+
     }
     catch (e) {
-        adapter.log.error('exception in  AddAirPressure [' + e + ']');
+        adapter.log.error("exception in  AddAirPressure [" + e + "]");
     }
 }
 
-function AddWeatherIconIdFromString(DisplayID) {
+async function AddWeatherIconIdFromString(DisplayID) {
     try {
 
         //adapter.log.debug("add icon");
 
-        adapter.getState(DisplayID + '.WeatherIconString2Display', function (err, obj) {
-            if (err) {
-                adapter.log.error(err);
-                AlreadySending = false;
-            } else {
-                if (obj !== null) {
+        const obj = await adapter.getStateAsync(DisplayID + ".WeatherIconString2Display");
 
-                    //set ack-flag
-                    adapter.setState(DisplayID + '.WeatherIconString2Display', { ack: true });
+        if (obj !== null) {
 
-                    var icon = obj.val;
+            //set ack-flag
+            adapter.setState(DisplayID + ".WeatherIconString2Display", { ack: true });
 
-                    var icon_id = -1;
+            const icon = obj.val;
 
-                    // das ist WU
-                    switch (icon) {
-                        case "clear":
-                        case "nt_clear":
-                            icon_id = 1;
-                            break;
-                        case "partlycloudy":
-                        case "nt_partlycloudy":
-                            icon_id = 2;
-                            break;
-                        case "mostlycloudy":
-                        case "nt_mostlycloudy":
-                            icon_id = 3;
-                            break;
-                        case "cloudy":
-                        case "nt_cloudy":
-                            icon_id = 4;
-                            break;
-                        case "hazy":
-                        case "nt_hazy":
-                            icon_id = 5;
-                            break;
-                        case "foggy":
-                        case "nt_foggy":
-                            icon_id = 6;
-                            break;
-                        case "veryhot":
-                        case "nt_veryhot":
-                            icon_id = 7;
-                            break;
-                        case "verycold":
-                        case "nt_verycold":
-                            icon_id = 8;
-                            break;
-                        case "blowingsnow":
-                        case "nt_blowingsnow":
-                            icon_id = 9;
-                            break;
-                        case "chanceshowers":
-                        case "nt_chanceshowers":
-                            icon_id = 10;
-                            break;
-                        case "showers":
-                        case "nt_showers":
-                            icon_id = 11;
-                            break;
-                        case "chancerain":
-                        case "nt_chancerain":
-                            icon_id = 12;
-                            break;
-                        case "rain":
-                        case "nt_rain":
-                            icon_id = 13;
-                            break;
-                        case "chancetstorms":
-                        case "nt_chancetstorms":
-                        case "chancethunderstorm":
-                        case "nt_chancethunderstorm":
-                            icon_id = 14;
-                            break;
+            let icon_id = -1;
 
-                        case "tstorms":
-                        case "nt_tstorms":
-                        case "thunderstorm":
-                        case "nt_thunderstorm":
-                            icon_id = 15;
-                            break;
-                        case "flurries":
-                        case "nt_flurries":
-                            icon_id = 16;
-                            break;
-                        case "chancesnowshowers":
-                        case "nt_chancesnowshowers":
-                            icon_id = 18;
-                            break;
-                        case "snowshowers":
-                        case "nt_snowshowers":
-                            icon_id = 19;
-                            break;
-                        case "chancesnow":
-                        case "nt_chancesnow":
-                            icon_id = 20;
-                            break;
-                        case "snow":
-                        case "nt_snow":
-                            icon_id = 21;
-                            break;
-                        case "chanceicepellets":
-                        case "nt_chanceicepellets":
-                            icon_id = 22;
-                            break;
-                        case "icepellets":
-                        case "nt_icepellets":
-                            icon_id = 23;
-                            break;
-                        case "blizzard":
-                        case "nt_blizzard":
-                            icon_id = 24;
-                            break;
-                        default:
-                            adapter.log.error('unknown WeatherIcon ' + icon);
-                            break;
-                    }
+            // das ist WU
+            switch (icon) {
+                case "clear":
+                case "nt_clear":
+                    icon_id = 1;
+                    break;
+                case "partlycloudy":
+                case "nt_partlycloudy":
+                    icon_id = 2;
+                    break;
+                case "mostlycloudy":
+                case "nt_mostlycloudy":
+                    icon_id = 3;
+                    break;
+                case "cloudy":
+                case "nt_cloudy":
+                    icon_id = 4;
+                    break;
+                case "hazy":
+                case "nt_hazy":
+                    icon_id = 5;
+                    break;
+                case "foggy":
+                case "nt_foggy":
+                    icon_id = 6;
+                    break;
+                case "veryhot":
+                case "nt_veryhot":
+                    icon_id = 7;
+                    break;
+                case "verycold":
+                case "nt_verycold":
+                    icon_id = 8;
+                    break;
+                case "blowingsnow":
+                case "nt_blowingsnow":
+                    icon_id = 9;
+                    break;
+                case "chanceshowers":
+                case "nt_chanceshowers":
+                    icon_id = 10;
+                    break;
+                case "showers":
+                case "nt_showers":
+                    icon_id = 11;
+                    break;
+                case "chancerain":
+                case "nt_chancerain":
+                    icon_id = 12;
+                    break;
+                case "rain":
+                case "nt_rain":
+                    icon_id = 13;
+                    break;
+                case "chancetstorms":
+                case "nt_chancetstorms":
+                case "chancethunderstorm":
+                case "nt_chancethunderstorm":
+                    icon_id = 14;
+                    break;
 
-
-
-
-                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
-                    DataToSend[DataToSendLength] = 0x0B; //WeatherIcon
-                    DataToSend[DataToSendLength + 1] = 0x01; //byte
-
-                    DataToSend[DataToSendLength + 2] = icon_id;
-
-                    DataToSend[DataToSendLength + 3] = 0x00; //ohne
-
-                    DataToSendLength += 4;
-
-                    //adapter.log.debug('WeatherIcon ' + icon + " = " + icon_id);
-
-                    CheckDataLength();
-
-                    //do not add another icon...
-                    AddTemperatureForecast(DisplayID);
-                }
-                else {
-                    AddWeatherIconIdFromID(DisplayID);
-                    //sendSerialDataRaw();
-                }
+                case "tstorms":
+                case "nt_tstorms":
+                case "thunderstorm":
+                case "nt_thunderstorm":
+                    icon_id = 15;
+                    break;
+                case "flurries":
+                case "nt_flurries":
+                    icon_id = 16;
+                    break;
+                case "chancesnowshowers":
+                case "nt_chancesnowshowers":
+                    icon_id = 18;
+                    break;
+                case "snowshowers":
+                case "nt_snowshowers":
+                    icon_id = 19;
+                    break;
+                case "chancesnow":
+                case "nt_chancesnow":
+                    icon_id = 20;
+                    break;
+                case "snow":
+                case "nt_snow":
+                    icon_id = 21;
+                    break;
+                case "chanceicepellets":
+                case "nt_chanceicepellets":
+                    icon_id = 22;
+                    break;
+                case "icepellets":
+                case "nt_icepellets":
+                    icon_id = 23;
+                    break;
+                case "blizzard":
+                case "nt_blizzard":
+                    icon_id = 24;
+                    break;
+                default:
+                    adapter.log.error("unknown WeatherIcon " + icon);
+                    break;
             }
-        });
+
+
+
+
+            DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+            DataToSend[DataToSendLength] = 0x0B; //WeatherIcon
+            DataToSend[DataToSendLength + 1] = 0x01; //byte
+
+            DataToSend[DataToSendLength + 2] = icon_id;
+
+            DataToSend[DataToSendLength + 3] = 0x00; //ohne
+
+            DataToSendLength += 4;
+
+            //adapter.log.debug('WeatherIcon ' + icon + " = " + icon_id);
+
+            CheckDataLength();
+
+            //do not add another icon...
+            //AddTemperatureForecast(DisplayID);
+        }
+        else {
+            //AddWeatherIconIdFromID(DisplayID);
+            //sendSerialDataRaw();
+        }
+
     }
     catch (e) {
-        adapter.log.error('exception in  AddWeatherIconIdFromString [' + e + ']');
+        adapter.log.error("exception in  AddWeatherIconIdFromString [" + e + "]");
     }
 }
 
-function AddWeatherIconIdFromID(DisplayID) {
+async function AddWeatherIconIdFromID(DisplayID) {
     try {
 
         //adapter.log.debug("add icon");
 
-        adapter.getState(DisplayID + '.WeatherIconID2Display', function (err, obj) {
-            if (err) {
-                adapter.log.error(err);
-                AlreadySending = false;
-            } else {
-                if (obj !== null) {
+        const obj = await adapter.getStateAsync(DisplayID + ".WeatherIconID2Display");
+        if (obj !== null) {
 
-                    //set ack-flag
-                    adapter.setState(DisplayID + '.WeatherIconID2Display', { ack: true });
+            //set ack-flag
+            adapter.setState(DisplayID + ".WeatherIconID2Display", { ack: true });
 
-                    var icon_id = obj.val;
+            const icon_id = obj.val;
 
-                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
-                    DataToSend[DataToSendLength] = 0x0B; //WeatherIcon
-                    DataToSend[DataToSendLength + 1] = 0x01; //byte
+            DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+            DataToSend[DataToSendLength] = 0x0B; //WeatherIcon
+            DataToSend[DataToSendLength + 1] = 0x01; //byte
 
-                    DataToSend[DataToSendLength + 2] = icon_id;
+            DataToSend[DataToSendLength + 2] = icon_id;
 
-                    DataToSend[DataToSendLength + 3] = 0x00; //ohne
+            DataToSend[DataToSendLength + 3] = 0x00; //ohne
 
-                    DataToSendLength += 4;
+            DataToSendLength += 4;
 
-                    //adapter.log.debug('WeatherIcon from id : ' +  icon_id);
+            //adapter.log.debug('WeatherIcon from id : ' +  icon_id);
 
-                    CheckDataLength();
-                }
-                AddTemperatureForecast(DisplayID);
-                
-            }
-        });
+            CheckDataLength();
+        }
+        //AddTemperatureForecast(DisplayID);
+
+
     }
     catch (e) {
-        adapter.log.error('exception in  AddWeatherIconIdFromID [' + e + ']');
+        adapter.log.error("exception in  AddWeatherIconIdFromID [" + e + "]");
     }
 }
 
-function AddTemperatureForecast(DisplayID) {
+async function AddTemperatureForecast(DisplayID) {
     try {
         //adapter.log.debug("add temperatur");
 
-        adapter.getState(DisplayID + '.TempForecast2Display', function (err, obj) {
-            if (err) {
-                adapter.log.error(err);
-                AlreadySending = false;
-            } else {
+        const obj = await adapter.getStateAsync(DisplayID + ".TempForecast2Display");
 
-                if (obj !== null) {
-                    //set ack-flag
-                    adapter.setState(DisplayID + '.TempForecast2Display', { ack: true });
-                    var temperature = obj.val;
-                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
-                    DataToSend[DataToSendLength] = 0x11;  //Temperature forecast
-                    DataToSend[DataToSendLength + 1] = 0x03; //float
+        if (obj !== null) {
+            //set ack-flag
+            adapter.setState(DisplayID + ".TempForecast2Display", { ack: true });
+            const temperature = obj.val;
+            DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+            DataToSend[DataToSendLength] = 0x11;  //Temperature forecast
+            DataToSend[DataToSendLength + 1] = 0x03; //float
 
 
-                    var farr = new Float32Array(1);
-                    farr[0] = temperature;
-                    var barr = new Int8Array(farr.buffer);
+            const farr = new Float32Array(1);
+            farr[0] = temperature;
+            const barr = new Int8Array(farr.buffer);
 
 
-                    DataToSend[DataToSendLength + 2] = barr[0];
-                    DataToSend[DataToSendLength + 3] = barr[1];
-                    DataToSend[DataToSendLength + 4] = barr[2];
-                    DataToSend[DataToSendLength + 5] = barr[3];
+            DataToSend[DataToSendLength + 2] = barr[0];
+            DataToSend[DataToSendLength + 3] = barr[1];
+            DataToSend[DataToSendLength + 4] = barr[2];
+            DataToSend[DataToSendLength + 5] = barr[3];
 
 
-                    DataToSend[DataToSendLength + 6] = 0x01; //°C
+            DataToSend[DataToSendLength + 6] = 0x01; //°C
 
-                    DataToSendLength += 7;
+            DataToSendLength += 7;
 
-                    //adapter.log.debug('Temperature ' + temperature);
+            //adapter.log.debug('Temperature ' + temperature);
 
-                    CheckDataLength();
-                }
-                AddRainForecast(DisplayID);
+            CheckDataLength();
+        }
+        //AddRainForecast(DisplayID);
 
-            }
-        });
+
     }
     catch (e) {
-        adapter.log.error('exception in  AddTemperatureForecast [' + e + ']');
+        adapter.log.error("exception in  AddTemperatureForecast [" + e + "]");
     }
 
 
 }
 
-function AddRainForecast(DisplayID) {
+async function AddRainForecast(DisplayID) {
     try {
 
         //adapter.log.debug("add pop");
 
-        adapter.getState(DisplayID + '.Rain2Display', function (err, obj) {
-            if (err) {
-                adapter.log.error(err);
-                AlreadySending = false;
-            } else {
+        const obj = await adapter.getStateAsync(DisplayID + ".Rain2Display");
 
-                if (obj !== null) {
-                    //set ack-flag
-                    adapter.setState(DisplayID + '.Rain2Display', { ack: true });
-                    var rain = obj.val;
+        if (obj !== null) {
+            //set ack-flag
+            adapter.setState(DisplayID + ".Rain2Display", { ack: true });
+            const rain = obj.val;
 
-                    DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
-                    DataToSend[DataToSendLength] = 0x10;  //rain forecast
-                    DataToSend[DataToSendLength + 1] = 0x02; //int
+            DataToSend[IDX_DATENPUNKTE] = DataToSend[IDX_DATENPUNKTE] + 1;  //Datenpunkte
+            DataToSend[DataToSendLength] = 0x10;  //rain forecast
+            DataToSend[DataToSendLength + 1] = 0x02; //int
 
-                    DataToSend[DataToSendLength + 2] = highByte(rain);
-                    DataToSend[DataToSendLength + 3] = lowByte(rain);
+            DataToSend[DataToSendLength + 2] = highByte(rain);
+            DataToSend[DataToSendLength + 3] = lowByte(rain);
 
-                    DataToSend[DataToSendLength + 4] = 0x07; //mm
+            DataToSend[DataToSendLength + 4] = 0x07; //mm
 
-                    DataToSendLength += 5;
+            DataToSendLength += 5;
 
-                    //adapter.log.debug('rain ' + rain);
+            //adapter.log.debug('rain ' + rain);
 
-                    CheckDataLength();
-                }
+            CheckDataLength();
+        }
 
-                sendSerialDataRaw();
-                
-            }
-        });
+        //sendSerialDataRaw();
     }
     catch (e) {
-        adapter.log.error('exception in  AddRainForecast [' + e + ']');
+        adapter.log.error("exception in  AddRainForecast [" + e + "]");
     }
 }
 
@@ -1429,7 +1354,7 @@ s 0  0  0  0  0  0  0  fe  fe  fe  fe  fe  fe  1 2 4 5 0 15 0  1 7 e1  0 5 6 0  
 
 
 
-function SendDataBroadcast() {
+async function SendDataBroadcast() {
     //adapter.log.debug('Send data');
 
     if (AlreadySending) {
@@ -1445,12 +1370,12 @@ function SendDataBroadcast() {
         AddTime();
     }
     catch (e) {
-        adapter.log.error('exception in  SendData [' + e + '] ');
+        adapter.log.error("exception in  SendData [" + e + "] ");
     }
-    sendSerialDataRaw(); 
+    await sendSerialDataRaw(); 
 }
 
-function SendData2Display(DisplayID) {
+async function SendData2Display(DisplayID) {
 
     if (AlreadySending) {
         adapter.log.warn("send to display:  already sending");
@@ -1461,61 +1386,87 @@ function SendData2Display(DisplayID) {
     adapter.log.debug("send data to " + DisplayID);
     try {
         AddHeader(0x00, DisplayID);
-        AddTemperature(DisplayID); //from there we add humidity and then air pressure; don't do it here because it's a asynchron call
+        await AddTemperature(DisplayID); //from there we add humidity and then air pressure; don't do it here because it's a asynchron call
+        await AddHumidity(DisplayID);
+        await AddPoP(DisplayID);
+        await AddAirPressure(DisplayID);
+        await AddWeatherIconIdFromString(DisplayID);
+        await AddWeatherIconIdFromID(DisplayID);
+        await AddTemperatureForecast(DisplayID);
+        await AddRainForecast(DisplayID);
+        await sendSerialDataRaw();
+
     }
     catch (e) {
-        adapter.log.error('exception in  SendData [' + e + '] ' + DisplayID);
+        adapter.log.error("exception in  SendData [" + e + "] " + DisplayID);
     }
     //sendSerialDataRaw(); it's called in AddPressure finally
 
 }
 
-function sendSerialDataRaw() {
+async function sendSerialDataRaw() {
 
     try {
 
-        var length = DataToSendLength + 2;
+        const length = DataToSendLength + 2;
         //adapter.log.debug('sendSerialDataRaw ' + length);
 
-        var buffer = new Buffer(length);
+        let buffer = new Buffer(length);
         //copy into buffer for data conversion...
         buffer[0] = 0x53; //== 'S'
         buffer[1] = DataToSendLength;
-        for (var i = 0; i < DataToSendLength; i++) {
+        for (let i = 0; i < DataToSendLength; i++) {
             buffer[i + 2] = DataToSend[i];
         }
 
-        myPort.write(buffer);
+        await myPort.write(buffer);
 
-        var sTemp = "";
-        for (var j = 0; j < buffer.length; j++) {
+        let sTemp = "";
+        for (let j = 0; j < buffer.length; j++) {
             sTemp += buffer[j].toString(16);
             sTemp += " ";
         }
         adapter.log.debug("sent :" + sTemp);
 
-        SentData2Compare = sTemp;
+        //SentData2Compare = sTemp;
 
         buffer = null;
 
     }
     catch (e) {
-        adapter.log.error('exception in  sendSerialDataRaw [' + e + ']');
+        adapter.log.error("exception in  sendSerialDataRaw [" + e + "]");
     }
     AlreadySending = false;
 }
 
-
+/*
 function DeleteDevices() {
     adapter.getDevices(function (err, devices) {
-        for (var d = 0; d < devices.length; d++) {
+        for (let d = 0; d < devices.length; d++) {
             //adapter.deleteDevice(devices[d]._id);
-            log(devices[d]._id);
+            adapter.log.debug(devices[d]._id);
         }
     });
 }
+*/
 
+async function ListUarts(obj) {
 
+    if (obj.callback) {
+        if (SerialPort) {
+            // read all found serial ports
+            const ports = await SerialPort.list();
+
+            // SerialPort.list(function (err, ports) {
+            adapter.log.info("List of port: " + JSON.stringify(ports));
+            adapter.sendTo(obj.from, obj.command, ports, obj.callback);
+            //});
+        } else {
+            adapter.log.warn("Module serialport is not available");
+            adapter.sendTo(obj.from, obj.command, [{ comName: "Not available" }], obj.callback);
+        }
+    }
+}
 
 function ListDevices(obj) {
     

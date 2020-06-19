@@ -70,7 +70,7 @@
 
                 var $sel = $('#serialport');
                 for (var i = 0; i < list.length; i++) {
-                    $sel.append('<option value="' + list[i].comName + '" ' + ((actualValue == list[i].comName) ? 'selected' : '') + '>' + list[i].comName + '</option>');
+                    $sel.append('<option value="' + list[i].path + '" ' + ((actualValue == list[i].path) ? 'selected' : '') + '>' + list[i].path + '</option>');
                 }
                 $sel.select();
             });
