@@ -10,3 +10,5 @@ node_modules
 /.settings/
 /.vs/
 /obj/
+/openhomecontrol.njsproj
+/package.json.orig
