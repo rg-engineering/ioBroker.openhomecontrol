@@ -151,15 +151,20 @@ async function main() {
 
     if (myPort != null) {
         adapter.log.info("port created; portname: " + options.serialport + " Data rate: " + myPort.baudRate);
+
+        myPort.on("open", showPortOpen);
+        myPort.on("data", receiveSerialData);
+        myPort.on("close", showPortClose);
+        myPort.on("error", showError);
+        adapter.log.info("OpenHomeControl used in raw mode");
     }
+    else {
+        adapter.log.warn("port is not created, probably a configuration error?");
+    }
+   
 
-    myPort.on("open", showPortOpen);
-    myPort.on("data", receiveSerialData);
-    myPort.on("close", showPortClose);
-    myPort.on("error", showError);
 
-
-    adapter.log.info("OpenHomeControl used in raw mode");
+   
 
 
     try {
@@ -743,7 +748,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
     adapter.log.debug(stype + " (" + sDataType + ") " + value + " " + sdataunit  );
     
 
-   //Object openhomecontrol.0.600000FEFE.Humidity is invalid: obj.common.type has an invalid value(state) but has to be one of number, string, boolean, array, object, mixed, file, json
+    //Object openhomecontrol.0.600000FEFE.Humidity is invalid: obj.common.type has an invalid value(state) but has to be one of number, string, boolean, array, object, mixed, file, json
  
     adapter.setObjectNotExists(source + "." + stype, {
         type: "state",
