@@ -516,17 +516,23 @@ function receiveSerialDataRaw(dataorg) {
         else {
 
             const obj1 = findObjectByKey(newDevices, "name", source);
+            const theDate = new Date();
 
-            if (obj1===null) {
+            if (obj1 === null && stype!="unknown") {
                 //adapter.log.debug(source + " is new");
                 newDevices.push({
                     name: source,
                     type: stype,
-                    isUsed: false
+                    isUsed: false,
+                    LastUpdate: theDate.toString()
+
                 });
             }
             else {
                 //adapter.log.debug(source + " already in list");
+                if (obj1 != null) {
+                    obj1.LastUpdate = theDate.toString();
+                }
             }
         }
     }

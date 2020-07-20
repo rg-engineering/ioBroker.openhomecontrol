@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "openhomecontrol",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "news": {
-      "1.0.0": {
+      "1.2.0": {
         "en": "first public release",
         "de": "erste öffentliche Veröffentlichung",
         "ru": "первый публичный релиз",

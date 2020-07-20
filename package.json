@@ -1,6 +1,6 @@
 {
   "name": "iobroker.openhomecontrol",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "ioBroker OpenHomeControl Adapter",
   "author": {
     "name": "René G.",
