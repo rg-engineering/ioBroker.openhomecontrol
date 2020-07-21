@@ -73,7 +73,26 @@
                 $sel.empty();
 
                 for (var i = 0; i < list.length; i++) {
-                    $sel.append('<option value="' + list[i].path + '" ' + ((actualValue == list[i].path) ? 'selected' : '') + '>' + list[i].path + '</option>');
+
+                    /*
+                      List of port: [
+                        {"path":"/dev/ttyS1"},
+                        {"path":"/dev/ttyS2"},
+                        {"path":"/dev/ttyS3"},
+                        {"path":"/dev/ttyS4"},
+                        {"path":"/dev/ttyS5"},
+                        {"path":"/dev/ttyS6"},
+                        {"path":"/dev/ttyS7"},
+                        {"manufacturer":"1a86","pnpId":"usb-1a86_USB2.0-Serial-if00-port0","vendorId":"1a86","productId":"7523","path":"/dev/ttyUSB0"},
+                        {"manufacturer":"Silicon Labs","serialNumber":"0001","pnpId":"usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0","vendorId":"10c4","productId":"ea60","path":"/dev/ttyUSB1"},
+                        {"path":"/dev/ttyS0"}]
+                     */
+                    if (list[i].manufacturer != null) {
+                        $sel.append('<option value="' + list[i].path + '" ' + ((actualValue == list[i].path) ? 'selected' : '') + '>' + list[i].path + list[i].manufacturer + '</option>');
+                    }
+                    else {
+                        $sel.append('<option value="' + list[i].path + '" ' + ((actualValue == list[i].path) ? 'selected' : '') + '>' + list[i].path + '</option>');
+                    }
                 }
                 $sel.select();
             });
