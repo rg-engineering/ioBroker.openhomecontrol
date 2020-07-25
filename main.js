@@ -1488,7 +1488,8 @@ function ListDevices(obj) {
         allDevices.push({
             name: adapter.config.devices[i].name,
             type: adapter.config.devices[i].type,
-            isUsed: true
+            isUsed: true,
+            LastUpdate: adapter.config.devices[i].LastUpdate
         });
     }
     //then all new devices
@@ -1496,7 +1497,9 @@ function ListDevices(obj) {
         allDevices.push({
             name: newDevices[i].name,
             type: newDevices[i].type,
-            isUsed: false
+            isUsed: false,
+            LastUpdate: newDevices[i].LastUpdate
+
         });
     }
     //clear the array
