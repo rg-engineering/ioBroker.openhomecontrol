@@ -499,7 +499,7 @@ function receiveSerialDataRaw(dataorg) {
                 type: "state",
                 common: {
                     name: "Last update",
-                    type: "datetime",
+                    type: "string",
                     role: "indicator.date",
                     read: true,
                     write: false
@@ -507,6 +507,9 @@ function receiveSerialDataRaw(dataorg) {
             });
             const theDate = new Date();
             adapter.setState(source + ".LastUpdate", { val: theDate.toString(), ack: true });
+
+            obj.LastUpdate = theDate.toString();
+
 
             if (type === 0x03) {
                 
