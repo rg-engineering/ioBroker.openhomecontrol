@@ -20,7 +20,8 @@
   },
   "dependencies": {
     "serialport": "9.0.1",
-    "@iobroker/adapter-core": "2.4.0"
+    "@iobroker/adapter-core": "2.4.0",
+    "@sentry/node": "^5.23.0"
   },
   "devDependencies": {
     "@iobroker/testing": "^2.2.0",
