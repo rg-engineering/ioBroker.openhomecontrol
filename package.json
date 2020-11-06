@@ -21,7 +21,7 @@
   "dependencies": {
     "serialport": "9.0.1",
     "@iobroker/adapter-core": "2.4.0",
-    "@sentry/node": "^5.27.2"
+    "@sentry/node": "^5.27.3"
   },
   "devDependencies": {
     "@iobroker/testing": "^2.2.0",
