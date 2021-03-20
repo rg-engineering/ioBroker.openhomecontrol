@@ -53,7 +53,9 @@
         "name": "René G.",
         "email": "info@rg-engineering.eu"
       }
-    ]
+    ],
+    "connectionType": "local",
+    "dataSource": "push"
   },
   "native": {
     "serialport": "COM7",
