@@ -93,6 +93,9 @@ With broadcast function adapter sends date and time information to every device.
 
 ## Changelog
 
+### 1.2.1 (2021-03-21)
+* (René) dependencies updated
+
 ### 1.2.0 (2020-07-20)
 * (René) add new device to list only if device type is valid
 * (René) show last update of device in admin
