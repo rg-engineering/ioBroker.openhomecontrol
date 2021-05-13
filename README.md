@@ -1,12 +1,15 @@
 ![Logo](admin/openhomecontrol.png)
 # ioBroker.OpenHomeControl
-![Number of Installations](http://iobroker.live/badges/openhomecontrol-installed.svg) ![Number of Installations](http://iobroker.live/badges/openhomecontrol-stable.svg) 
 
-[![NPM version](https://img.shields.io/npm/v/iobroker.openhomecontrol.svg)](https://www.npmjs.com/package/iobroker.openhomecontrol)
+![Number of Installations](http://iobroker.live/badges/openhomecontrol-installed.svg) ![Number of Installations](http://iobroker.live/badges/openhomecontrol-stable.svg)
 [![Downloads](https://img.shields.io/npm/dm/iobroker.openhomecontrol.svg)](https://www.npmjs.com/package/iobroker.openhomecontrol)
-[![Tests](https://travis-ci.org/rg-engineering/ioBroker.openhomecontrol.svg?branch=master)](https://travis-ci.org/rg-engineering/ioBroker.openhomecontrol)
+[![NPM version](http://img.shields.io/npm/v/iobroker.openhomecontrol.svg)](https://www.npmjs.com/package/iobroker.openhomecontrol)
 
-[![NPM](https://nodei.co/npm/iobroker.openhomecontrol.png?downloads=true)](https://nodei.co/npm/iobroker.openhomecontrol/) 
+[![Known Vulnerabilities](https://snyk.io/test/github/rg-engineering/ioBroker.openhomecontrol/badge.svg)](https://snyk.io/test/github/rg-engineering/ioBroker.openhomecontrol)
+![GitHub Actions](https://github.com/rg-engineering/ioBroker.openhomecontrol/workflows/Test%20and%20Release/badge.svg)
+
+[![NPM](https://nodei.co/npm/iobroker.openhomecontrol.png?downloads=true)](https://nodei.co/npm/iobroker.openhomecontrol/)
+
 
 **This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.** 
 For more details and for information how to disable the error reporting see [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Sentry reporting is used starting with js-controller 3.0.

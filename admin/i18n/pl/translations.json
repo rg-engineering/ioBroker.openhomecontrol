@@ -1,0 +1,10 @@
+{
+    "baudrate": "szybkość transmisji",
+    "device": "urządzenie",
+    "devices": "pomysłowość",
+    "disable_broadcast_hint": "wyłączyć interwał czasowy wysyłania transmisji do -1; 0 użyje zakodowanej wartości standardowej.",
+    "send_interval_broadcast": "wyślij transmisję Interwał [s]",
+    "serialport": "Port szeregowy",
+    "type": "rodzaj",
+    "used": "używany"
+}

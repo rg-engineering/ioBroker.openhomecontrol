@@ -1,0 +1,10 @@
+{
+    "baudrate": "taxa de transmissão",
+    "device": "dispositivo",
+    "devices": "dispositivos",
+    "disable_broadcast_hint": "para desabilitar o envio do intervalo do conjunto de dados de transmissão para -1; 0 usará o valor padrão codificado.",
+    "send_interval_broadcast": "Enviar transmissão por intervalo [s]",
+    "serialport": "porta serial",
+    "type": "tipo",
+    "used": "usava"
+}

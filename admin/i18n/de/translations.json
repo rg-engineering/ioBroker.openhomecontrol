@@ -1,0 +1,10 @@
+{
+    "baudrate": "Baudrate",
+    "device": "Gerät",
+    "devices": "Geräte",
+    "disable_broadcast_hint": "um das Senden des Broadcast-Datensatzintervalls zu deaktivieren auf -1 setzen; 0 wird den fest codierten Standardwert verwendet.",
+    "send_interval_broadcast": "Sende Interval Broadcast [s]",
+    "serialport": "serielle Schnittstelle",
+    "type": "Art",
+    "used": "benutzt"
+}

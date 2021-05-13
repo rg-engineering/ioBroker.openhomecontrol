@@ -1,0 +1,10 @@
+{
+    "baudrate": "velocidad de baudios",
+    "device": "dispositivo",
+    "devices": "dispositivos",
+    "disable_broadcast_hint": "deshabilitar el envío del intervalo del conjunto de datos de difusión a -1; 0 usará el valor estándar codificado.",
+    "send_interval_broadcast": "enviar transmisión por intervalos [s]",
+    "serialport": "Puerto serial",
+    "type": "tipo",
+    "used": "usado"
+}

@@ -1,0 +1,10 @@
+{
+    "baudrate": "baudrate",
+    "device": "device",
+    "devices": "devices",
+    "disable_broadcast_hint": "to disable sending broadcast data set interval to -1; 0 will use hardcoded standard value.",
+    "send_interval_broadcast": "send Interval broadcast [s]",
+    "serialport": "serialport",
+    "type": "type",
+    "used": "used"
+}

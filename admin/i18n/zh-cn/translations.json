@@ -1,0 +1,10 @@
+{
+    "baudrate": "波特率",
+    "device": "设备",
+    "devices": "设备",
+    "disable_broadcast_hint": "禁止发送广播数据的时间间隔设置为-1； ",
+    "send_interval_broadcast": "发送间隔广播[s]",
+    "serialport": "串行端口",
+    "type": "类型",
+    "used": "用过的"
+}

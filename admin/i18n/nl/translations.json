@@ -1,0 +1,10 @@
+{
+    "baudrate": "baudrate",
+    "device": "apparaat",
+    "devices": "apparaten",
+    "disable_broadcast_hint": "om het verzenden van uitzendgegevensinterval naar -1 uit te schakelen; 0 gebruikt de standaardwaarde met harde codes.",
+    "send_interval_broadcast": "verzend Interval uitzending [s]",
+    "serialport": "seriele poort",
+    "type": "type",
+    "used": "gebruikt"
+}

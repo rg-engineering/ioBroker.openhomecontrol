@@ -1,0 +1,10 @@
+{
+    "baudrate": "baudrate",
+    "device": "dispositivo",
+    "devices": "dispositivi",
+    "disable_broadcast_hint": "per disabilitare l'invio dell'intervallo di set di dati di trasmissione a -1; 0 utilizzerà il valore standard hardcoded.",
+    "send_interval_broadcast": "invia una trasmissione intervallata [s]",
+    "serialport": "porta seriale",
+    "type": "genere",
+    "used": "Usato"
+}

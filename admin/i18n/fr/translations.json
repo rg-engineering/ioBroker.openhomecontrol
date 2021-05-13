@@ -1,0 +1,10 @@
+{
+    "baudrate": "baudrate",
+    "device": "dispositif",
+    "devices": "dispositifs",
+    "disable_broadcast_hint": "pour désactiver l'envoi de l'intervalle de données diffusé à -1; 0 utilisera une valeur standard codée en dur.",
+    "send_interval_broadcast": "envoi d'intervalles [s]",
+    "serialport": "port série",
+    "type": "type",
+    "used": "utilisé"
+}
