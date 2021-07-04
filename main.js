@@ -774,7 +774,13 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
 
     //adapter.log.debug("update " + source + "." + stype + " with " + value + " " + sdataunit + " bytenumber: " + bytenumber);
 
-    adapter.setState(source + "." + stype, { val: value, ack: true });
+    const nValue = parseFloat(value);
+
+    if (isNaN(nValue)) {
+        adapter.log.debug(source + " is not a number " + value + " " + nValue + " " + typeof nValue);
+    }
+
+    adapter.setState(source + "." + stype, { val: nValue, ack: true });
 
     return bytenumber;
 }
