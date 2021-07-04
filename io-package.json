@@ -41,6 +41,18 @@
             }
         },
         "title": "OpenHomeControl",
+        "titleLang": {
+            "en": "OpenHomeControl",
+            "de": "OpenHomeControl",
+            "ru": "OpenHomeControl",
+            "pt": "OpenHomeControl",
+            "nl": "OpenHomeControl",
+            "fr": "OpenHomeControl",
+            "it": "OpenHomeControl",
+            "es": "OpenHomeControl",
+            "pl": "OpenHomeControl",
+            "zh-cn": "开放家庭控制"
+        },
         "desc": {
             "en": "OpenHomeControl Adapter",
             "de": "OpenHomeControl Adapter",
