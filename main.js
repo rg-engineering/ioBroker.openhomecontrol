@@ -282,6 +282,18 @@ function receiveSerialData(data) {
 
 function AddDatapoints4Display(id) {
     //adapter.log.debug("found a display; add datapoints");
+
+    AddObject(id + "." + "Temp2Display", "number", "Temperature", "°C", "Sensor");
+    AddObject(id + "." + "TempForecast2Display", "number", "Temperature", "°C", "Sensor");
+    AddObject(id + "." + "Humidity2Display", "number", "Humidity", "%", "Sensor");
+
+    AddObject(id + "." + "Pressure2Display", "number", "Pressure", "kPs", "Sensor");
+    AddObject(id + "." + "WeatherIconString2Display", "number", "WeatherIcon String Forecast", "", "Sensor");
+    AddObject(id + "." + "WeatherIconID2Display", "number", "WeatherIcon ID Forecast", "", "Sensor");
+    AddObject(id + "." + "PoP2Display", "number", "Percentage of precipitation Forecast", "%", "Sensor");
+    AddObject(id + "." + "Rain2Display", "number", "Rain Forecast", "mm", "Sensor");
+
+    /*
     adapter.setObjectNotExists(id + "." + "Temp2Display", {
         type: "state",
         common: {
@@ -294,7 +306,7 @@ function AddDatapoints4Display(id) {
             unit: "°C"
         }
     });
-
+    
     adapter.setObjectNotExists(id + "." + "TempForecast2Display", {
         type: "state",
         common: {
@@ -307,7 +319,7 @@ function AddDatapoints4Display(id) {
             unit: "°C"
         }
     });
-
+    
 
     adapter.setObjectNotExists(id + "." + "Humidity2Display", {
         type: "state",
@@ -321,7 +333,7 @@ function AddDatapoints4Display(id) {
             unit: "%"
         }
     });
-
+    
     adapter.setObjectNotExists(id + "." + "Pressure2Display", {
         type: "state",
         common: {
@@ -384,6 +396,7 @@ function AddDatapoints4Display(id) {
             unit: "mm"
         }
     });
+    */
 }
 
 
@@ -495,6 +508,10 @@ function receiveSerialDataRaw(dataorg) {
                     bytenumber = InterpreteDatapoint(dataArray, bytenumber, source);
                 }
             }
+
+            const now = new Date();
+            AddObject(source + ".LastUpdate", typeof now, "Last update", "", "indicator.date");
+            /*
             adapter.setObjectNotExists(source + ".LastUpdate", {
                 type: "state",
                 common: {
@@ -505,8 +522,8 @@ function receiveSerialDataRaw(dataorg) {
                     write: false
                 }
             });
-            const theDate = new Date();
-            adapter.setState(source + ".LastUpdate", { val: theDate.toString(), ack: true });
+            */
+            adapter.setState(source + ".LastUpdate", { val: now.toString(), ack: true });
 
             obj.LastUpdate = theDate.toString();
 
@@ -758,7 +775,8 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
     
 
     //Object openhomecontrol.0.600000FEFE.Humidity is invalid: obj.common.type has an invalid value(state) but has to be one of number, string, boolean, array, object, mixed, file, json
- 
+    AddObject(source + "." + stype, "number", stype, sdataunit, "Sensor");
+    /*
     adapter.setObjectNotExists(source + "." + stype, {
         type: "state",
         common: {
@@ -771,7 +789,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
             write: false
         }
     });
-
+    */
     //adapter.log.debug("update " + source + "." + stype + " with " + value + " " + sdataunit + " bytenumber: " + bytenumber);
 
     const nValue = parseFloat(value);
@@ -785,7 +803,52 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
     return bytenumber;
 }
 
+async function AddObject(key, type, name, unit, role) {
 
+    adapter.log.debug("addObject " + key);
+
+    await adapter.setObjectNotExistsAsync(key, {
+        type: "state",
+        common: {
+            name: name,
+            type: type,
+            role: role,
+            unit: unit,
+            read: true,
+            write: false
+        },
+        native: {
+            location: key
+        }
+    });
+
+    const obj = await adapter.getObjectAsync(key);
+
+    if (obj != null) {
+        //adapter.log.debug(" got Object " + JSON.stringify(obj));
+        if (obj.common.name != name
+            || obj.common.type != type
+            || obj.common.role != "value"
+            || obj.common.unit != unit   ) {
+            adapter.log.debug(" !!! need to change for " + key);
+            await adapter.extendObject(key, {
+                type: "state",
+                common: {
+                    name: name,
+                    type: type,
+                    role: role,
+                    unit: unit,
+                    read: true,
+                    write: false
+                },
+                native: {
+                    location: key
+                }
+            });
+        }
+
+    }
+}
 
 function showPortClose() {
     adapter.log.debug("port closed.");
