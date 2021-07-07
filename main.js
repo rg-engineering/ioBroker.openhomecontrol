@@ -525,7 +525,7 @@ function receiveSerialDataRaw(dataorg) {
             */
             adapter.setState(source + ".LastUpdate", { val: now.toString(), ack: true });
 
-            obj.LastUpdate = theDate.toString();
+            obj.LastUpdate = now.toString();
 
 
             if (type === 0x03) {
