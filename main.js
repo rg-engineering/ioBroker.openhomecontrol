@@ -829,7 +829,8 @@ async function AddObject(key, type, name, unit, role, write=false) {
         if (obj.common.name != name
             || obj.common.type != type
             || obj.common.role != "value"
-            || obj.common.unit != unit   ) {
+            || obj.common.unit != unit
+            || obj.common.write != write        ) {
             adapter.log.debug(" !!! need to change for " + key);
             await adapter.extendObject(key, {
                 type: "state",
@@ -839,7 +840,7 @@ async function AddObject(key, type, name, unit, role, write=false) {
                     role: role,
                     unit: unit,
                     read: true,
-                    write: false
+                    write: write
                 },
                 native: {
                     location: key
