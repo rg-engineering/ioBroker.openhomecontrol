@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "openhomecontrol",
-        "version": "1.2.3",
+        "version": "1.2.4",
         "news": {
-            "1.2.3": {
+            "1.2.4": {
                 "en": "remove warning regarding wrong datatype with js-controller 3.3",
                 "de": "Entfernen Sie die Warnung bezüglich des falschen Datentyps mit js-controller 3.3",
                 "ru": "удалить предупреждение о неправильном типе данных с помощью js-controller 3.3",

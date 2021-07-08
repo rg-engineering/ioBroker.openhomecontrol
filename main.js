@@ -283,15 +283,15 @@ function receiveSerialData(data) {
 function AddDatapoints4Display(id) {
     //adapter.log.debug("found a display; add datapoints");
 
-    AddObject(id + "." + "Temp2Display", "number", "Temperature", "°C", "Sensor");
-    AddObject(id + "." + "TempForecast2Display", "number", "Temperature", "°C", "Sensor");
-    AddObject(id + "." + "Humidity2Display", "number", "Humidity", "%", "Sensor");
+    AddObject(id + "." + "Temp2Display", "number", "Temperature", "°C", "Sensor",true);
+    AddObject(id + "." + "TempForecast2Display", "number", "Temperature", "°C", "Sensor", true);
+    AddObject(id + "." + "Humidity2Display", "number", "Humidity", "%", "Sensor", true);
 
-    AddObject(id + "." + "Pressure2Display", "number", "Pressure", "kPs", "Sensor");
-    AddObject(id + "." + "WeatherIconString2Display", "number", "WeatherIcon String Forecast", "", "Sensor");
-    AddObject(id + "." + "WeatherIconID2Display", "number", "WeatherIcon ID Forecast", "", "Sensor");
-    AddObject(id + "." + "PoP2Display", "number", "Percentage of precipitation Forecast", "%", "Sensor");
-    AddObject(id + "." + "Rain2Display", "number", "Rain Forecast", "mm", "Sensor");
+    AddObject(id + "." + "Pressure2Display", "number", "Pressure", "kPs", "Sensor", true);
+    AddObject(id + "." + "WeatherIconString2Display", "number", "WeatherIcon String Forecast", "", "Sensor", true);
+    AddObject(id + "." + "WeatherIconID2Display", "number", "WeatherIcon ID Forecast", "", "Sensor", true);
+    AddObject(id + "." + "PoP2Display", "number", "Percentage of precipitation Forecast", "%", "Sensor", true);
+    AddObject(id + "." + "Rain2Display", "number", "Rain Forecast", "mm", "Sensor", true);
 
     /*
     adapter.setObjectNotExists(id + "." + "Temp2Display", {
@@ -803,7 +803,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
     return bytenumber;
 }
 
-async function AddObject(key, type, name, unit, role) {
+async function AddObject(key, type, name, unit, role, write=false) {
 
     adapter.log.debug("addObject " + key);
 
@@ -815,7 +815,7 @@ async function AddObject(key, type, name, unit, role) {
             role: role,
             unit: unit,
             read: true,
-            write: false
+            write: write
         },
         native: {
             location: key
