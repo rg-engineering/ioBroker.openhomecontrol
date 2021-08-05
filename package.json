@@ -19,7 +19,7 @@
     "url": "https://github.com/rg-engineering/ioBroker.openhomecontrol"
   },
   "dependencies": {
-    "@iobroker/adapter-core": "2.5.0",
+    "@iobroker/adapter-core": "2.5.1",
     "@sentry/node": "6.9.0",
     "serialport": "9.2.0"
   },
