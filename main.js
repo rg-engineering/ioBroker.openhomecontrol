@@ -510,7 +510,7 @@ function receiveSerialDataRaw(dataorg) {
             }
 
             const now = new Date();
-            AddObject(source + ".LastUpdate", typeof now, "Last update", "", "indicator.date");
+            AddObject(source + ".LastUpdate", "string", "Last update", "", "indicator.date");
             /*
             adapter.setObjectNotExists(source + ".LastUpdate", {
                 type: "state",
@@ -805,7 +805,7 @@ function InterpreteDatapoint(dataArray, bytenumber, source) {
 
 async function AddObject(key, type, name, unit, role, write=false) {
 
-    adapter.log.debug("addObject " + key);
+    adapter.log.debug("addObject " + key + " " + JSON.stringify(type) + " " + unit + " " + role + " " + write);
 
     await adapter.setObjectNotExistsAsync(key, {
         type: "state",
@@ -824,14 +824,24 @@ async function AddObject(key, type, name, unit, role, write=false) {
 
     const obj = await adapter.getObjectAsync(key);
 
+    /*
+      !!! need to change for 87FB30030800.LastUpdate {"type":"state","common":{"name":"Last update","type":"object","role":"indicator.date","read":true,"write":false,"unit":""},"from":"system.adapter.openhomecontrol.0","user":"system.user.admin","ts":1633712555559,"_id":"openhomecontrol.0.87FB30030800.LastUpdate","acl":{"object":1636,"state":1636,"owner":"system.user.admin","ownerGroup":"system.group.administrator"},"native":{"location":"87FB30030800.LastUpdate"}} 
+      
+      should be Last update object false
+     
+        !!! need to change for 1A0000000000.Humidity {"type":"state","common":{"name":"Humidity","type":"number","role":"Sensor","function":"","unit":"%","read":true,"write":false},"from":"system.adapter.openhomecontrol.1","user":"system.user.admin","ts":1633718844365,"_id":"openhomecontrol.1.1A0000000000.Humidity","acl":{"object":1636,"state":1636,"owner":"system.user.admin","ownerGroup":"system.group.administrator"},"native":{"location":"1A0000000000.Humidity"}} 
+        should be Humiditynumber % false
+
+     */
+
     if (obj != null) {
         //adapter.log.debug(" got Object " + JSON.stringify(obj));
         if (obj.common.name != name
             || obj.common.type != type
-            || obj.common.role != "value"
+            || obj.common.role != role
             || obj.common.unit != unit
             || obj.common.write != write) {
-            adapter.log.debug(" !!! need to change for " + key + " " + JSON.stringify(obj) + " should be " + name + type + " " + unit + " " + write );
+            adapter.log.debug(" !!! need to change for " + key + " " + JSON.stringify(obj) + " should be " + name + " " + type + " " + unit + " " + write );
             await adapter.extendObject(key, {
                 type: "state",
                 common: {
