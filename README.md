@@ -95,6 +95,10 @@ With broadcast function adapter sends date and time information to every device.
 
 
 ## Changelog
+
+### 1.2.6 (in progress)
+
+
 ### 1.2.5 (2021-07-08)
 * (René) bug fix: remove warning regarding wrong datatype with js-controller 3.3
 * (René) dependencies updated

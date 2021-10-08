@@ -830,8 +830,8 @@ async function AddObject(key, type, name, unit, role, write=false) {
             || obj.common.type != type
             || obj.common.role != "value"
             || obj.common.unit != unit
-            || obj.common.write != write        ) {
-            adapter.log.debug(" !!! need to change for " + key);
+            || obj.common.write != write) {
+            adapter.log.debug(" !!! need to change for " + key + " " + JSON.stringify(obj) + " should be " + name + type + " " + unit + " " + write );
             await adapter.extendObject(key, {
                 type: "state",
                 common: {

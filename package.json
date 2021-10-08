@@ -1,6 +1,6 @@
 {
   "name": "iobroker.openhomecontrol",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "ioBroker OpenHomeControl Adapter",
   "author": {
     "name": "René G.",
@@ -20,11 +20,11 @@
   },
   "dependencies": {
     "@iobroker/adapter-core": "2.5.1",
-    "@sentry/node": "6.9.0",
-    "serialport": "9.2.0"
+    "@sentry/node": "6.13.2",
+    "serialport": "9.2.4"
   },
   "devDependencies": {
-    "@iobroker/testing": "2.4.4",
+    "@iobroker/testing": "2.5.2",
     "@types/chai": "4.2.19",
     "@types/chai-as-promised": "7.1.4",
     "@types/gulp": "4.0.8",
