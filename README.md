@@ -96,6 +96,9 @@ With broadcast function adapter sends date and time information to every device.
 
 ## Changelog
 
+### 1.2.9 (2023-04-07)
+* (René) update of dependencies
+
 ### 1.2.8 (2023-01-31)
 * (René) update of dependencies
 

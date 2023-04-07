@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "openhomecontrol",
-        "version": "1.2.8",
+        "version": "1.2.9",
         "news": {
-            "1.2.8": {
+            "1.2.9": {
                 "en": "dependencies updated",
                 "de": "Abhängigkeiten aktualisiert",
                 "ru": "зависимости обновлены",
