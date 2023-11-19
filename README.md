@@ -101,6 +101,9 @@ With broadcast function adapter sends date and time information to every device.
   ### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+* (René) update of dependencies
+
 ### 1.2.9 (2023-04-07)
 * (René) update of dependencies
 

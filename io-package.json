@@ -1,9 +1,9 @@
 {
     "common": {
         "name": "openhomecontrol",
-        "version": "1.2.9",
+        "version": "1.2.10",
         "news": {
-            "1.2.9": {
+            "1.2.10": {
                 "en": "dependencies updated",
                 "de": "Abhängigkeiten aktualisiert",
                 "ru": "зависимости обновлены",
@@ -64,9 +64,9 @@
             }
         ],
         "plugins": {
-          "sentry": {
-            "dsn": "https://225481d692324d3e9e49959589edb8b6@o390433.ingest.sentry.io/5434785"
-          }
+            "sentry": {
+                "dsn": "https://225481d692324d3e9e49959589edb8b6@o390433.ingest.sentry.io/5434785"
+            }
         },
         "compact": true,
         "authors": [
