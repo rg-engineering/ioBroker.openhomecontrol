@@ -1,91 +1,104 @@
 {
-    "common": {
-        "name": "openhomecontrol",
-        "version": "1.2.10",
-        "news": {
-            "1.2.10": {
-                "en": "dependencies updated",
-                "de": "Abhängigkeiten aktualisiert",
-                "ru": "зависимости обновлены",
-                "pt": "dependências atualizadas",
-                "nl": "afhankelijkheden bijgewerkt",
-                "fr": "dépendances mises à jour",
-                "it": "dipendenze aggiornate",
-                "es": "dependencias actualizadas",
-                "pl": "zaktualizowano zależności",
-                "zh-cn": "已更新依赖项",
-                "uk": "залежності оновлено"
-            }
-        },
-        "titleLang": {
-            "en": "OpenHomeControl",
-            "de": "OpenHomeControl",
-            "ru": "OpenHomeControl",
-            "pt": "OpenHomeControl",
-            "nl": "OpenHomeControl",
-            "fr": "OpenHomeControl",
-            "it": "OpenHomeControl",
-            "es": "OpenHomeControl",
-            "pl": "OpenHomeControl",
-            "zh-cn": "开放家庭控制",
-            "uk": "OpenHomeControl"
-        },
-        "desc": {
-            "en": "OpenHomeControl Adapter",
-            "de": "OpenHomeControl Adapter",
-            "ru": "OpenHomeControl Adapter",
-            "pt": "Adaptador OpenHomeControl",
-            "nl": "OpenHomeControl-adapter",
-            "fr": "Adaptateur OpenHomeControl",
-            "it": "OpenHomeControl Adapter",
-            "es": "Adaptador OpenHomeControl",
-            "pl": "Adapter OpenHomeControl",
-            "zh-cn": "OpenHomeControl适配器",
-            "uk": "Адаптер OpenHomeControl"
-        },
-        "platform": "Javascript/Node.js",
-        "mode": "daemon",
-        "icon": "openhomecontrol.png",
-        "enabled": true,
-        "messagebox": true,
-        "extIcon": "https://raw.githubusercontent.com/rg-engineering/ioBroker.openhomecontrol/master/admin/openhomecontrol.png",
-        "keywords": [
-            "openhomecontrol"
-        ],
-        "readme": "https://github.com/rg-engineering/ioBroker.openhomecontrol/blob/master/README.md",
-        "loglevel": "debug",
-        "stopBeforeUpdate": true,
-        "type": "hardware",
-        "license": "MIT",
-        "materialize": true,
-        "dependencies": [
-            {
-                "js-controller": ">=2.0.0"
-            }
-        ],
-        "plugins": {
-            "sentry": {
-                "dsn": "https://225481d692324d3e9e49959589edb8b6@o390433.ingest.sentry.io/5434785"
-            }
-        },
-        "compact": true,
-        "authors": [
-            {
-                "name": "René G.",
-                "email": "info@rg-engineering.eu"
-            }
-        ],
-        "connectionType": "local",
-        "dataSource": "push",
-        "adminUI": {
-            "config": "materialize"
-        }
+  "common": {
+    "name": "openhomecontrol",
+    "version": "1.2.11",
+    "news": {
+      "1.2.11": {
+        "en": "(René) update of dependencies",
+        "de": "(René) Aktualisierung der Abhängigkeiten",
+        "ru": "(René) обновление зависимостей",
+        "pt": "(René) atualização de dependências",
+        "nl": "(René) bijwerking van afhankelijkheden",
+        "fr": "(René) mise à jour des dépendances",
+        "it": "(René) aggiornamento delle dipendenze",
+        "es": "(René) actualización de las dependencias",
+        "pl": "(René) aktualizacja zależności",
+        "uk": "(René) оновлення залежностей",
+        "zh-cn": "(René) 属地更新"
+      },
+      "1.2.10": {
+        "en": "dependencies updated",
+        "de": "Abhängigkeiten aktualisiert",
+        "ru": "зависимости обновлены",
+        "pt": "dependências atualizadas",
+        "nl": "afhankelijkheden bijgewerkt",
+        "fr": "dépendances mises à jour",
+        "it": "dipendenze aggiornate",
+        "es": "dependencias actualizadas",
+        "pl": "zaktualizowano zależności",
+        "zh-cn": "已更新依赖项",
+        "uk": "залежності оновлено"
+      }
     },
-    "native": {
-        "serialport": "COM7",
-        "baudrate": 57600,
-        "sendInterval2Display": 180,
-        "sendIntervalBroadcast": 60,
-        "devices": []
+    "titleLang": {
+      "en": "OpenHomeControl",
+      "de": "OpenHomeControl",
+      "ru": "OpenHomeControl",
+      "pt": "OpenHomeControl",
+      "nl": "OpenHomeControl",
+      "fr": "OpenHomeControl",
+      "it": "OpenHomeControl",
+      "es": "OpenHomeControl",
+      "pl": "OpenHomeControl",
+      "zh-cn": "开放家庭控制",
+      "uk": "OpenHomeControl"
+    },
+    "desc": {
+      "en": "OpenHomeControl Adapter",
+      "de": "OpenHomeControl Adapter",
+      "ru": "OpenHomeControl Adapter",
+      "pt": "Adaptador OpenHomeControl",
+      "nl": "OpenHomeControl-adapter",
+      "fr": "Adaptateur OpenHomeControl",
+      "it": "OpenHomeControl Adapter",
+      "es": "Adaptador OpenHomeControl",
+      "pl": "Adapter OpenHomeControl",
+      "zh-cn": "OpenHomeControl适配器",
+      "uk": "Адаптер OpenHomeControl"
+    },
+    "platform": "Javascript/Node.js",
+    "mode": "daemon",
+    "icon": "openhomecontrol.png",
+    "enabled": true,
+    "messagebox": true,
+    "extIcon": "https://raw.githubusercontent.com/rg-engineering/ioBroker.openhomecontrol/master/admin/openhomecontrol.png",
+    "keywords": [
+      "openhomecontrol"
+    ],
+    "readme": "https://github.com/rg-engineering/ioBroker.openhomecontrol/blob/master/README.md",
+    "loglevel": "debug",
+    "stopBeforeUpdate": true,
+    "type": "hardware",
+    "license": "MIT",
+    "materialize": true,
+    "dependencies": [
+      {
+        "js-controller": ">=2.0.0"
+      }
+    ],
+    "plugins": {
+      "sentry": {
+        "dsn": "https://225481d692324d3e9e49959589edb8b6@o390433.ingest.sentry.io/5434785"
+      }
+    },
+    "compact": true,
+    "authors": [
+      {
+        "name": "René G.",
+        "email": "info@rg-engineering.eu"
+      }
+    ],
+    "connectionType": "local",
+    "dataSource": "push",
+    "adminUI": {
+      "config": "materialize"
     }
+  },
+  "native": {
+    "serialport": "COM7",
+    "baudrate": 57600,
+    "sendInterval2Display": 180,
+    "sendIntervalBroadcast": 60,
+    "devices": []
+  }
 }
