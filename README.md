@@ -109,6 +109,10 @@ With broadcast function adapter sends date and time information to every device.
   Placeholder for the next version (at the beginning of the line):
   ### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+* (René) update of dependencies
+
 ### 1.2.10 (2023-11-19)
 * (René) update of dependencies
 
@@ -205,7 +209,7 @@ With broadcast function adapter sends date and time information to every device.
 ## License
 MIT License
 
-Copyright (c) 2017-2023 rg-engineering info@rg-engineering.eu
+Copyright (c) 2017-2024 René G. <info@rg-engineering.eu>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
