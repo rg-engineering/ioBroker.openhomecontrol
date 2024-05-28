@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "openhomecontrol",
-    "version": "1.2.11",
+    "version": "1.2.12",
     "news": {
+      "1.2.12": {
+        "en": "(René) change of dependencies",
+        "de": "(René) Veränderung der Abhängigkeiten",
+        "ru": "(René) изменение зависимостей",
+        "pt": "(René) mudança de dependências",
+        "nl": "(René) verandering van afhankelijkheden",
+        "fr": "(René) changement de dépendances",
+        "it": "(René) cambiamento delle dipendenze",
+        "es": "(René) cambio de dependencia",
+        "pl": "(René) zmiana zależności",
+        "uk": "(Рене) зміна залежностей",
+        "zh-cn": "(René) 属地变化"
+      },
       "1.2.11": {
         "en": "(René) update of dependencies",
         "de": "(René) Aktualisierung der Abhängigkeiten",
