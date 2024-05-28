@@ -232,15 +232,6 @@ function receiveSerialData(data) {
         
     }
 
-    /*
-    //only once after boot of Nano
-    if (receivedData.indexOf("RAM") >= 0) {
-        receivedData = "";
-        setTimeout(function () {
-            SetMode();
-        }, 2000);
-    }
-    */
 
     //telegram starts with I and ends with J
     if (receivedData.indexOf("I") >= 0 && receivedData.indexOf("J") > 0) {
