@@ -24,8 +24,7 @@ let receivedData = "";
 //let CompareErrCnt = 0;
 
 let SendTimerBroadcast = null;
-//var Watchdog = null;
-//var Waitung4Watchdog = false;
+
 
 
 const DataToSend = {};
@@ -161,12 +160,7 @@ async function main() {
     else {
         adapter.log.warn("port is not created, probably a configuration error?");
     }
-   
-
-
-   
-
-
+  
     try {
         if (SendTimerBroadcast==null && options.sendIntervalBroadcast > 0) {
             adapter.log.debug("init timer broadcast with " + options.sendIntervalBroadcast + "s");
@@ -175,21 +169,12 @@ async function main() {
             }, options.sendIntervalBroadcast * 1000);
             
         }
-
-        //var _Watchdog = setInterval(function () {
-        //     WatchDog();
-        // }, 60000);
-        // Watchdog = _Watchdog;
-
     }
     catch (e) {
         adapter.log.error("exception in  init timer [" + e + "]");
     }
 
 }
-
-
-
 
 function showPortOpen() {
 
