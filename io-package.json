@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "openhomecontrol",
-    "version": "1.2.12",
+    "version": "1.2.13",
     "news": {
+      "1.2.13": {
+        "en": "(René) bugfix: clearInterval instead of clearTimout",
+        "de": "(René) bugfix: clearInterval statt klar Timing",
+        "ru": "(René) ошибка: clearInterval вместо чистого Timout",
+        "pt": "(René) bugfix: clearInterval em vez de clear Timout",
+        "nl": "(René) bugfix: clearInterval in plaats van clear Timout",
+        "fr": "(René) bugfix: clearInterval au lieu de clear Timout",
+        "it": "(René) bugfix: clearInterval invece di chiaro Timout",
+        "es": "(René) bugfix: clearInterval en lugar de claro Timout",
+        "pl": "(René) bugfix: clearInterval zamiast clear Czas",
+        "uk": "(René) Виправлення помилок: clearInterval замість чіткого Тимур",
+        "zh-cn": "(René) 错误修复: 清除Interval 而不是清除 点火"
+      },
       "1.2.12": {
         "en": "(René) change of dependencies",
         "de": "(René) Veränderung der Abhängigkeiten",
