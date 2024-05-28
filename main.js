@@ -84,7 +84,7 @@ function startAdapter(options) {
         unload: function (callback) {
             try {
                 if (SendTimerBroadcast != null) {
-                    clearTimeout(SendTimerBroadcast);
+                    clearInterval(SendTimerBroadcast);
                     adapter.log.debug("timer killed");
                 }
                 callback();
