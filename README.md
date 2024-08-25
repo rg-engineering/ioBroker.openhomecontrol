@@ -109,6 +109,9 @@ With broadcast function adapter sends date and time information to every device.
   Placeholder for the next version (at the beginning of the line):
   ### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+* (René) update dependencies
+
 ### 1.2.13 (2024-05-28)
 * (René) bugfix: clearInterval instead of clearTimout
 
