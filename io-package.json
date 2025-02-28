@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "openhomecontrol",
-    "version": "1.2.14",
+    "version": "1.2.15",
     "news": {
+      "1.2.15": {
+        "en": "update dependencies\nchanges requested by adapter checker",
+        "de": "aktualisierung der abhängigkeiten\nänderungen, die von adapter checker angefordert werden",
+        "ru": "обновление зависимостей\nизменения, запрошенные adapter checker",
+        "pt": "dependências\nalterações solicitadas pelo verificador do adaptador",
+        "nl": "afhankelijkheden bijwerken\nwijzigingen gevraagd door adaptercontrole",
+        "fr": "mettre à jour les dépendances\nmodifications demandées par l'adaptateur checker",
+        "it": "aggiornamento dipendenze\nmodifiche richieste da adattatore checker",
+        "es": "dependencias de actualización\ncambios solicitados por el adaptador",
+        "pl": "aktualizacji zależności\nzmiany wymagane przez sprawdzacz adaptera",
+        "uk": "оновлення залежності\nзміни, які вимагаються перевіркою адаптера",
+        "zh-cn": "更新依赖关系\n适配器检查器要求的更改"
+      },
       "1.2.14": {
         "en": "update dependencies",
         "de": "aktualisierung der abhängigkeiten",
