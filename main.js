@@ -1,3 +1,4 @@
+/* eslint-disable prefer-template */
 /*
  * myhomecontrol adapter für iobroker
  *
@@ -48,8 +49,7 @@ function startAdapter(options) {
             try {
                 //adapter.log.debug('start');
                 main();
-            }
-            catch (e) {
+            } catch (e) {
                 adapter.log.error("exception catch after ready [" + e + "]");
             }
         },
@@ -62,7 +62,9 @@ function startAdapter(options) {
                         adapter.log.debug("send command");
 
                         // Send response in callback if required
-                        if (obj.callback) adapter.sendTo(obj.from, obj.command, "Message received", obj.callback);
+                        if (obj.callback) {
+adapter.sendTo(obj.from, obj.command, "Message received", obj.callback);
+}
                         break;
                     case "listUart":
                         //cmd comes typically from adpater settings page
@@ -89,6 +91,7 @@ function startAdapter(options) {
                 }
                 callback();
             } catch (e) {
+                adapter.log.error("exception catch after unload [" + e + "]");
                 callback();
             }
         }
@@ -143,8 +146,7 @@ async function main() {
         } catch (e) {
             adapter.log.error("Serial port is not created [" + e + "]");
         }
-    }
-    else {
+    } else {
         adapter.log.warn("port " + options.serialport + " not found, please select correct port");
     }
 
@@ -156,8 +158,7 @@ async function main() {
         myPort.on("close", showPortClose);
         myPort.on("error", showError);
         adapter.log.info("OpenHomeControl used in raw mode");
-    }
-    else {
+    } else {
         adapter.log.warn("port is not created, probably a configuration error?");
     }
   
@@ -169,8 +170,7 @@ async function main() {
             }, options.sendIntervalBroadcast * 1000);
             
         }
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  init timer [" + e + "]");
     }
 
@@ -185,9 +185,7 @@ function showPortOpen() {
             adapter.log.debug("port open: " + myPort.baudRate);
 
         }
-    }
-
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  showPortOpen [" + e + "]");
     }
 }
@@ -229,7 +227,7 @@ function receiveSerialData(data) {
     if (receivedData.indexOf("too many data") >= 0) {
         receivedData = "";
         adapter.log.error("message to sender too long");
-        
+
     }
 
 
@@ -237,18 +235,7 @@ function receiveSerialData(data) {
     if (receivedData.indexOf("I") >= 0 && receivedData.indexOf("J") > 0) {
         //adapter.log.debug('now going to interprete ' + receivedData);
         receiveSerialDataRaw(receivedData);
-    }
-    /*
-    else if (receivedData.indexOf("X") >= 0 && receivedData.indexOf("Y") > 0) {
-        adapter.log.debug('now going to interprete ' + receivedData);
-        receiveSerialDataRaw(receivedData);
-    }
-    else if (receivedData.indexOf("I") < 0 && receivedData.indexOf("X") < 0) {
-        //ignore the rest...
-        receivedData = "";
-    }
-    */
-    else if (receivedData.indexOf("I") < 0 ) {
+    } else if (receivedData.indexOf("I") < 0) {
         //ignore the rest...
         receivedData = "";
     }
@@ -473,12 +460,11 @@ function receiveSerialDataRaw(dataorg) {
                 AddDatapoints4Display(source);
             }
 
-            if (datapoints > 100) // shouldnt be... 
-            {
+            // shouldnt be... 
+            if (datapoints > 100) {
                 //too many! 87,fb,30,03,08,00,fe,fe,fe,fe,fe,fe,03,80,J
                 adapter.log.warn("too many! " + dataArray);
-            }
-            else {
+            } else {
                 // than all datapoints
                 for (let i = 0; i < datapoints; i++) {
                     bytenumber = InterpreteDatapoint(dataArray, bytenumber, source);
@@ -508,8 +494,7 @@ function receiveSerialDataRaw(dataorg) {
                 
                 SendData2Display(source);
             }
-        }
-        else {
+        } else {
 
             const obj1 = findObjectByKey(newDevices, "name", source);
             const theDate = new Date();
@@ -523,16 +508,14 @@ function receiveSerialDataRaw(dataorg) {
                     LastUpdate: theDate.toString()
 
                 });
-            }
-            else {
+            } else {
                 //adapter.log.debug(source + " already in list");
                 if (obj1 != null) {
                     obj1.LastUpdate = theDate.toString();
                 }
             }
         }
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in receiveSerialDataRaw [" + e + "]");
     }
     receivedData = "";
@@ -871,8 +854,7 @@ function AddHeader(target, DisplayID) {
         DataToSend[IDX_TARGET + 3] = 0xFE;
         DataToSend[IDX_TARGET + 4] = 0xFE;
         DataToSend[IDX_TARGET + 5] = 0xFE;
-    }
-    else {
+    } else {
         //to do: über alle displays
         //98EF82180000
 
@@ -997,8 +979,7 @@ async function AddTemperature(DisplayID) {
         //AddHumidity(DisplayID);
 
 
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  AddTemperature [" + e + "]");
     }
 }
@@ -1040,8 +1021,7 @@ async function AddHumidity(DisplayID) {
         }
         //AddPoP(DisplayID);
 
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  AddHumidity [" + e + "]");
     }
 }
@@ -1075,8 +1055,7 @@ async function AddPoP(DisplayID) {
         }
         //AddAirPressure(DisplayID);
 
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  AddPoP [" + e + "]");
     }
 }
@@ -1116,8 +1095,7 @@ async function AddAirPressure(DisplayID) {
         }
         // AddWeatherIconIdFromString(DisplayID);
 
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  AddAirPressure [" + e + "]");
     }
 }
@@ -1261,14 +1239,12 @@ async function AddWeatherIconIdFromString(DisplayID) {
 
             //do not add another icon...
             //AddTemperatureForecast(DisplayID);
-        }
-        else {
+        } else {
             //AddWeatherIconIdFromID(DisplayID);
             //sendSerialDataRaw();
         }
 
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  AddWeatherIconIdFromString [" + e + "]");
     }
 }
@@ -1303,8 +1279,7 @@ async function AddWeatherIconIdFromID(DisplayID) {
         //AddTemperatureForecast(DisplayID);
 
 
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  AddWeatherIconIdFromID [" + e + "]");
     }
 }
@@ -1346,8 +1321,7 @@ async function AddTemperatureForecast(DisplayID) {
         //AddRainForecast(DisplayID);
 
 
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  AddTemperatureForecast [" + e + "]");
     }
 
@@ -1383,8 +1357,7 @@ async function AddRainForecast(DisplayID) {
         }
 
         //sendSerialDataRaw();
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  AddRainForecast [" + e + "]");
     }
 }
@@ -1438,8 +1411,7 @@ async function SendDataBroadcast() {
         AddHeader(0xFE,"");
         AddDate();
         AddTime();
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  SendData [" + e + "] ");
     }
     await sendSerialDataRaw(); 
@@ -1466,8 +1438,7 @@ async function SendData2Display(DisplayID) {
         await AddRainForecast(DisplayID);
         await sendSerialDataRaw();
 
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  SendData [" + e + "] " + DisplayID);
     }
     //sendSerialDataRaw(); it's called in AddPressure finally
@@ -1502,8 +1473,7 @@ async function sendSerialDataRaw() {
 
         buffer = null;
 
-    }
-    catch (e) {
+    } catch (e) {
         adapter.log.error("exception in  sendSerialDataRaw [" + e + "]");
     }
     AlreadySending = false;
