@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "openhomecontrol",
-    "version": "1.2.15",
+    "version": "1.2.16",
     "news": {
+      "1.2.16": {
+        "en": "new testing\nchanges requested by adapter checker",
+        "de": "neue tests\nänderungen, die von adapter checker angefordert werden",
+        "ru": "новые испытания\nизменения, запрошенные adapter checker",
+        "pt": "novos testes\nalterações solicitadas pelo verificador de adaptadores",
+        "nl": "nieuwe tests\nwijzigingen gevraagd door adaptercontrole",
+        "fr": "nouveaux essais\nmodifications demandées par l'adaptateur checker",
+        "it": "nuovi test\nmodifiche richieste da adattatore checker",
+        "es": "nuevas pruebas\ncambios solicitados por el adaptador",
+        "pl": "nowe badania\nzmiany wymagane przez sprawdzacz adaptera",
+        "uk": "новий тест\nзміни, які вимагаються перевіркою адаптера",
+        "zh-cn": "新测试\n适配器检查器要求的更改"
+      },
       "1.2.15": {
         "en": "update dependencies\nchanges requested by adapter checker",
         "de": "aktualisierung der abhängigkeiten\nänderungen, die von adapter checker angefordert werden",
@@ -136,7 +149,6 @@
         "admin": ">=7.6.17"
       }
     ],
-
     "plugins": {
       "sentry": {
         "dsn": "https://225481d692324d3e9e49959589edb8b6@o390433.ingest.sentry.io/5434785"
