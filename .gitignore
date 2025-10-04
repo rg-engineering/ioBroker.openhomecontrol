@@ -12,3 +12,4 @@ lib/i18n/*/flat.txt
 /.settings/
 *.orig
 /typings/
+/.vscode/extensions.json

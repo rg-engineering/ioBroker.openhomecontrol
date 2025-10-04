@@ -128,9 +128,15 @@
     },
     "dependencies": [
       {
-        "js-controller": ">=5.0.19"
+        "js-controller": ">=6.0.11"
       }
     ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.17"
+      }
+    ],
+
     "plugins": {
       "sentry": {
         "dsn": "https://225481d692324d3e9e49959589edb8b6@o390433.ingest.sentry.io/5434785"
