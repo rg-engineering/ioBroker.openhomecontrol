@@ -13,3 +13,5 @@ lib/i18n/*/flat.txt
 *.orig
 /typings/
 /.vscode/extensions.json
+/bin/Microsoft.NodejsTools.WebRole.dll
+/obj/Debug/
