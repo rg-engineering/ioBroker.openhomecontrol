@@ -1479,16 +1479,7 @@ async function sendSerialDataRaw() {
     AlreadySending = false;
 }
 
-/*
-function DeleteDevices() {
-    adapter.getDevices(function (err, devices) {
-        for (let d = 0; d < devices.length; d++) {
-            //adapter.deleteDevice(devices[d]._id);
-            adapter.log.debug(devices[d]._id);
-        }
-    });
-}
-*/
+
 
 async function ListUarts(obj) {
 
