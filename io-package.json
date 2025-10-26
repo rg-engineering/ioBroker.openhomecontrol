@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "openhomecontrol",
-    "version": "1.2.16",
+    "version": "1.2.17",
     "news": {
+      "1.2.17": {
+        "en": "bug fix sentry",
+        "de": "fehlerbehebung gesendet",
+        "ru": "исправлять ошибки",
+        "pt": "corrigir o erro sentinela",
+        "nl": "bug repareren wacht",
+        "fr": "correction du bug sentinelle",
+        "it": "bug fix sendry",
+        "es": "bug fix centry",
+        "pl": "bug fix sentry",
+        "uk": "виправлення помилок",
+        "zh-cn": "错误修正哨兵"
+      },
       "1.2.16": {
         "en": "new testing\nchanges requested by adapter checker",
         "de": "neue tests\nänderungen, die von adapter checker angefordert werden",
@@ -80,19 +93,6 @@
         "pl": "(René) aktualizacja zależności",
         "uk": "(René) оновлення залежностей",
         "zh-cn": "(René) 属地更新"
-      },
-      "1.2.10": {
-        "en": "dependencies updated",
-        "de": "Abhängigkeiten aktualisiert",
-        "ru": "зависимости обновлены",
-        "pt": "dependências atualizadas",
-        "nl": "afhankelijkheden bijgewerkt",
-        "fr": "dépendances mises à jour",
-        "it": "dipendenze aggiornate",
-        "es": "dependencias actualizadas",
-        "pl": "zaktualizowano zależności",
-        "zh-cn": "已更新依赖项",
-        "uk": "залежності оновлено"
       }
     },
     "titleLang": {
