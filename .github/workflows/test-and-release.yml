@@ -73,6 +73,11 @@ jobs:
       id-token: write
 
     steps:
+        # avoid:  error: Could not find the SHA of the previous release in the git history. If you limit the clone depth, try to increase it. Otherwise, it means that the commit we are looking for was amended or squashed and cannot be retrieved. Use --ignore-missing flag to skip it and create a new release with the default commits count.
+      - uses: actions/checkout@v4
+        with:
+            fetch-depth: 0
+
       - uses: ioBroker/testing-action-deploy@v1
         with:
           node-version: '22.x'
