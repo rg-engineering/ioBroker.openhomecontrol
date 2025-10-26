@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "openhomecontrol",
-    "version": "1.2.18",
+    "version": "1.2.19",
     "news": {
+      "1.2.19": {
+        "en": "bug fix sentry",
+        "de": "fehlerbehebung gesendet",
+        "ru": "исправлять ошибки",
+        "pt": "corrigir o erro sentinela",
+        "nl": "bug repareren wacht",
+        "fr": "correction du bug sentinelle",
+        "it": "bug fix sendry",
+        "es": "bug fix centry",
+        "pl": "bug fix sentry",
+        "uk": "виправлення помилок",
+        "zh-cn": "错误修正哨兵"
+      },
       "1.2.18": {
         "en": "bug fix sentry",
         "de": "fehlerbehebung gesendet",
@@ -80,19 +93,6 @@
         "pl": "(René) bugfix: clearInterval zamiast clear Czas",
         "uk": "(René) Виправлення помилок: clearInterval замість чіткого Тимур",
         "zh-cn": "(René) 错误修复: 清除Interval 而不是清除 点火"
-      },
-      "1.2.12": {
-        "en": "(René) change of dependencies",
-        "de": "(René) Veränderung der Abhängigkeiten",
-        "ru": "(René) изменение зависимостей",
-        "pt": "(René) mudança de dependências",
-        "nl": "(René) verandering van afhankelijkheden",
-        "fr": "(René) changement de dépendances",
-        "it": "(René) cambiamento delle dipendenze",
-        "es": "(René) cambio de dependencia",
-        "pl": "(René) zmiana zależności",
-        "uk": "(Рене) зміна залежностей",
-        "zh-cn": "(René) 属地变化"
       }
     },
     "titleLang": {
