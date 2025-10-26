@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "openhomecontrol",
-    "version": "1.2.19",
+    "version": "1.2.20",
     "news": {
+      "1.2.20": {
+        "en": "bug fix sentry",
+        "de": "fehlerbehebung gesendet",
+        "ru": "исправлять ошибки",
+        "pt": "corrigir o erro sentinela",
+        "nl": "bug repareren wacht",
+        "fr": "correction du bug sentinelle",
+        "it": "bug fix sendry",
+        "es": "bug fix centry",
+        "pl": "bug fix sentry",
+        "uk": "виправлення помилок",
+        "zh-cn": "错误修正哨兵"
+      },
       "1.2.19": {
         "en": "bug fix sentry",
         "de": "fehlerbehebung gesendet",
@@ -80,19 +93,6 @@
         "pl": "aktualizacji zależności",
         "uk": "оновлення залежності",
         "zh-cn": "更新依赖关系"
-      },
-      "1.2.13": {
-        "en": "(René) bugfix: clearInterval instead of clearTimout",
-        "de": "(René) bugfix: clearInterval statt klar Timing",
-        "ru": "(René) ошибка: clearInterval вместо чистого Timout",
-        "pt": "(René) bugfix: clearInterval em vez de clear Timout",
-        "nl": "(René) bugfix: clearInterval in plaats van clear Timout",
-        "fr": "(René) bugfix: clearInterval au lieu de clear Timout",
-        "it": "(René) bugfix: clearInterval invece di chiaro Timout",
-        "es": "(René) bugfix: clearInterval en lugar de claro Timout",
-        "pl": "(René) bugfix: clearInterval zamiast clear Czas",
-        "uk": "(René) Виправлення помилок: clearInterval замість чіткого Тимур",
-        "zh-cn": "(René) 错误修复: 清除Interval 而不是清除 点火"
       }
     },
     "titleLang": {
