@@ -109,8 +109,7 @@ With broadcast function adapter sends date and time information to every device.
   Placeholder for the next version (at the beginning of the line):
   ### **WORK IN PROGRESS**
 -->
-
-### **WORK IN PROGRESS**
+### 1.2.21 (2026-03-17)
 * (René) update dependencies and changes requested by adapter checker
 
 ### 1.2.20 (2025-10-26)

@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "openhomecontrol",
-    "version": "1.2.20",
+    "version": "1.2.21",
     "news": {
+      "1.2.21": {
+        "en": "update dependencies and changes requested by adapter checker",
+        "de": "aktualisierung von abhängigkeiten und änderungen, die vom adapter-checker angefordert werden",
+        "ru": "зависимости от обновлений и изменения, запрошенные adapter checker",
+        "pt": "atualizar dependências e alterações solicitadas pelo verificador de adaptadores",
+        "nl": "update afhankelijkheden en wijzigingen gevraagd door adaptercontrole",
+        "fr": "mettre à jour les dépendances et les modifications demandées par l'adaptateur checker",
+        "it": "aggiornamento dipendenze e modifiche richieste da adattatore checker",
+        "es": "actualizar las dependencias y los cambios solicitados por el control de adaptador",
+        "pl": "aktualizacji zależności i zmian wymaganych przez sprawdzacz adaptera",
+        "uk": "оновлення залежностей та змін, які вимагаються перевіркою адаптера",
+        "zh-cn": "适配器检查器请求的更新依赖性和更改"
+      },
       "1.2.20": {
         "en": "bug fix sentry",
         "de": "fehlerbehebung gesendet",
@@ -80,19 +93,6 @@
         "pl": "aktualizacji zależności\nzmiany wymagane przez sprawdzacz adaptera",
         "uk": "оновлення залежності\nзміни, які вимагаються перевіркою адаптера",
         "zh-cn": "更新依赖关系\n适配器检查器要求的更改"
-      },
-      "1.2.14": {
-        "en": "update dependencies",
-        "de": "aktualisierung der abhängigkeiten",
-        "ru": "обновление зависимостей",
-        "pt": "dependências",
-        "nl": "afhankelijkheden bijwerken",
-        "fr": "mettre à jour les dépendances",
-        "it": "aggiornamento dipendenze",
-        "es": "dependencias de actualización",
-        "pl": "aktualizacji zależności",
-        "uk": "оновлення залежності",
-        "zh-cn": "更新依赖关系"
       }
     },
     "titleLang": {
